@@ -1,0 +1,22 @@
+{
+  "app": {
+    "title": "Desktop Platform",
+    "subtitle": "Gestión de dispositivos, adquisición Modbus y reportería",
+    "noBridge": "Bridge no disponible — abrí esta UI desde el shell de Electron, no desde un navegador."
+  },
+  "system": {
+    "title": "Sidecar de Python",
+    "ping": "Ping al sidecar",
+    "pinging": "Consultando…",
+    "answer": "Python {version} respondió desde el PID {pid}"
+  },
+  "devices": {
+    "title": "Vista en vivo (dispositivo demo)",
+    "start": "Iniciar vista en vivo",
+    "stop": "Detener vista en vivo",
+    "empty": "Sin lecturas todavía — iniciá la vista en vivo."
+  },
+  "language": {
+    "label": "Idioma"
+  }
+}

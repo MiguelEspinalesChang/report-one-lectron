@@ -1,0 +1,22 @@
+{
+  "app": {
+    "title": "Desktop Platform",
+    "subtitle": "Device management, Modbus acquisition and reporting",
+    "noBridge": "Bridge not available — open this UI through the Electron shell, not a plain browser."
+  },
+  "system": {
+    "title": "Python sidecar",
+    "ping": "Ping sidecar",
+    "pinging": "Pinging…",
+    "answer": "Python {version} answered from PID {pid}"
+  },
+  "devices": {
+    "title": "Live view (demo device)",
+    "start": "Start live view",
+    "stop": "Stop live view",
+    "empty": "No readings yet — start the live view."
+  },
+  "language": {
+    "label": "Language"
+  }
+}

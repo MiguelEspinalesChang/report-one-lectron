@@ -44,6 +44,11 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 - Reglas de propiedad no negociables (`docs/ARCHITECTURE.md` §11): los handlers de Electron son delegaciones de una línea, cero lógica de negocio; Vue solo invoca/escucha/pinta; core es una librería — sin HTTP, sin puertos abiertos; python es el único dueño de puertos seriales y único escritor de `telemetry.db`; core es el único escritor de `app.db`; los datos masivos nunca cruzan fronteras de proceso (solo resúmenes/eventos); zod valida las fronteras IPC, python valida los params RPC.
 - **Todavía no implementado**: la capa de base de datos (better-sqlite3 + drizzle para `app.db`) se difirió a propósito — el módulo nativo necesita rebuild contra el ABI de Electron. La adquisición Modbus real, importación CSV y reportes son paquetes placeholder con docstrings.
 
+## Convenciones del frontend
+
+- **Estilos**: Tailwind CSS v4 (plugin `@tailwindcss/vite`, sin tailwind.config — tokens en `@theme` dentro de `src/assets/main.css`). Jerarquía: utilidades Tailwind → clases compartidas `.island`/`.btn` (`@layer components`) → `<style module>` para lo específico del componente. Prohibido CSS global fuera de `main.css`.
+- **i18n**: vue-i18n (composition, `legacy: false`), locales EN/ES en `src/i18n/locales/*.json`. Todo texto visible pasa por `t('...')` y se agrega en AMBOS archivos. La elección persiste en localStorage (`setLocale` en `src/i18n/index.ts`); default por `navigator.language`.
+
 ## Gotchas del entorno
 
 - pnpm 11 lee las aprobaciones de build scripts desde `pnpm-workspace.yaml` (`allowBuilds:`); ignora `pnpm.onlyBuiltDependencies` en package.json.
