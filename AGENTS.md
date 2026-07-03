@@ -18,6 +18,7 @@ Tooling del proyecto para desarrollo asistido por IA. Fuente de verdad de la arq
 | `add-rpc-method` | new RPC method, sidecar command, push event, nuevo metodo RPC | Cablea un comando/evento a través de shared-types → core → electron → python, con tests |
 | `add-island` | new island, new view, nueva isla, nueva vista | Crea una isla Vue contenedor/presentacional conectada a `window.platform`, con reglas de ciclo de vida |
 | `verify-stack` | verify app, probar la app, correr la app | Build + tests + lint + smoke run en vivo de los tres procesos |
+| `commit-flow` | commit, hacer commit, subir cambios | Flujo de commits: verificación de rama, build, agrupación por workspace, conventional + gitmoji |
 
 Patrón transversal: **arquitectura hexagonal** — guía normativa en `docs/HEXAGONAL.md` (regla de dependencia, estructura por capa, testing con fakes de puertos).
 
