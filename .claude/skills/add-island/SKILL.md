@@ -1,31 +1,31 @@
 ---
 name: add-island
-description: "Trigger: new island, new view, new screen, nueva isla, nueva vista. Create a Vue island wired to the platform bridge, UI-only."
+description: "Trigger: new island, new view, new screen, nueva isla, nueva vista, nueva pantalla. Crea una isla Vue conectada al platform bridge, solo UI."
 license: Apache-2.0
 metadata:
   author: MiguelEspinalesChang
   version: "1.0"
 ---
 
-## Activation Contract
+## Contrato de activación
 
-Use when creating or extending a UI view in `apps/frontend`. Islands render and react — they never decide.
+Usar al crear o extender una vista de UI en `apps/frontend`. Las islas pintan y reaccionan — nunca deciden.
 
-## Hard Rules
+## Reglas duras
 
-- Islands live in `apps/frontend/src/islands/<Area>/<Name>.vue`, PascalCase, multi-word component names.
-- UI only: no aggregation, no CSV validation, no device logic. If tempted to "process a little" in the frontend, that code belongs to `packages/core` or python.
-- Backend access ONLY through `window.platform` (typed by `PlatformApi` from `@platform/shared-types`). Never import electron or node modules.
-- Every push subscription stores its unsubscribe function and calls it in `onUnmounted`. Device views must `unwatch` on leave — never leave an orphan live poll on a serial bus.
-- State shared across islands goes in a Pinia store (`src/stores/`) subscribed once to push events; components read the store.
+- Las islas viven en `apps/frontend/src/islands/<Area>/<Nombre>.vue`, PascalCase, nombres de componente de más de una palabra.
+- Solo UI: sin agregaciones, sin validación de CSV, sin lógica de dispositivos. Si aparece la tentación de "procesar tantito" en el frontend, ese código pertenece a `packages/core` o a python.
+- Acceso al backend SOLO a través de `window.platform` (tipado por `PlatformApi` de `@platform/shared-types`). Nunca importar módulos de electron ni de node.
+- Toda suscripción push guarda su función de desuscripción y la llama en `onUnmounted`. Las vistas de dispositivo deben hacer `unwatch` al salir — nunca dejar un polling live huérfano en un bus serial.
+- El estado compartido entre islas va en un store de Pinia (`src/stores/`) suscrito una sola vez a los eventos push; los componentes leen el store.
 
-## Execution Steps
+## Pasos
 
-1. If the data needed is not in `PlatformApi`, STOP and run the `add-rpc-method` skill first.
-2. Create the `.vue` with `<script setup lang="ts">`; import payload types from `@platform/shared-types` (type-only imports).
-3. Wire it into `App.vue` (or the router once it exists).
+1. Si el dato que necesitás no está en `PlatformApi`, FRENÁ y ejecutá primero el skill `add-rpc-method`.
+2. Creá el `.vue` con `<script setup lang="ts">`; importá los tipos del payload desde `@platform/shared-types` (imports solo de tipos).
+3. Conectala en `App.vue` (o en el router cuando exista).
 4. Typecheck: `pnpm --filter @platform/frontend build`.
 
-## Output Contract
+## Contrato de salida
 
-Island file path, store changes (if any), and passing frontend build.
+Ruta del archivo de la isla, cambios en stores (si hubo) y build del frontend pasando.

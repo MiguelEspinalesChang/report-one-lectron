@@ -2,63 +2,63 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project
+## Proyecto
 
-Offline-first desktop platform for Modbus device management, data acquisition and reporting. The normative architecture document is `docs/ARCHITECTURE.md` (Spanish) — when in doubt, it wins.
+Plataforma de escritorio offline-first para gestión de dispositivos Modbus, adquisición de datos y reportería. El documento normativo de arquitectura es `docs/ARCHITECTURE.md` — ante cualquier duda, ese documento manda.
 
-## Commands
-
-```bash
-pnpm install            # all JS/TS workspaces (pnpm 11 + Turborepo)
-pnpm setup:python       # creates apps/python-service/.venv (Python 3.11+, pytest, ruff) — required for tests
-pnpm dev                # full stack: Vite (HMR) + Electron + Python sidecar spawned by Electron
-pnpm build              # typechecks + vite build + esbuild bundles for electron main/preload
-pnpm lint               # eslint (TS/Vue) + ruff (python, via scripts/lint-python.sh)
-pnpm test               # vitest + pytest (via scripts/test-python.sh)
-```
-
-Scoped runs:
+## Comandos
 
 ```bash
-pnpm --filter @platform/core test                     # integration test: spawns the REAL python sidecar
-pnpm --filter @platform/core exec vitest run -t "ping" # single vitest test by name
-pnpm --filter @platform/frontend build                # typecheck the UI only
-cd apps/python-service && .venv/bin/pytest -q          # python tests
-cd apps/python-service && .venv/bin/ruff check .       # python lint
+pnpm install            # todos los workspaces JS/TS (pnpm 11 + Turborepo)
+pnpm setup:python       # crea apps/python-service/.venv (Python 3.11+, pytest, ruff) — requerido para los tests
+pnpm dev                # stack completo: Vite (HMR) + Electron + sidecar Python (lo spawnea Electron)
+pnpm build              # typechecks + build de vite + bundles esbuild para main/preload de electron
+pnpm lint               # eslint (TS/Vue) + ruff (python, vía scripts/lint-python.sh)
+pnpm test               # vitest + pytest (vía scripts/test-python.sh)
 ```
 
-## Architecture (big picture)
+Ejecuciones puntuales:
 
-Three processes, strict ownership, contracts in one place:
+```bash
+pnpm --filter @platform/core test                      # test de integración: levanta el sidecar Python REAL
+pnpm --filter @platform/core exec vitest run -t "ping" # un solo test de vitest por nombre
+pnpm --filter @platform/frontend build                 # typecheck solo de la UI
+cd apps/python-service && .venv/bin/pytest -q          # tests de python
+cd apps/python-service && .venv/bin/ruff check .       # lint de python
+```
+
+## Arquitectura (visión general)
+
+Tres procesos, propiedad estricta, contratos en un solo lugar:
 
 ```
-Vue renderer ──ipcRenderer.invoke──▶ Electron main ──direct call──▶ packages/core ──JSON-RPC 2.0 stdio──▶ Python sidecar
-     ▲                                    │                              ▲                                     │
-     └────── webContents.send ◀───────────┴── bridge 'notification' ◀────┴────── self.notify(...) ◀───────────┘
+Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada directa──▶ packages/core ──JSON-RPC 2.0 stdio──▶ sidecar Python
+     ▲                                    │                                  ▲                                     │
+     └────── webContents.send ◀───────────┴── evento 'notification' ◀────────┴────── self.notify(...) ◀───────────┘
 ```
 
-- **`packages/shared-types`** is the single source of truth for every cross-boundary contract (`RpcMethods`, `IpcChannels`, DTOs, `PlatformApi`). Python mirrors the method-name strings **manually**: the `_handlers()` dict in `apps/python-service/rpc/server.py` must match `RpcMethods` values. Changing one side without the other breaks silently.
-- Adding any RPC method or push event touches ~5 files across 3 processes — follow `.claude/skills/add-rpc-method/SKILL.md`.
-- **Process vs protocol split**: `apps/electron/main/python-manager.ts` owns the sidecar process (spawn, restart on crash, shutdown); `packages/core/src/python-bridge/client.ts` owns the JSON-RPC protocol and gets attached to the child's stdio. Push events flow: python `notify` → bridge `'notification'` event → `main/events.ts` maps method→channel → `webContents.send` → preload subscription.
-- **Python interpreter resolution** (`resolvePythonBin` in core): `PYTHON_BIN` env → `apps/python-service/.venv` → system `python3`. System python here is 3.9; the venv (3.12) is required.
-- Non-negotiable ownership rules (`docs/ARCHITECTURE.md` §11): Electron handlers are one-line delegations, zero business logic; Vue only invokes/listens/renders; core is a library — no HTTP, no open ports; python is the only serial-port owner and only `telemetry.db` writer; core is the only `app.db` writer; massive data never crosses process boundaries (only summaries/events); zod validates IPC boundaries, python validates RPC params.
-- **Not implemented yet**: the DB layer (better-sqlite3 + drizzle for `app.db`) was deliberately deferred — the native module needs a rebuild against Electron's ABI. Real Modbus acquisition, CSV imports and reports are placeholder packages with docstrings.
+- **`packages/shared-types`** es la única fuente de verdad de todo contrato entre fronteras (`RpcMethods`, `IpcChannels`, DTOs, `PlatformApi`). Python replica los strings de nombres de método **manualmente**: el dict `_handlers()` en `apps/python-service/rpc/server.py` debe coincidir con los valores de `RpcMethods`. Cambiar un lado sin el otro rompe en silencio.
+- Agregar cualquier método RPC o evento push toca ~5 archivos en 3 procesos — seguir `.claude/skills/add-rpc-method/SKILL.md`.
+- **Separación proceso vs protocolo**: `apps/electron/main/python-manager.ts` es dueño del proceso sidecar (spawn, reinicio ante crash, apagado); `packages/core/src/python-bridge/client.ts` es dueño del protocolo JSON-RPC y se conecta al stdio del hijo. Los eventos push fluyen: `notify` de python → evento `'notification'` del bridge → `main/events.ts` mapea método→canal → `webContents.send` → suscripción en el preload.
+- **Resolución del intérprete Python** (`resolvePythonBin` en core): variable `PYTHON_BIN` → `apps/python-service/.venv` → `python3` del sistema. El python del sistema acá es 3.9; el venv (3.12) es obligatorio.
+- Reglas de propiedad no negociables (`docs/ARCHITECTURE.md` §11): los handlers de Electron son delegaciones de una línea, cero lógica de negocio; Vue solo invoca/escucha/pinta; core es una librería — sin HTTP, sin puertos abiertos; python es el único dueño de puertos seriales y único escritor de `telemetry.db`; core es el único escritor de `app.db`; los datos masivos nunca cruzan fronteras de proceso (solo resúmenes/eventos); zod valida las fronteras IPC, python valida los params RPC.
+- **Todavía no implementado**: la capa de base de datos (better-sqlite3 + drizzle para `app.db`) se difirió a propósito — el módulo nativo necesita rebuild contra el ABI de Electron. La adquisición Modbus real, importación CSV y reportes son paquetes placeholder con docstrings.
 
-## Environment gotchas
+## Gotchas del entorno
 
-- pnpm 11 reads build-script approvals from `pnpm-workspace.yaml` (`allowBuilds:`); it ignores `pnpm.onlyBuiltDependencies` in package.json.
-- Turbo requires the `packageManager` field in the root package.json.
-- Vite is pinned to `host: 127.0.0.1` (`apps/frontend/vite.config.ts`) because it bound IPv6-only on this machine and `wait-on tcp:127.0.0.1:5173` hung forever. Electron loads `http://127.0.0.1:5173` in dev. Do not "clean up" the pin.
-- `apps/python-service/pyproject.toml` needs `[tool.setuptools.packages.find] include=[...]` — setuptools rejects the flat layout otherwise.
-- In the sidecar, stdout is reserved for JSON-RPC; log to stderr only.
+- pnpm 11 lee las aprobaciones de build scripts desde `pnpm-workspace.yaml` (`allowBuilds:`); ignora `pnpm.onlyBuiltDependencies` en package.json.
+- Turbo requiere el campo `packageManager` en el package.json raíz.
+- Vite está fijado a `host: 127.0.0.1` (`apps/frontend/vite.config.ts`) porque en esta máquina se enganchaba solo a IPv6 y `wait-on tcp:127.0.0.1:5173` esperaba para siempre. Electron carga `http://127.0.0.1:5173` en dev. NO "limpiar" ese pin.
+- `apps/python-service/pyproject.toml` necesita `[tool.setuptools.packages.find] include=[...]` — setuptools rechaza el layout plano sin eso.
+- En el sidecar, stdout está reservado para JSON-RPC; loguear solo a stderr.
 
 ## Git
 
-- Flow: `main`, `develop`, `feature/*`, `release/*`, `hotfix/*`. Never commit directly to `main` or `develop`.
-- Conventional commits, no AI attribution.
-- Remote uses the SSH host alias `github.com-personal` (personal key). Keep it when re-adding remotes.
+- Flujo: `main`, `develop`, `feature/*`, `release/*`, `hotfix/*`. Nunca commitear directo a `main` ni `develop`.
+- Conventional commits, sin atribución de IA.
+- El remote usa el alias SSH `github.com-personal` (llave personal). Mantenerlo al re-agregar remotes.
 
-## AI tooling
+## Tooling de IA
 
-- Agents (`.claude/agents/`): `arch-guard` (adversarial boundary review before commits/PRs, read-only), `modbus-sidecar` (python data-core implementation).
-- Skills (`.claude/skills/`): `add-rpc-method`, `add-island`, `verify-stack`. Registry in `AGENTS.md`.
+- Agentes (`.claude/agents/`): `arch-guard` (revisión adversarial de fronteras antes de commits/PRs, solo lectura), `modbus-sidecar` (implementación del núcleo de datos Python).
+- Skills (`.claude/skills/`): `add-rpc-method`, `add-island`, `verify-stack`. Registro en `AGENTS.md`.

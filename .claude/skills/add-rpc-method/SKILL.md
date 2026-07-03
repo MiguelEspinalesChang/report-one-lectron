@@ -1,39 +1,39 @@
 ---
 name: add-rpc-method
-description: "Trigger: new RPC method, sidecar command, IPC channel, push event, nuevo metodo RPC. Wire a command or event across shared-types, core, electron and python."
+description: "Trigger: new RPC method, sidecar command, IPC channel, push event, nuevo metodo RPC, nuevo evento. Cablea un comando o evento a través de shared-types, core, electron y python."
 license: Apache-2.0
 metadata:
   author: MiguelEspinalesChang
   version: "1.0"
 ---
 
-## Activation Contract
+## Contrato de activación
 
-Use when adding any command (renderer → python) or push event (python → renderer). Never add a method in a single layer — the chain always crosses processes.
+Usar al agregar cualquier comando (renderer → python) o evento push (python → renderer). Nunca agregar un método en una sola capa — la cadena siempre cruza procesos.
 
-## Hard Rules
+## Reglas duras
 
-- `packages/shared-types/src/index.ts` is the single source of truth. Add the `RpcMethods` entry (and `IpcChannels` + `PlatformApi` if the renderer is involved) plus DTOs FIRST.
-- Python mirrors method name strings manually: keep the `_handlers()` dict keys in `apps/python-service/rpc/server.py` in sync with `RpcMethods` values.
-- Validate at every boundary: zod in core services, explicit param checks in python (`ValueError` → INVALID_PARAMS).
-- Electron handlers stay one-line delegations to core. Zero logic in `handlers.ts` or `preload/bridge.ts`.
-- Massive data never crosses stdio/IPC — only summaries, states and job progress.
+- `packages/shared-types/src/index.ts` es la única fuente de verdad. Agregá PRIMERO la entrada en `RpcMethods` (y en `IpcChannels` + `PlatformApi` si el renderer participa) más los DTOs.
+- Python replica los strings de nombres de método manualmente: mantené las claves del dict `_handlers()` en `apps/python-service/rpc/server.py` sincronizadas con los valores de `RpcMethods`.
+- Validá en cada frontera: zod en los servicios de core, checks explícitos de params en python (`ValueError` → INVALID_PARAMS).
+- Los handlers de Electron son delegaciones de una línea a core. Cero lógica en `handlers.ts` o `preload/bridge.ts`.
+- Los datos masivos nunca cruzan stdio/IPC — solo resúmenes, estados y progreso de jobs.
 
-## Execution Steps — command (request/response)
+## Pasos — comando (request/response)
 
-1. shared-types: `RpcMethods` entry + params/result DTOs; if UI-facing, also `IpcChannels` + `PlatformApi` method.
-2. core: method on the owning service calling `this.bridge.request(...)` with zod-parsed params.
-3. electron: `ipcMain.handle` one-liner in `main/handlers.ts`; expose in `preload/bridge.ts`.
-4. python: async handler registered in `_handlers()` in `rpc/server.py`.
-5. Tests: dispatch case in `apps/python-service/tests/` + integration case in `packages/core/src/python-bridge/client.spec.ts`.
+1. shared-types: entrada en `RpcMethods` + DTOs de params/resultado; si llega a la UI, también `IpcChannels` + método en `PlatformApi`.
+2. core: método en el servicio dueño que llama `this.bridge.request(...)` con params parseados por zod.
+3. electron: one-liner `ipcMain.handle` en `main/handlers.ts`; exponer en `preload/bridge.ts`.
+4. python: handler async registrado en `_handlers()` de `rpc/server.py`.
+5. Tests: caso de dispatch en `apps/python-service/tests/` + caso de integración en `packages/core/src/python-bridge/client.spec.ts`.
 
-## Execution Steps — push event (python → UI)
+## Pasos — evento push (python → UI)
 
-1. shared-types: notification name in `RpcMethods`, channel in `IpcChannels`, payload DTO, `PlatformApi.onX` subscription.
-2. python: emit with `self.notify(method, params)`.
-3. electron: add the method→channel mapping in `main/events.ts` `channelByMethod`; add `onX` in preload (must return an unsubscribe function).
-4. UI: consume from a Pinia store subscribed once, not per-component listeners.
+1. shared-types: nombre de la notificación en `RpcMethods`, canal en `IpcChannels`, DTO del payload y suscripción `PlatformApi.onX`.
+2. python: emitir con `self.notify(method, params)`.
+3. electron: agregar el mapeo método→canal en `channelByMethod` de `main/events.ts`; agregar `onX` en el preload (debe devolver una función de desuscripción).
+4. UI: consumir desde un store de Pinia suscrito una sola vez, no listeners por componente.
 
-## Output Contract
+## Contrato de salida
 
-List every layer touched. `pnpm build` and `pnpm test` must pass before done.
+Listar cada capa tocada. `pnpm build` y `pnpm test` deben pasar antes de dar por terminado.

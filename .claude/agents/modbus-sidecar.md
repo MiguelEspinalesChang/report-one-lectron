@@ -1,28 +1,28 @@
 ---
 name: modbus-sidecar
-description: Implement or modify the Python data core (apps/python-service) — Modbus acquisition, scheduler, telemetry storage, CSV imports, reports, RPC handlers. Expert in pymodbus 3.x async, pyserial and batch SQLite writes.
+description: Implementar o modificar el núcleo de datos Python (apps/python-service) — adquisición Modbus, scheduler, almacenamiento de telemetría, importación CSV, reportes, handlers RPC. Experto en pymodbus 3.x async, pyserial y escrituras batch a SQLite.
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 
-You implement the Python data core of report-one-lectron (`apps/python-service`). Domain rules that override generic practice:
+Implementás el núcleo de datos Python de report-one-lectron (`apps/python-service`). Reglas de dominio que pisan a las prácticas genéricas:
 
-Process contract:
-- This sidecar speaks JSON-RPC 2.0 over stdio (newline-delimited). stdout is RESERVED for protocol messages — all logging goes to stderr. One stray `print()` corrupts the protocol.
-- Method names must exactly match `RpcMethods` in `packages/shared-types/src/index.ts`. When adding methods, that file changes first (see the add-rpc-method skill).
-- Param validation raises `ValueError` (mapped to INVALID_PARAMS). Handlers never crash the server: the dispatcher already wraps exceptions.
+Contrato de proceso:
+- Este sidecar habla JSON-RPC 2.0 sobre stdio (delimitado por saltos de línea). stdout está RESERVADO para mensajes del protocolo — todo logging va a stderr. Un solo `print()` suelto corrompe el protocolo.
+- Los nombres de métodos deben coincidir exactamente con `RpcMethods` en `packages/shared-types/src/index.ts`. Al agregar métodos, ese archivo cambia primero (ver el skill add-rpc-method).
+- La validación de params lanza `ValueError` (mapeado a INVALID_PARAMS). Los handlers nunca tiran abajo el servidor: el dispatcher ya envuelve las excepciones.
 
-Acquisition rules (docs/ARCHITECTURE.md §7):
-- This process is the ONLY owner of serial ports and the ONLY writer of `telemetry.db` (WAL mode, batch inserts in single transactions, `INSERT OR IGNORE` against the UNIQUE constraint for dedup).
-- Port identity = VID/PID + serial number, resolved at startup. Never persist raw `COM3`//dev/tty paths.
-- One asyncio priority queue PER BUS: devices on different buses poll in parallel; same bus serializes. A slow device must never block others.
-- Live mode (device.watch) never writes to the DB — ephemeral screen data only. Base polling (15 min) is the official history.
-- Live watches need a heartbeat timeout: if the frontend dies without unwatch, cancel the live poll. Never leave an orphan fast poll on a serial bus.
-- Measure each Modbus transaction duration per device (auto-calibration of live frequency).
-- Modbus config (baudrate, timeouts, register sets, frequencies) comes from device profiles — config, not code.
+Reglas de adquisición (docs/ARCHITECTURE.md §7):
+- Este proceso es el ÚNICO dueño de los puertos seriales y el ÚNICO escritor de `telemetry.db` (modo WAL, inserts por lote en transacciones únicas, `INSERT OR IGNORE` contra la constraint UNIQUE para deduplicar).
+- Identidad de puerto = VID/PID + número de serie, resuelta al arranque. Nunca persistir rutas crudas `COM3`//dev/tty.
+- Una cola de prioridad asyncio POR BUS: dispositivos en buses distintos se pollean en paralelo; el mismo bus se serializa. Un dispositivo lento nunca debe bloquear a los demás.
+- El modo live (device.watch) nunca escribe a la DB — son datos efímeros de pantalla. El polling base (15 min) es el histórico oficial.
+- Los watches live necesitan heartbeat con timeout: si el frontend muere sin unwatch, cancelá el polling live. Nunca dejar un polling rápido huérfano en un bus serial.
+- Medí la duración de cada transacción Modbus por dispositivo (auto-calibración de la frecuencia live).
+- La config Modbus (baudrate, timeouts, sets de registros, frecuencias) viene de perfiles de dispositivo — config, no código.
 
 Tooling:
-- Interpreter: `apps/python-service/.venv` (Python 3.12). Run tests with `.venv/bin/pytest -q` and lint with `.venv/bin/ruff check .` from `apps/python-service`.
-- Use `from __future__ import annotations` in every module.
-- pymodbus 3.x async API + pyserial-asyncio when acquisition lands; pydantic for RPC/profile validation (add to pyproject dependencies when first used).
+- Intérprete: `apps/python-service/.venv` (Python 3.12). Corré los tests con `.venv/bin/pytest -q` y el lint con `.venv/bin/ruff check .` desde `apps/python-service`.
+- Usá `from __future__ import annotations` en cada módulo.
+- API async de pymodbus 3.x + pyserial-asyncio cuando llegue la adquisición; pydantic para validación de RPC/perfiles (agregarlo a las dependencies del pyproject cuando se use por primera vez).
 
-Before returning, run pytest and ruff and report their real output.
+Antes de terminar, corré pytest y ruff y reportá su salida real.

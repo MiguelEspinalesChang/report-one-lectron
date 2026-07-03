@@ -1,24 +1,24 @@
-# AI Agents & Skills Registry
+# Registro de Agentes y Skills de IA
 
-Project-scoped tooling for AI-assisted development. Architecture source of truth: `docs/ARCHITECTURE.md`. Operating guide: `CLAUDE.md`.
+Tooling del proyecto para desarrollo asistido por IA. Fuente de verdad de la arquitectura: `docs/ARCHITECTURE.md`. Guía operativa: `CLAUDE.md`.
 
-## Agents (`.claude/agents/`)
+## Agentes (`.claude/agents/`)
 
-| Agent | Purpose | When to use |
+| Agente | Propósito | Cuándo usarlo |
 |---|---|---|
-| `arch-guard` | Adversarial review of diffs against the architecture rules (§11). Read-only. | Before every commit/PR that touches more than one file or any process boundary |
-| `modbus-sidecar` | Python data-core implementation (acquisition, scheduler, storage, imports, reports, RPC). | Any work inside `apps/python-service` |
+| `arch-guard` | Revisión adversarial de diffs contra las reglas de arquitectura (§11). Solo lectura. | Antes de cada commit/PR que toque más de un archivo o cualquier frontera de proceso |
+| `modbus-sidecar` | Implementación del núcleo de datos Python (adquisición, scheduler, storage, imports, reportes, RPC). | Cualquier trabajo dentro de `apps/python-service` |
 
 ## Skills (`.claude/skills/`)
 
-| Skill | Trigger | What it does |
+| Skill | Trigger | Qué hace |
 |---|---|---|
-| `add-rpc-method` | new RPC method, sidecar command, push event, IPC channel | Wires a command/event across shared-types → core → electron → python, with tests |
-| `add-island` | new island, new view, new screen | Creates a UI-only Vue island wired to `window.platform`, with lifecycle rules |
-| `verify-stack` | verify app, run app, smoke test | Build + tests + lint + live smoke run of the three processes |
+| `add-rpc-method` | new RPC method, sidecar command, push event, nuevo metodo RPC | Cablea un comando/evento a través de shared-types → core → electron → python, con tests |
+| `add-island` | new island, new view, nueva isla, nueva vista | Crea una isla Vue solo-UI conectada a `window.platform`, con reglas de ciclo de vida |
+| `verify-stack` | verify app, probar la app, correr la app | Build + tests + lint + smoke run en vivo de los tres procesos |
 
-## Conventions for new skills/agents
+## Convenciones para nuevos skills/agentes
 
-- Skills: one directory per skill with `SKILL.md`; frontmatter requires `name`, one-line `description` starting with `Trigger:`, `license`, `metadata.author`, `metadata.version`. Imperative instructions, 180–450 tokens target.
-- Agents: markdown with `name`, `description`, `tools` frontmatter; system prompt states domain rules that override generic practice.
-- Register every addition in this file.
+- Skills: un directorio por skill con `SKILL.md`; el frontmatter requiere `name`, `description` de una línea que empiece con `Trigger:`, `license`, `metadata.author` y `metadata.version`. Instrucciones imperativas, objetivo 180–450 tokens.
+- Agentes: markdown con frontmatter `name`, `description`, `tools`; el system prompt declara las reglas de dominio que pisan a las prácticas genéricas.
+- Registrar cada agregado en este archivo.
