@@ -60,6 +60,13 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 - Los hooks se instalan con `pnpm install` (script `prepare`). Si un commit falla, leer el error del hook — no usar `--no-verify` salvo emergencia explícita del usuario.
 - El remote usa el alias SSH `github.com-personal` (llave personal). Mantenerlo al re-agregar remotes.
 
+### Higiene de ramas
+
+- GitHub debe tener activado **"Automatically delete head branches"** (Settings → General): al mergear un PR, la rama remota se borra sola. En el remote solo viven `main`, `develop` y las ramas con trabajo activo.
+- El repo tiene `fetch.prune = true` (config local): cada fetch/pull limpia las referencias remotas muertas.
+- `pnpm branches:clean` (`scripts/git-clean-branches.sh`): borra las ramas locales cuyo upstream ya no existe (PRs mergeados). Nunca toca `main` ni `develop`. Correrlo después de mergear PRs.
+- Las ramas remotas nunca se borran a mano salvo abandono explícito de un feature — el borrado normal lo hace GitHub al mergear.
+
 ## Reglas de TypeScript
 
 El preset `packages/tsconfig/base.json` (heredado por TODOS los paquetes) exige además de `strict`: `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `noUncheckedIndexedAccess` (todo acceso por índice devuelve `T | undefined` — chequear antes de usar) y `verbatimModuleSyntax` (los imports solo-de-tipos DEBEN usar `import type` / `{ type X }`). ESLint suma: `consistent-type-imports` (inline), `no-unused-vars` con prefijo `_` permitido, `no-console` (solo `warn`/`error`) y `eqeqeq`.

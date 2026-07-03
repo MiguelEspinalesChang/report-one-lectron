@@ -12,6 +12,7 @@
     "installer": "turbo run installer",
     "update": "pnpm update -r",
     "setup:python": "bash scripts/setup-python.sh",
+    "branches:clean": "bash scripts/git-clean-branches.sh",
     "prepare": "husky"
   },
   "lint-staged": {
