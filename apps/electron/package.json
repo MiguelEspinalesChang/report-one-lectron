@@ -1,0 +1,24 @@
+{
+  "name": "@platform/electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/main/index.cjs",
+  "scripts": {
+    "dev": "node esbuild.config.mjs && wait-on tcp:127.0.0.1:5173 && electron .",
+    "build": "tsc --noEmit && node esbuild.config.mjs",
+    "installer": "echo 'installer packaging not configured yet (electron-builder + PyInstaller)'",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@platform/core": "workspace:*",
+    "@platform/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@platform/tsconfig": "workspace:*",
+    "@types/node": "^22.10.0",
+    "electron": "^34.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "wait-on": "^8.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "report-one-lectron",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.1.2",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "eslint . && bash scripts/lint-python.sh",
+    "test": "turbo run test && bash scripts/test-python.sh",
+    "clean": "turbo run clean",
+    "installer": "turbo run installer",
+    "update": "pnpm update -r",
+    "setup:python": "bash scripts/setup-python.sh"
+  },
+  "devDependencies": {
+    "@platform/eslint-config": "workspace:*",
+    "eslint": "^9.17.0",
+    "turbo": "^2.3.0"
+  }
+}

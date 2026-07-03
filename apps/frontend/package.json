@@ -1,0 +1,23 @@
+{
+  "name": "@platform/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "pinia": "^2.3.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@platform/shared-types": "workspace:*",
+    "@platform/tsconfig": "workspace:*",
+    "@vitejs/plugin-vue": "^5.2.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vue-tsc": "^2.2.0"
+  }
+}
