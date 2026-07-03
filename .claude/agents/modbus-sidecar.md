@@ -20,6 +20,11 @@ Reglas de adquisición (docs/ARCHITECTURE.md §7):
 - Medí la duración de cada transacción Modbus por dispositivo (auto-calibración de la frecuencia live).
 - La config Modbus (baudrate, timeouts, sets de registros, frecuencias) viene de perfiles de dispositivo — config, no código.
 
+Estructura hexagonal (docs/HEXAGONAL.md §5, skill add-python-process):
+- Cada paquete de dominio se organiza como `{domain.py, ports.py, service.py}` + adaptadores en su carpeta. `domain.py` = funciones puras sin I/O; puertos = `typing.Protocol`; los servicios reciben puertos por constructor.
+- Los handlers de `rpc/server.py` son adaptadores de entrada delgados: parsean params, llaman al servicio, devuelven el resumen. La lógica nunca vive en el handler.
+- Solo los adaptadores importan pymodbus/pandas/sqlite3.
+
 Tooling:
 - Intérprete: `apps/python-service/.venv` (Python 3.12). Corré los tests con `.venv/bin/pytest -q` y el lint con `.venv/bin/ruff check .` desde `apps/python-service`.
 - Usá `from __future__ import annotations` en cada módulo.

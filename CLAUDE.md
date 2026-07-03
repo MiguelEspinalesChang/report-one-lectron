@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Proyecto
 
-Plataforma de escritorio offline-first para gestión de dispositivos Modbus, adquisición de datos y reportería. El documento normativo de arquitectura es `docs/ARCHITECTURE.md` — ante cualquier duda, ese documento manda.
+Plataforma de escritorio offline-first para gestión de dispositivos Modbus, adquisición de datos y reportería. Documentos normativos: `docs/ARCHITECTURE.md` (qué hace cada proceso) y `docs/HEXAGONAL.md` (cómo se organiza el código dentro de cada proceso: dominio/puertos/adaptadores). Ante cualquier duda, esos documentos mandan.
 
 ## Comandos
 
@@ -60,5 +60,5 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 
 ## Tooling de IA
 
-- Agentes (`.claude/agents/`): `arch-guard` (revisión adversarial de fronteras antes de commits/PRs, solo lectura), `modbus-sidecar` (implementación del núcleo de datos Python).
-- Skills (`.claude/skills/`): `add-rpc-method`, `add-island`, `verify-stack`. Registro en `AGENTS.md`.
+- Agentes (`.claude/agents/`): `arch-guard` (revisión adversarial de fronteras + regla hexagonal antes de commits/PRs, solo lectura), `modbus-sidecar` (implementación del núcleo de datos Python).
+- Skills (`.claude/skills/`): `add-feature`, `add-python-process`, `add-rpc-method`, `add-island`, `verify-stack`. Registro en `AGENTS.md`.

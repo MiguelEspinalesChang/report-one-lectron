@@ -18,6 +18,7 @@ Usar al crear o extender una vista de UI en `apps/frontend`. Las islas pintan y 
 - Acceso al backend SOLO a través de `window.platform` (tipado por `PlatformApi` de `@platform/shared-types`). Nunca importar módulos de electron ni de node.
 - Toda suscripción push guarda su función de desuscripción y la llama en `onUnmounted`. Las vistas de dispositivo deben hacer `unwatch` al salir — nunca dejar un polling live huérfano en un bus serial.
 - El estado compartido entre islas va en un store de Pinia (`src/stores/`) suscrito una sola vez a los eventos push; los componentes leen el store.
+- Patrón contenedor/presentacional (`docs/HEXAGONAL.md` §4): la isla es el CONTENEDOR (habla con `window.platform` y stores); el markup reutilizable va en componentes PRESENTACIONALES (solo `props` + `emits`, sin acceso a `window.platform` ni stores) que se mueven a `packages/ui-components` cuando se reutilizan.
 
 ## Pasos
 

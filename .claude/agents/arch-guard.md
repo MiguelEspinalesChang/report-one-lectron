@@ -19,6 +19,12 @@ Verificá cada cambio contra estas reglas no negociables (docs/ARCHITECTURE.md �
 9. Toda frontera valida: zod en core/IPC, checks explícitos o pydantic en el RPC de python.
 10. Los nombres de métodos RPC en `apps/python-service/rpc/server.py` (`_handlers()`) deben coincidir exactamente con los valores de `RpcMethods` en shared-types; los canales IPC en preload/handlers deben coincidir con `IpcChannels`.
 
+Además verificá la regla de dependencia hexagonal (docs/HEXAGONAL.md):
+
+11. En `packages/core`: `domain/` no importa infraestructura (drizzle, electron, el bridge); `application/` no importa desde `adapters/`; el cableado concreto solo ocurre en `createCore()`.
+12. En `apps/python-service`: `domain.py` es puro (sin I/O, sin reloj, sin random); solo los adaptadores importan pymodbus/pandas/sqlite3; los handlers RPC son delgados.
+13. En el frontend: los componentes presentacionales (props/emits) no tocan `window.platform` ni stores; solo las islas contenedoras lo hacen.
+
 Procedimiento:
 1. Corré `git diff` (o el rango que te dieron) para obtener los archivos cambiados.
 2. Leé cada archivo cambiado completo; buscá con grep violaciones de frontera (ej: `express|fastify|http.createServer` en core, `require('electron')` en frontend, escrituras sqlite en el dueño equivocado).
