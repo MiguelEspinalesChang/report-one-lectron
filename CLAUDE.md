@@ -64,7 +64,8 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 
 - GitHub debe tener activado **"Automatically delete head branches"** (Settings → General): al mergear un PR, la rama remota se borra sola. En el remote solo viven `main`, `develop` y las ramas con trabajo activo.
 - El repo tiene `fetch.prune = true` (config local): cada fetch/pull limpia las referencias remotas muertas.
-- `pnpm branches:clean` (`scripts/git-clean-branches.sh`): borra las ramas locales cuyo upstream ya no existe (PRs mergeados). Nunca toca `main` ni `develop`. Correrlo después de mergear PRs.
+- `pnpm branches:clean` (`scripts/git-clean-branches.sh`): borra las ramas locales cuyo upstream ya no existe (PRs mergeados). Nunca toca `main` ni `develop`. Corre SOLA vía el hook `post-merge` (cada `git pull` con merge); también se puede invocar a mano.
+- Política acordada: la limpieza ocurre ÚNICAMENTE vía merge de PR — NUNCA por antigüedad. Un feature puede vivir semanas sin mergearse y sigue siendo trabajo activo. No agregar actions de "stale branches" por timer.
 - Las ramas remotas nunca se borran a mano salvo abandono explícito de un feature — el borrado normal lo hace GitHub al mergear.
 
 ## Reglas de TypeScript
