@@ -1,65 +1,36 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from './components/LanguageSwitcher.vue'
 import SystemStatus from './islands/Dashboard/SystemStatus.vue'
 import DeviceLive from './islands/Devices/DeviceLive.vue'
 
+const { t } = useI18n()
 const hasBridge = 'platform' in window
 </script>
 
 <template>
-  <main class="app">
-    <h1>Desktop Platform</h1>
-    <p v-if="!hasBridge" class="warning">
-      Bridge not available — open this UI through the Electron shell, not a plain browser.
-    </p>
-    <template v-else>
-      <SystemStatus />
-      <DeviceLive />
-    </template>
-  </main>
+  <div class="min-h-screen">
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
+        <div>
+          <h1 class="text-lg font-semibold text-slate-900">{{ t('app.title') }}</h1>
+          <p class="text-xs text-slate-500">{{ t('app.subtitle') }}</p>
+        </div>
+        <LanguageSwitcher />
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-3xl space-y-4 px-4 py-6">
+      <p
+        v-if="!hasBridge"
+        class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+      >
+        {{ t('app.noBridge') }}
+      </p>
+      <template v-else>
+        <SystemStatus />
+        <DeviceLive />
+      </template>
+    </main>
+  </div>
 </template>
-
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f5f6f8;
-  color: #1c1e21;
-}
-
-.app {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.island {
-  background: #fff;
-  border: 1px solid #e0e2e6;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.warning {
-  color: #92400e;
-  background: #fef3c7;
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-}
-
-.error {
-  color: #b91c1c;
-}
-
-button {
-  cursor: pointer;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid #cbd0d6;
-  border-radius: 6px;
-  background: #fff;
-}
-
-button:hover {
-  background: #f0f1f3;
-}
-</style>
