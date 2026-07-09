@@ -1,4 +1,16 @@
-import type { DeviceReading, DeviceStatus, PlatformApi } from '@platform/shared-types'
+import type {
+  AssignRoleDto,
+  BrandDto,
+  ChangePasswordDto,
+  CreateUserDto,
+  DeviceDto,
+  DeviceReading,
+  DeviceStatus,
+  LoginDto,
+  MeterModelDto,
+  PlatformApi,
+  RegisterMap,
+} from '@platform/shared-types'
 import { IpcChannels } from '@platform/shared-types'
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
@@ -17,6 +29,42 @@ const api: PlatformApi = {
     unwatch: (deviceId) => ipcRenderer.invoke(IpcChannels.DeviceUnwatch, deviceId),
     onReading: (callback) => subscribe<DeviceReading>(IpcChannels.DeviceReading, callback),
     onStatus: (callback) => subscribe<DeviceStatus>(IpcChannels.DeviceStatus, callback),
+  },
+  auth: {
+    login: (dto: LoginDto) => ipcRenderer.invoke(IpcChannels.AuthLogin, dto),
+    logout: () => ipcRenderer.invoke(IpcChannels.AuthLogout),
+    getSession: () => ipcRenderer.invoke(IpcChannels.AuthGetSession),
+    changePassword: (dto: ChangePasswordDto) => ipcRenderer.invoke(IpcChannels.AuthChangePassword, dto),
+  },
+  users: {
+    create: (dto: CreateUserDto) => ipcRenderer.invoke(IpcChannels.UsersCreate, dto),
+    list: () => ipcRenderer.invoke(IpcChannels.UsersList),
+    assignRole: (dto: AssignRoleDto) => ipcRenderer.invoke(IpcChannels.UsersAssignRole, dto),
+  },
+  catalog: {
+    brands: {
+      create: (dto: Pick<BrandDto, 'name'>) => ipcRenderer.invoke(IpcChannels.CatalogBrandsCreate, dto),
+      list: () => ipcRenderer.invoke(IpcChannels.CatalogBrandsList),
+      rename: (dto: { id: number; name: string }) => ipcRenderer.invoke(IpcChannels.CatalogBrandsRename, dto),
+      delete: (dto: { id: number }) => ipcRenderer.invoke(IpcChannels.CatalogBrandsDelete, dto),
+    },
+    models: {
+      create: (dto: Omit<MeterModelDto, 'id'>) => ipcRenderer.invoke(IpcChannels.CatalogModelsCreate, dto),
+      list: () => ipcRenderer.invoke(IpcChannels.CatalogModelsList),
+      listByBrand: (brandId: number) => ipcRenderer.invoke(IpcChannels.CatalogModelsListByBrand, { brandId }),
+      updateMap: (dto: { id: number; registerMap: RegisterMap }) =>
+        ipcRenderer.invoke(IpcChannels.CatalogModelsUpdateMap, dto),
+      delete: (dto: { id: number }) => ipcRenderer.invoke(IpcChannels.CatalogModelsDelete, dto),
+    },
+    devices: {
+      create: (dto: Omit<DeviceDto, 'id' | 'createdAt' | 'updatedAt'>) =>
+        ipcRenderer.invoke(IpcChannels.CatalogDevicesCreate, dto),
+      list: () => ipcRenderer.invoke(IpcChannels.CatalogDevicesList),
+      update: (dto: Partial<Omit<DeviceDto, 'createdAt' | 'updatedAt'>> & { id: number }) =>
+        ipcRenderer.invoke(IpcChannels.CatalogDevicesUpdate, dto),
+      enable: (dto: { id: number; enabled: boolean }) => ipcRenderer.invoke(IpcChannels.CatalogDevicesEnable, dto),
+      delete: (dto: { id: number }) => ipcRenderer.invoke(IpcChannels.CatalogDevicesDelete, dto),
+    },
   },
 }
 

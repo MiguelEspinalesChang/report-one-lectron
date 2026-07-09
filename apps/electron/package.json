@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@platform/core": "workspace:*",
-    "@platform/shared-types": "workspace:*"
+    "@platform/shared-types": "workspace:*",
+    "argon2": "^0.44.0",
+    "better-sqlite3": "^11.10.0"
   },
   "devDependencies": {
     "@platform/tsconfig": "workspace:*",

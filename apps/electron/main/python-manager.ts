@@ -10,12 +10,24 @@ const MAX_RESTARTS = 5
  * Owns the python sidecar process: spawn, supervise, restart on crash,
  * clean shutdown. The RPC protocol itself lives in packages/core.
  */
+export interface PythonManagerOptions {
+  /**
+   * Absolute path to telemetry.db, injected into the sidecar via the
+   * TELEMETRY_DB_PATH env var. Python is the sole writer of this file
+   * (ARCHITECTURE.md §11); the sidecar reads this env var to locate it.
+   */
+  telemetryDbPath: string
+}
+
 export class PythonManager {
   private child: ChildProcessWithoutNullStreams | null = null
   private restarts = 0
   private stopping = false
 
-  constructor(private readonly bridge: PythonBridge) {}
+  constructor(
+    private readonly bridge: PythonBridge,
+    private readonly options: PythonManagerOptions,
+  ) {}
 
   private get serviceDir(): string {
     return app.isPackaged
@@ -26,7 +38,12 @@ export class PythonManager {
   async start(): Promise<void> {
     if (this.child) return
     const serviceDir = this.serviceDir
-    const child = spawn(resolvePythonBin(serviceDir), ['main.py'], { cwd: serviceDir })
+    const child = spawn(resolvePythonBin(serviceDir), ['main.py'], {
+      cwd: serviceDir,
+      // The sidecar reads TELEMETRY_DB_PATH from its environment to locate
+      // telemetry.db. Without this, acquisition.simulatedPoll fails.
+      env: { ...process.env, TELEMETRY_DB_PATH: this.options.telemetryDbPath },
+    })
     this.child = child
 
     child.stderr.on('data', (chunk: Buffer) => {
