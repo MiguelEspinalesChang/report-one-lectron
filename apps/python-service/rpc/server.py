@@ -18,6 +18,11 @@ import random
 import sys
 import time
 
+from acquisition.adapters.simulated_reader import SimulatedReader
+from acquisition.profiles.register_map import RegisterMap
+from storage.adapters.sqlite_writer import SqliteTelemetryWriter
+from storage.migrations import apply_migrations
+
 PARSE_ERROR = -32700
 METHOD_NOT_FOUND = -32601
 INVALID_PARAMS = -32602
@@ -86,6 +91,7 @@ class RpcServer:
             "system.shutdown": self._shutdown,
             "device.watch": self._watch,
             "device.unwatch": self._unwatch,
+            "acquisition.simulatedPoll": self._simulated_poll,
         }
 
     async def _ping(self, _params: dict) -> dict:
@@ -128,6 +134,61 @@ class RpcServer:
                 },
             )
             await asyncio.sleep(LIVE_INTERVAL_SECONDS)
+
+    async def _simulated_poll(self, params: dict) -> dict:
+        """Run a simulated Modbus poll and persist results to telemetry.db.
+
+        params:
+            deviceId  (int, required) — positive integer device identifier.
+            registerMap (dict, required) — validated RegisterMap payload.
+            ticks (int, optional, 1–1000, default 10) — number of poll cycles.
+
+        Returns a summary dict with inserted/ignored/ticks/metrics counts.
+        """
+        # ── validate deviceId ──────────────────────────────────────────────────
+        device_id = _require_device_id(params)
+
+        # ── validate ticks ─────────────────────────────────────────────────────
+        raw_ticks = params.get("ticks", 10)
+        if not isinstance(raw_ticks, int) or isinstance(raw_ticks, bool):
+            raise ValueError("ticks must be an integer")
+        if raw_ticks < 1 or raw_ticks > 1000:
+            raise ValueError("ticks must be between 1 and 1000")
+        ticks: int = raw_ticks
+
+        # ── validate registerMap ───────────────────────────────────────────────
+        raw_map = params.get("registerMap")
+        if not isinstance(raw_map, dict):
+            raise ValueError("registerMap must be an object")
+        try:
+            register_map = RegisterMap.model_validate(raw_map)
+        except Exception as exc:
+            raise ValueError(f"invalid registerMap: {exc}") from exc
+
+        # ── resolve DB path ────────────────────────────────────────────────────
+        db_path = os.environ.get("TELEMETRY_DB_PATH")
+        if not db_path:
+            raise ValueError("TELEMETRY_DB_PATH env var not set")
+
+        # ── migrate + write ────────────────────────────────────────────────────
+        apply_migrations(db_path)
+        writer = SqliteTelemetryWriter(db_path)
+        reader = SimulatedReader()
+
+        all_readings = []
+        base_ts_origin = int(time.time() * 1000)
+        for tick in range(1, ticks + 1):
+            base_ts = base_ts_origin + (tick - 1) * 1000
+            batch = reader.read(device_id, register_map, tick, base_ts)
+            all_readings.extend(batch)
+
+        result = writer.write_batch(all_readings)
+        return {
+            "inserted": result.inserted,
+            "ignored": result.ignored,
+            "ticks": ticks,
+            "metrics": len(register_map.registers),
+        }
 
     def notify(self, method: str, params: dict) -> None:
         self._send({"jsonrpc": "2.0", "method": method, "params": params})
