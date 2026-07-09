@@ -1,7 +1,8 @@
 # Progreso: Modelado de base de datos
 
-> Rama: `feature/db-architecture` — **todo el trabajo está sin commitear** (orden explícita: no commitear hasta terminar todas las tareas).
-> Plan de referencia: `docs/features/db-architecture.md`
+> Rama: `feature/db-architecture` — trabajo commiteado en 7 commits agrupados por feature (`abf4c3d..e34e74c`).
+> Plan de referencia: `docs/features/db-architecture-done.md`
+> Lo pendiente de Fase 4 ahora se trackea en `docs/features/vue-backend-integration.md` §5.
 > Última actualización: 2026-07-09
 
 ## Tareas realizadas
@@ -60,6 +61,8 @@ Falta:
 - Con todas las fases terminadas y aprobadas por arch-guard: flujo `commit-flow` (verificación de rama, build + tests, commits agrupados por área con conventional commits + gitmoji). Pendiente definir idioma de los mensajes.
 
 ## Decisiones tomadas en el camino
+
+- Transporte `csv` (2026-07-09): existe el caso de uso de medidores cuya data llega SOLO por CSV, sin conexión viva. Se agregó `'csv'` al contrato de transporte (zod en shared-types, `Transport` type, validadores de dominio en core) con `connection: {}`. Sin migración SQL (la columna es TEXT sin CHECK). El union de transporte se consolidó en un único `TransportSchema`/`Transport` en shared-types (antes estaba copiado en 7 lugares). Pendiente para la fase del importador: mapping columna CSV → métrica canónica y (opcional) tabla de auditoría de imports. El scheduler futuro debe saltear dispositivos `csv`.
 
 - Matriz de roles por defecto (ajustable): `admin` = todo; `operator` = devices.manage/view, telemetry.view, reports.generate/view; `viewer` = solo lectura (devices.view, telemetry.view, reports.view).
 - `InactiveUserError` se lanza solo DESPUÉS de verificar la contraseña (no revela estado de cuenta a quien no tiene credenciales).

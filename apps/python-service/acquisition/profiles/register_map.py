@@ -1,4 +1,4 @@
-"""Pydantic mirror of the register map JSON contract (docs/features/db-architecture.md §3.4).
+"""Pydantic mirror of the register map JSON contract (docs/features/db-architecture-done.md §3.4).
 
 This model validates a register map the moment it arrives over RPC — before
 any polling or storage work starts. Invalid maps raise ValidationError, which

@@ -102,7 +102,7 @@ CREATE TABLE devices (
   id                 INTEGER PRIMARY KEY,
   model_id           INTEGER NOT NULL REFERENCES meter_models(id),
   name               TEXT    NOT NULL UNIQUE,   -- nombre visible ('Medidor planta 1')
-  transport          TEXT    NOT NULL,          -- 'serial' | 'tcp' | 'simulated'
+  transport          TEXT    NOT NULL,          -- 'serial' | 'tcp' | 'simulated' | 'csv'
   connection         TEXT    NOT NULL,          -- JSON según transporte (ver abajo)
   slave_id           INTEGER NOT NULL DEFAULT 1,
   polling_interval_s INTEGER NOT NULL DEFAULT 900,
@@ -117,6 +117,7 @@ CREATE TABLE devices (
 - `serial`: `{ "vid": "...", "pid": "...", "serialNumber": "...", "baudrate": 9600, "parity": "N", "timeoutMs": 2000 }` — VID/PID + serie, nunca `COM3` a secas (ARCHITECTURE.md §7).
 - `tcp`: `{ "host": "...", "port": 502, "timeoutMs": 2000 }`
 - `simulated`: `{}` (o parámetros del generador: ruido, deriva).
+- `csv`: `{}` — el medidor no tiene conexión viva; sus lecturas llegan por importación de archivos (`readings.source = 'csv_import'`). El scheduler NUNCA pollea este transporte. El mapa de registros del modelo sigue siendo obligatorio: declara las métricas canónicas que el importador CSV mapea desde las columnas del archivo.
 
 ### 3.4 Contrato del mapa de registros (JSON)
 
