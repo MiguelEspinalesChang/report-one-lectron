@@ -42,7 +42,7 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 - **Separación proceso vs protocolo**: `apps/electron/main/python-manager.ts` es dueño del proceso sidecar (spawn, reinicio ante crash, apagado); `packages/core/src/python-bridge/client.ts` es dueño del protocolo JSON-RPC y se conecta al stdio del hijo. Los eventos push fluyen: `notify` de python → evento `'notification'` del bridge → `main/events.ts` mapea método→canal → `webContents.send` → suscripción en el preload.
 - **Resolución del intérprete Python** (`resolvePythonBin` en core): variable `PYTHON_BIN` → `apps/python-service/.venv` → `python3` del sistema. El python del sistema acá es 3.9; el venv (3.12) es obligatorio.
 - Reglas de propiedad no negociables (`docs/ARCHITECTURE.md` §11): los handlers de Electron son delegaciones de una línea, cero lógica de negocio; Vue solo invoca/escucha/pinta; core es una librería — sin HTTP, sin puertos abiertos; python es el único dueño de puertos seriales y único escritor de `telemetry.db`; core es el único escritor de `app.db`; los datos masivos nunca cruzan fronteras de proceso (solo resúmenes/eventos); zod valida las fronteras IPC, python valida los params RPC.
-- **Todavía no implementado**: la capa de base de datos (better-sqlite3 + drizzle para `app.db`) se difirió a propósito — el módulo nativo necesita rebuild contra el ABI de Electron. La adquisición Modbus real, importación CSV y reportes son paquetes placeholder con docstrings.
+- **Todavía no implementado**: tablas de dominio de `app.db` (usuarios, roles, permisos, dispositivos) — se agregan en Fase 1 y 2. La adquisición Modbus real, importación CSV y reportes son paquetes placeholder con docstrings.
 
 ## Convenciones del frontend
 
@@ -56,6 +56,16 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 - Vite está fijado a `host: 127.0.0.1` (`apps/frontend/vite.config.ts`) porque en esta máquina se enganchaba solo a IPv6 y `wait-on tcp:127.0.0.1:5173` esperaba para siempre. Electron carga `http://127.0.0.1:5173` en dev. NO "limpiar" ese pin.
 - `apps/python-service/pyproject.toml` necesita `[tool.setuptools.packages.find] include=[...]` — setuptools rechaza el layout plano sin eso.
 - En el sidecar, stdout está reservado para JSON-RPC; loguear solo a stderr.
+- **ABI de better-sqlite3 (dos builds, dos usos):** el módulo nativo tiene que estar compilado contra el ABI correcto según quién lo carga. Electron 34 usa `MODULE_VERSION 132`; Node 22 usa `MODULE_VERSION 127`. Son incompatibles.
+  - `pnpm rebuild:electron` → compila para Electron (requerido para `pnpm dev` y el build de distribución).
+  - `pnpm rebuild:node` → restaura el build de Node (requerido para `pnpm test` / vitest).
+  - `pnpm install` por sí solo NO restaura el build de Node si el binario ya existe — el script `rebuild:node` lo elimina y corre `prebuild-install` directamente.
+  - Flujo típico de desarrollo: `pnpm install` (la primera vez, queda en Node-ABI) → `pnpm test` funciona. Si en algún momento corriste `pnpm rebuild:electron`, antes de volver a testear corré `pnpm rebuild:node`.
+  - Ambos scripts resuelven versiones y rutas dinámicamente: `rebuild:electron` deja que electron-rebuild detecte la versión de Electron instalada; `scripts/rebuild-node-sqlite.sh` resuelve better-sqlite3 y prebuild-install con `require.resolve` desde `packages/core`. Sobreviven bumps de versión sin tocar nada.
+- **argon2 NO necesita rebuild** (a diferencia de better-sqlite3): es N-API puro, el mismo prebuilt (`prebuilds/darwin-arm64`) carga bajo Node y bajo Electron sin recompilar. Sí necesita `argon2: true` en `allowBuilds` de `pnpm-workspace.yaml`.
+- **Módulos nativos y el bundle de Electron:** el main de Electron se bundlea con esbuild en formato CJS. Los módulos nativos (`better-sqlite3`, `argon2`) están en `external:` del `esbuild.config.mjs` Y declarados como dependencias de `apps/electron` (pnpm aisla node_modules — sin la dependencia directa, el `require` en runtime no resuelve). Nunca bundlear un módulo nativo: su loader resuelve el `.node` relativo a su propio `__dirname`.
+- **`import.meta` en código de core que llega al bundle CJS:** esbuild lo reescribe a `{}` (queda `undefined`). `packages/core/src/persistence/adapters/sqlite-database.ts` lo maneja (`import.meta.url ?? __filename`) y por eso la carpeta de migraciones se INYECTA desde Electron main (`migrationsFolder`) — el default relativo al fuente solo funciona bajo vitest/ESM.
+- **`COLLATE NOCASE` en `users.username`:** drizzle no lo puede expresar; vive solo en el SQL de la migración (parcheado a mano). Regenerar esa migración con drizzle-kit lo pierde en silencio — ver `database/README.md`.
 
 ## Git y hooks (husky)
 
