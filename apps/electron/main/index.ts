@@ -1,5 +1,5 @@
 import { createAppDatabase, createCore } from '@platform/core'
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import path from 'node:path'
 import { forwardCoreEvents } from './events'
 import { registerHandlers } from './handlers'
@@ -31,6 +31,13 @@ app.whenReady().then(async () => {
     python.stop()
     database.close()
   })
+}).catch((error: unknown) => {
+  // Without this, a startup failure leaves a dock icon with no window and
+  // the error buried in the terminal.
+  const message = error instanceof Error ? error.message : String(error)
+  console.error('[main] startup failed:', message)
+  dialog.showErrorBox('Startup failed', message)
+  app.exit(1)
 })
 
 app.on('window-all-closed', () => {
