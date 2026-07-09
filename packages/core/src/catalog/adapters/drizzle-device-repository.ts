@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import type { AppSchema } from '../../persistence/adapters/sqlite-database'
 import { devices } from '../../persistence/adapters/schema'
-import type { Device } from '../domain/entities'
+import type { Device, Transport } from '../domain/entities'
 import type { CreateDeviceInput, DeviceRepository, UpdateDeviceInput } from '../ports/repositories'
 
 type DeviceRow = typeof devices.$inferSelect
@@ -13,7 +13,7 @@ function toDevice(row: DeviceRow): Device {
     id: row.id,
     modelId: row.modelId,
     name: row.name,
-    transport: row.transport as 'serial' | 'tcp' | 'simulated',
+    transport: row.transport as Transport,
     connection: JSON.parse(row.connection) as Record<string, unknown>,
     slaveId: row.slaveId,
     pollingIntervalS: row.pollingIntervalS,

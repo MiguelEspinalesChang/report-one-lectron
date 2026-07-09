@@ -1,4 +1,4 @@
-import type { Device } from '../domain/entities'
+import type { Device, Transport } from '../domain/entities'
 import { DeviceNotFoundError } from '../domain/errors'
 import { validateConnection } from '../domain/validators'
 import type { CreateDeviceInput, DeviceRepository, UpdateDeviceInput } from '../ports/repositories'
@@ -8,7 +8,7 @@ export { DeviceNotFoundError, InvalidConnectionError, TransportMismatchError } f
 export interface CreateDeviceParams {
   modelId: number
   name: string
-  transport: 'serial' | 'tcp' | 'simulated'
+  transport: Transport
   connection: Record<string, unknown>
   slaveId: number
   pollingIntervalS: number
@@ -18,7 +18,7 @@ export interface CreateDeviceParams {
 export interface UpdateDeviceParams {
   modelId?: number
   name?: string
-  transport?: 'serial' | 'tcp' | 'simulated'
+  transport?: Transport
   connection?: Record<string, unknown>
   slaveId?: number
   pollingIntervalS?: number

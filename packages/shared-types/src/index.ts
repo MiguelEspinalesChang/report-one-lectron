@@ -4,7 +4,7 @@
  * - IPC channel names and payloads (Vue renderer <-> Electron main)
  * - DTOs shared by all layers
  */
-import type { RegisterMap } from './catalog-schemas'
+import type { RegisterMap, Transport } from './catalog-schemas'
 
 // ---------------------------------------------------------------------------
 // JSON-RPC 2.0 envelopes (core <-> python)
@@ -239,7 +239,7 @@ export interface DeviceDto {
   id: number
   modelId: number
   name: string
-  transport: 'serial' | 'tcp' | 'simulated'
+  transport: Transport
   connection: Record<string, unknown>
   slaveId: number
   pollingIntervalS: number
@@ -310,4 +310,4 @@ export {
   DeleteDeviceSchema,
   EnableDeviceSchema,
 } from './catalog-schemas'
-export type { RegisterEntry, RegisterMap } from './catalog-schemas'
+export type { RegisterEntry, RegisterMap, Transport } from './catalog-schemas'

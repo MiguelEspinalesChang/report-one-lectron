@@ -74,10 +74,16 @@ const SimulatedConnectionSchema = z.object({
   transport: z.literal('simulated'),
 }).passthrough()
 
+// csv: no live connection — readings arrive via file import (source='csv_import')
+const CsvConnectionSchema = z.object({
+  transport: z.literal('csv'),
+}).passthrough()
+
 const ConnectionSchema = z.discriminatedUnion('transport', [
   SerialConnectionSchema,
   TcpConnectionSchema,
   SimulatedConnectionSchema,
+  CsvConnectionSchema,
 ])
 
 /**

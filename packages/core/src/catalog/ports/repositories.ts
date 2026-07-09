@@ -1,4 +1,4 @@
-import type { Brand, Device, MeterModel, RegisterMap } from '../domain/entities'
+import type { Brand, Device, MeterModel, RegisterMap, Transport } from '../domain/entities'
 
 export interface CreateBrandInput {
   name: string
@@ -33,7 +33,7 @@ export interface MeterModelRepository {
 export interface CreateDeviceInput {
   modelId: number
   name: string
-  transport: 'serial' | 'tcp' | 'simulated'
+  transport: Transport
   connection: Record<string, unknown>
   slaveId: number
   pollingIntervalS: number
@@ -43,7 +43,7 @@ export interface CreateDeviceInput {
 export interface UpdateDeviceInput {
   modelId?: number
   name?: string
-  transport?: 'serial' | 'tcp' | 'simulated'
+  transport?: Transport
   connection?: Record<string, unknown>
   slaveId?: number
   pollingIntervalS?: number

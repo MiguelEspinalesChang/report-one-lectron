@@ -4,9 +4,9 @@
  * RegisterEntry and RegisterMap are type-only imports from @platform/shared-types.
  * A type import is a contract declaration, not a runtime dependency — HEXAGONAL.md §8.
  */
-import type { RegisterEntry, RegisterMap } from '@platform/shared-types'
+import type { RegisterEntry, RegisterMap, Transport } from '@platform/shared-types'
 
-export type { RegisterEntry, RegisterMap }
+export type { RegisterEntry, RegisterMap, Transport }
 
 export interface Brand {
   id: number
@@ -26,7 +26,7 @@ export interface Device {
   id: number
   modelId: number
   name: string
-  transport: 'serial' | 'tcp' | 'simulated'
+  transport: Transport
   /** Parsed connection parameters. */
   connection: Record<string, unknown>
   slaveId: number

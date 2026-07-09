@@ -24,6 +24,10 @@ export const RegisterMapSchema = z
     { message: 'Duplicate metric names in register map' },
   )
 
+// Transport — single source of truth for how a device's data arrives
+export const TransportSchema = z.enum(['serial', 'tcp', 'simulated', 'csv'])
+export type Transport = z.infer<typeof TransportSchema>
+
 // Connection discriminated union
 export const SerialConnectionSchema = z.object({
   vid: z.string(),
@@ -42,10 +46,14 @@ export const TcpConnectionSchema = z.object({
 
 export const SimulatedConnectionSchema = z.object({}).passthrough()
 
+// csv: no live connection — readings arrive via file import (source='csv_import')
+export const CsvConnectionSchema = z.object({}).passthrough()
+
 export const ConnectionSchema = z.discriminatedUnion('transport', [
   z.object({ transport: z.literal('serial') }).merge(SerialConnectionSchema),
   z.object({ transport: z.literal('tcp') }).merge(TcpConnectionSchema),
   z.object({ transport: z.literal('simulated') }).merge(SimulatedConnectionSchema),
+  z.object({ transport: z.literal('csv') }).merge(CsvConnectionSchema),
 ])
 
 // IPC input schemas (for Electron handler boundary validation)
@@ -85,7 +93,7 @@ export const DeleteMeterModelSchema = z.object({
 export const CreateDeviceSchema = z.object({
   modelId: z.number().int().positive(),
   name: z.string().min(1).max(128),
-  transport: z.enum(['serial', 'tcp', 'simulated']),
+  transport: TransportSchema,
   connection: z.record(z.unknown()),
   slaveId: z.number().int().min(0).max(247).default(1),
   pollingIntervalS: z.number().int().positive().default(900),

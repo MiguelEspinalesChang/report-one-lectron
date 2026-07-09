@@ -87,7 +87,7 @@ export const devices = sqliteTable('devices', {
     .notNull()
     .references(() => meterModels.id),
   name: text('name').notNull().unique(),
-  /** 'serial' | 'tcp' | 'simulated' */
+  /** 'serial' | 'tcp' | 'simulated' | 'csv' */
   transport: text('transport').notNull(),
   /** JSON: discriminated by transport */
   connection: text('connection').notNull(),

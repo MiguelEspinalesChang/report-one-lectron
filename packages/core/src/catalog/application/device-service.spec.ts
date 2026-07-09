@@ -81,6 +81,19 @@ describe('DeviceService', () => {
     expect(device.transport).toBe('simulated')
   })
 
+  it('creates a csv-only device (data arrives via file import, no live connection)', async () => {
+    const device = await service.create({
+      modelId: 1,
+      name: 'CSV meter',
+      transport: 'csv',
+      connection: {},
+      slaveId: 1,
+      pollingIntervalS: 900,
+      enabled: true,
+    })
+    expect(device.transport).toBe('csv')
+  })
+
   it('creates a tcp device with valid connection', async () => {
     const device = await service.create({
       modelId: 1,
