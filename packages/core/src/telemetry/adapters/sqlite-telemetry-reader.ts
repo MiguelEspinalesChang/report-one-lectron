@@ -5,7 +5,10 @@
  * It satisfies the TelemetryReader port via structural subtyping.
  *
  * Ownership rules (ARCHITECTURE.md §11):
- * - Python is the sole WRITER of telemetry.db.
+ * - Python is the sole WRITER of telemetry.db — it also CREATES the file on
+ *   its first write. Core may boot before that happens, so the connection is
+ *   opened lazily: a missing file (or a file whose migrations have not run
+ *   yet) yields an empty history instead of a startup crash.
  * - core opens it read-only (PRAGMA query_only = ON) — never writes.
  * - SQLite WAL allows concurrent readers; busy_timeout guards against
  *   rare checkpoint contention.
@@ -13,6 +16,7 @@
  * Note on CJS bundles: this adapter uses the same createRequire pattern
  * as the app.db adapter to keep import.meta.url safe under esbuild/CJS.
  */
+import { existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import type BetterSqlite3 from 'better-sqlite3'
 import type { TelemetryHistoryParams, TelemetryPoint } from '@platform/shared-types'
@@ -34,59 +38,84 @@ interface AggRow {
 }
 
 /**
- * Opens telemetry.db read-only and exposes an aggregated history query.
+ * Reads telemetry.db read-only and exposes an aggregated history query.
  * One instance per call site — the caller controls the lifetime.
  */
 export class SqliteTelemetryReader implements TelemetryReader {
-  private readonly connection: BetterSqlite3.Database
+  private connection: BetterSqlite3.Database | null = null
 
   constructor(
     /** Absolute path to telemetry.db (injected — never hardcoded). */
-    dbPath: string,
-    busyTimeoutMs = 5_000,
-  ) {
+    private readonly dbPath: string,
+    private readonly busyTimeoutMs = 5_000,
+  ) {}
+
+  /**
+   * Opens the connection on first use. Returns null while the file does not
+   * exist yet (python has not written its first batch).
+   */
+  private connect(): BetterSqlite3.Database | null {
+    if (this.connection !== null) return this.connection
+    if (!existsSync(this.dbPath)) return null
+
     // Open read-only: prevents any accidental write from core.
-    this.connection = new Database(dbPath, { readonly: true })
-    this.connection.pragma(`busy_timeout = ${busyTimeoutMs}`)
+    const connection = new Database(this.dbPath, { readonly: true })
+    connection.pragma(`busy_timeout = ${this.busyTimeoutMs}`)
     // WAL checkpoint reads can still race; query_only is an extra safety belt.
-    this.connection.pragma('query_only = ON')
+    connection.pragma('query_only = ON')
+    this.connection = connection
+    return connection
   }
 
   getHistory(params: TelemetryHistoryParams): TelemetryPoint[] {
+    const connection = this.connect()
+    if (connection === null) return []
+
     const { deviceId, metric, fromMs, toMs, bucketMs = 60_000 } = params
 
     /**
      * Bucket aggregation on raw `readings` table.
      *
-     * SQLite integer arithmetic: (timestamp / bucketMs) * bucketMs gives the
-     * start of each bucket (floor division, integer result).
+     * better-sqlite3 binds JS numbers as REAL, so a bare `timestamp / ?`
+     * performs FLOAT division and every reading lands in its own bucket.
+     * CAST both the quotient and the bucket size to INTEGER to get floor
+     * division: CAST(timestamp / ? AS INTEGER) * CAST(? AS INTEGER).
      *
      * We avoid reading from readings_1m / readings_1h because the downsampling
      * job is not yet implemented — all aggregation happens on-the-fly here.
      * The idx_readings_dev_ts index makes this efficient for normal ranges.
      */
-    const stmt = this.connection.prepare<[number, number, number, string, number, number], AggRow>(`
-      SELECT
-        (timestamp / ?) * ? AS bucket,
-        MIN(value)          AS min,
-        MAX(value)          AS max,
-        AVG(value)          AS avg,
-        COUNT(*)            AS count
-      FROM readings
-      WHERE device_id = ?
-        AND metric    = ?
-        AND timestamp >= ?
-        AND timestamp <= ?
-      GROUP BY bucket
-      ORDER BY bucket ASC
-    `)
-
-    const rows = stmt.all(bucketMs, bucketMs, deviceId, metric, fromMs, toMs)
-    return rows
+    try {
+      const stmt = connection.prepare<[number, number, number, string, number, number], AggRow>(`
+        SELECT
+          CAST(timestamp / ? AS INTEGER) * CAST(? AS INTEGER) AS bucket,
+          MIN(value)          AS min,
+          MAX(value)          AS max,
+          AVG(value)          AS avg,
+          COUNT(*)            AS count
+        FROM readings
+        WHERE device_id = ?
+          AND metric    = ?
+          AND timestamp >= ?
+          AND timestamp <= ?
+        GROUP BY bucket
+        ORDER BY bucket ASC
+      `)
+      return stmt.all(bucketMs, bucketMs, deviceId, metric, fromMs, toMs)
+    } catch (error) {
+      // The file can exist before python finished its migrations (e.g. an
+      // empty database created by a connection that never wrote). Treat a
+      // missing readings table as "no data yet", not a crash.
+      if (error instanceof Error && error.message.includes('no such table')) {
+        return []
+      }
+      throw error
+    }
   }
 
   /** Close the underlying connection. Call when done with this reader. */
   close(): void {
-    this.connection.close()
+    this.connection?.close()
+    this.connection = null
   }
 }

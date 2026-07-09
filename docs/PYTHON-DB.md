@@ -72,6 +72,7 @@ Core **no** le pide el histórico a Python: abre `telemetry.db` directamente en 
 
 - Puerto: `TelemetryReader` (`packages/core/src/telemetry/ports/telemetry-reader.ts`).
 - Adaptador: `SqliteTelemetryReader` (`packages/core/src/telemetry/adapters/sqlite-telemetry-reader.ts`) — `new Database(dbPath, { readonly: true })` + `PRAGMA query_only = ON`. Imposible escribir por accidente.
+- **Conexión perezosa**: el archivo lo crea Python en su primera escritura, y core puede arrancar antes de eso. El reader abre la conexión en el primer `getHistory`; si el archivo no existe (o aún no tiene la tabla `readings`), devuelve historial vacío en vez de reventar el arranque.
 - `getHistory({ deviceId, metric, fromMs, toMs, bucketMs })` agrega al vuelo sobre `readings` (min/max/avg/count por bucket), usando el índice `idx_readings_dev_ts`.
 - Las tablas `readings_1m`/`readings_1h` existen en el esquema pero todavía no se pueblan (el job de downsampling es trabajo futuro); por eso la agregación es on-the-fly.
 - Gracias a WAL, el lector ve siempre el último snapshot consistente aunque Python esté escribiendo en ese momento.
