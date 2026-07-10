@@ -70,6 +70,7 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 ## Git y hooks (husky)
 
 - Flujo: `main`, `develop`, `feature/*`, `release/*`, `hotfix/*`. Nunca commitear directo a `main` ni `develop` — el hook `pre-commit` lo BLOQUEA.
+- **NUNCA commitear sin preguntar primero.** Todo commit se propone al developer (qué archivos, qué mensaje) y se ejecuta solo con su confirmación explícita. Aplica también dentro de skills y sub-agentes.
 - `pre-commit` (`.husky/pre-commit`): guard de rama + `lint-staged` (eslint --fix sobre TS/Vue staged, ruff --fix sobre python staged vía `scripts/ruff-staged.sh`; ruff se salta con warning si falta el venv).
 - `commit-msg` (`.husky/commit-msg`): commitlint con `@commitlint/config-conventional` — el mensaje DEBE ser conventional commit (`feat:`, `fix:`, `docs:`, `chore:`...). Sin atribución de IA.
 - Los hooks se instalan con `pnpm install` (script `prepare`). Si un commit falla, leer el error del hook — no usar `--no-verify` salvo emergencia explícita del usuario.
