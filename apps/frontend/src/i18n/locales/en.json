@@ -18,5 +18,30 @@
   },
   "language": {
     "label": "Language"
+  },
+  "nav": {
+    "main": "Main navigation",
+    "dashboard": "Dashboard",
+    "catalog": "Catalog",
+    "users": "Users",
+    "login": "Login"
+  },
+  "common": {
+    "comingSoon": "Coming soon — not yet implemented.",
+    "dismiss": "Dismiss",
+    "loading": "Loading…",
+    "empty": "No items to display.",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred. Please try again.",
+    "invalidCredentials": "Invalid username or password.",
+    "inactiveUser": "This account is inactive. Contact an administrator.",
+    "brandInUse": "This brand has associated models and cannot be deleted.",
+    "meterModelInUse": "This model has associated devices and cannot be deleted.",
+    "deviceNotFound": "Device not found.",
+    "transportMismatch": "Connection settings do not match the selected transport.",
+    "invalidConnection": "Invalid connection configuration."
   }
 }

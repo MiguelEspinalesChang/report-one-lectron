@@ -2,23 +2,17 @@
 import type { PingResult } from '@platform/shared-types'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useApiCall } from '../../composables/useApiCall'
 
 const { t } = useI18n()
+const { loading: pending, call } = useApiCall()
 
 const result = ref<PingResult | null>(null)
-const error = ref<string | null>(null)
-const pending = ref(false)
 
 async function ping(): Promise<void> {
-  pending.value = true
-  error.value = null
-  try {
-    result.value = await window.platform.system.ping()
-  } catch (err) {
-    result.value = null
-    error.value = err instanceof Error ? err.message : String(err)
-  } finally {
-    pending.value = false
+  const res = await call(() => window.platform.system.ping())
+  if (res !== undefined) {
+    result.value = res
   }
 }
 </script>
@@ -32,6 +26,5 @@ async function ping(): Promise<void> {
     <p v-if="result" class="mt-3 text-sm text-emerald-700">
       {{ t('system.answer', { version: result.pythonVersion, pid: result.pid }) }}
     </p>
-    <p v-if="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
   </section>
 </template>

@@ -18,5 +18,30 @@
   },
   "language": {
     "label": "Idioma"
+  },
+  "nav": {
+    "main": "Navegación principal",
+    "dashboard": "Inicio",
+    "catalog": "Catálogo",
+    "users": "Usuarios",
+    "login": "Ingresar"
+  },
+  "common": {
+    "comingSoon": "Próximamente — todavía no implementado.",
+    "dismiss": "Descartar",
+    "loading": "Cargando…",
+    "empty": "No hay elementos para mostrar.",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "errors": {
+    "generic": "Ocurrió un error inesperado. Por favor intentá de nuevo.",
+    "invalidCredentials": "Usuario o contraseña incorrectos.",
+    "inactiveUser": "Esta cuenta está inactiva. Contactá a un administrador.",
+    "brandInUse": "Esta marca tiene modelos asociados y no puede eliminarse.",
+    "meterModelInUse": "Este modelo tiene dispositivos asociados y no puede eliminarse.",
+    "deviceNotFound": "Dispositivo no encontrado.",
+    "transportMismatch": "La configuración de conexión no coincide con el transporte seleccionado.",
+    "invalidConnection": "Configuración de conexión inválida."
   }
 }

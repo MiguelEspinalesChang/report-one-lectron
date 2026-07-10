@@ -11,13 +11,16 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",
     "pinia": "^2.3.0",
+    "preline": "^4.2.0",
     "tailwindcss": "^4.3.2",
     "vue": "^3.5.0",
-    "vue-i18n": "^11.4.6"
+    "vue-i18n": "^11.4.6",
+    "vue-router": "^5.1.0"
   },
   "devDependencies": {
     "@platform/shared-types": "workspace:*",
     "@platform/tsconfig": "workspace:*",
+    "@tailwindcss/forms": "^0.5.11",
     "@vitejs/plugin-vue": "^5.2.0",
     "typescript": "^5.7.0",
     "vite": "^6.0.0",

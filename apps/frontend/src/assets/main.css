@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* Preline variants: use direct path — ./variants.css is not in preline's exports map */
+@import "../../node_modules/preline/variants.css";
+/* Scan Preline JS bundles so Tailwind generates all variant/component classes. */
+/* Path is relative to this file (src/assets/) → apps/frontend/node_modules/preline/dist/ */
+@source "../../node_modules/preline/dist/*.js";
+@plugin "@tailwindcss/forms";
 
 /* Design tokens — keep the palette calm: slate neutrals + one accent. */
 @theme {
