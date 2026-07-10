@@ -21,10 +21,12 @@
   },
   "nav": {
     "main": "Main navigation",
+    "breadcrumbs": "Breadcrumbs",
     "dashboard": "Dashboard",
     "catalog": "Catalog",
     "users": "Users",
-    "login": "Login"
+    "login": "Login",
+    "openMenu": "Open menu"
   },
   "common": {
     "comingSoon": "Coming soon — not yet implemented.",
@@ -34,10 +36,38 @@
     "cancel": "Cancel",
     "confirm": "Confirm"
   },
+  "auth": {
+    "title": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "signOut": "Sign out",
+    "changePassword": "Change password",
+    "changing": "Changing…",
+    "passwordMin": "Password must be at least {min} characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "changed": "Password changed successfully.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "health": {
+    "up": "Sidecar OK",
+    "down": "Sidecar unavailable",
+    "checking": "Checking…"
+  },
   "errors": {
     "generic": "An unexpected error occurred. Please try again.",
     "invalidCredentials": "Invalid username or password.",
     "inactiveUser": "This account is inactive. Contact an administrator.",
+    "weakPassword": "The password does not meet the minimum requirements.",
+    "roleNotFound": "The selected role does not exist.",
+    "brandNotFound": "Brand not found.",
+    "meterModelNotFound": "Meter model not found.",
+    "invalidRegisterMap": "The register map is invalid.",
     "brandInUse": "This brand has associated models and cannot be deleted.",
     "meterModelInUse": "This model has associated devices and cannot be deleted.",
     "deviceNotFound": "Device not found.",

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 import type { PlatformApi } from '@platform/shared-types'
-import type { HSStaticMethods as _HSStaticMethods } from 'preline'
+import type { HSOverlay as _HSOverlay, HSStaticMethods as _HSStaticMethods } from 'preline'
 
 declare global {
   interface Window {
@@ -12,7 +12,19 @@ declare global {
      * (dynamic import after app.mount). May be undefined before the chunk resolves.
      */
     HSStaticMethods: typeof _HSStaticMethods
+    /**
+     * Preline overlay manager — used to close the off-canvas sidebar on navigation.
+     * May be undefined before the Preline chunk resolves.
+     */
+    HSOverlay: typeof _HSOverlay
   }
 }
 
 export {}
+
+import 'vue-router'
+declare module 'vue-router' {
+  interface RouteMeta {
+    breadcrumb?: string
+  }
+}

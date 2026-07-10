@@ -21,10 +21,12 @@
   },
   "nav": {
     "main": "Navegación principal",
+    "breadcrumbs": "Ruta de navegación",
     "dashboard": "Inicio",
     "catalog": "Catálogo",
     "users": "Usuarios",
-    "login": "Ingresar"
+    "login": "Ingresar",
+    "openMenu": "Abrir menú"
   },
   "common": {
     "comingSoon": "Próximamente — todavía no implementado.",
@@ -34,10 +36,38 @@
     "cancel": "Cancelar",
     "confirm": "Confirmar"
   },
+  "auth": {
+    "title": "Ingresar",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "signIn": "Ingresar",
+    "signingIn": "Ingresando…",
+    "signOut": "Cerrar sesión",
+    "changePassword": "Cambiar contraseña",
+    "changing": "Cambiando…",
+    "passwordMin": "La contraseña debe tener al menos {min} caracteres.",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "changed": "Contraseña cambiada correctamente.",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
+  },
+  "health": {
+    "up": "Sidecar OK",
+    "down": "Sidecar no disponible",
+    "checking": "Verificando…"
+  },
   "errors": {
     "generic": "Ocurrió un error inesperado. Por favor intentá de nuevo.",
     "invalidCredentials": "Usuario o contraseña incorrectos.",
     "inactiveUser": "Esta cuenta está inactiva. Contactá a un administrador.",
+    "weakPassword": "La contraseña no cumple los requisitos mínimos.",
+    "roleNotFound": "El rol seleccionado no existe.",
+    "brandNotFound": "Marca no encontrada.",
+    "meterModelNotFound": "Modelo no encontrado.",
+    "invalidRegisterMap": "El mapa de registros es inválido.",
     "brandInUse": "Esta marca tiene modelos asociados y no puede eliminarse.",
     "meterModelInUse": "Este modelo tiene dispositivos asociados y no puede eliminarse.",
     "deviceNotFound": "Dispositivo no encontrado.",

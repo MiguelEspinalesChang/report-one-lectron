@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useToast } from '../composables/useToast'
+import { useToastStore } from '../stores/toast'
 
 const { t } = useI18n()
-const { toasts, dismiss } = useToast()
+const { toasts, dismiss } = useToastStore()
 </script>
 
 <template>

@@ -293,8 +293,18 @@ export interface TelemetryHistoryParams {
   bucketMs?: number
 }
 
+// Re-export domain error names for use across layers
+export { DomainErrorNames } from './domain-errors'
+export type { DomainErrorName } from './domain-errors'
+
 // Re-export Zod schemas for use at IPC boundaries
-export { LoginSchema, ChangePasswordSchema, CreateUserSchema, AssignRoleSchema } from './auth-schemas'
+export {
+  LoginSchema,
+  ChangePasswordSchema,
+  CreateUserSchema,
+  AssignRoleSchema,
+  PASSWORD_MIN_LENGTH,
+} from './auth-schemas'
 export {
   RegisterMapSchema,
   ConnectionSchema,
