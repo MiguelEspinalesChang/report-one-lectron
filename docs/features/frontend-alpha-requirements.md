@@ -55,7 +55,9 @@ Regla de `docs/HEXAGONAL.md`: los stores solo invocan `window.platform`, escucha
 
 ### F3 — Shell de aplicación
 
-- Layout con navegación lateral o superior: Dashboard, Catálogo, Dispositivos, Usuarios; ítems visibles según permisos (§5).
+- **Layout tipo dashboard con sidebar lateral** (decisión 2026-07-10, referencia: template Admin Dashboard de Preline): sidebar fija a la izquierda con marca + navegación vertical (Dashboard, Catálogo, Dispositivos, Usuarios; ítems visibles según permisos §5), topbar con breadcrumbs + salud del sidecar + `LanguageSwitcher` + menú de usuario, y área de contenido. Las vistas de auth (login, change-password) NO usan el shell — layout centrado propio.
+- **Responsive**: por debajo de `lg` la sidebar colapsa a off-canvas con botón hamburguesa en la topbar (componente Sidebar/Offcanvas de Preline). El contenido nunca queda inaccesible en el tamaño mínimo de ventana.
+- **Tamaño mínimo de ventana Electron**: `minWidth: 1024`, `minHeight: 700` (default `1280×800`) en el `BrowserWindow` — el layout se valida contra ese mínimo.
 - Header con usuario actual (`displayName`, `roleName`), botón de logout y `LanguageSwitcher` (ya existe).
 - **Breadcrumbs** en toda vista interna: derivados de la jerarquía de rutas (`route.meta` + `route.matched`), renderizados con `AppBreadcrumb` (base Preline). El router es la única fuente de verdad — las vistas NO arman breadcrumbs a mano; declaran su etiqueta (clave i18n) en `meta.breadcrumb`.
 - Indicador de salud del sidecar (reutilizar `SystemStatus`): ping periódico y estado visible cuando el sidecar no responde.
@@ -291,8 +293,8 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 | Fase | Nombre | Requerimientos | Depende de | Estado |
 | --- | --- | --- | --- | --- |
-| 0 | Infraestructura UI | F1 (router base), F4, F5 (skeleton), F6 | — | ⬜ Pendiente |
-| 1 | Autenticación y shell del admin (solo admin seed, con breadcrumbs) | R1, F1 (guards), F2 (session), F3 | 0 | ⬜ Pendiente |
+| 0 | Infraestructura UI | F1 (router base), F4, F5 (skeleton), F6 | — | ✅ Hecha |
+| 1 | Autenticación y shell del admin (solo admin seed, con breadcrumbs) | R1, F1 (guards), F2 (session), F3 | 0 | ✅ Hecha (smoke visual pendiente) |
 | 2 | Catálogo: marcas | R3 | 1 | ⬜ Pendiente |
 | 3 | Catálogo: modelos + editor de mapa | R4 | 2 | ⬜ Pendiente |
 | 4 | Catálogo: dispositivos | R5 | 3 | ⬜ Pendiente |
