@@ -34,7 +34,11 @@
     "loading": "Loading…",
     "empty": "No items to display.",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close"
   },
   "auth": {
     "title": "Sign in",
@@ -73,5 +77,33 @@
     "deviceNotFound": "Device not found.",
     "transportMismatch": "Connection settings do not match the selected transport.",
     "invalidConnection": "Invalid connection configuration."
+  },
+  "catalog": {
+    "title": "Inventory catalog",
+    "tabs": {
+      "brands": "Brands",
+      "models": "Models",
+      "devices": "Devices"
+    },
+    "brands": {
+      "title": "Brands",
+      "new": "+ New brand",
+      "columns": {
+        "name": "Name",
+        "actions": "Actions"
+      },
+      "empty": "No brands yet. Create the first one to get started.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Siemens",
+      "nameRequired": "Name is required.",
+      "nameTooLong": "Name must be at most {max} characters.",
+      "createTitle": "New brand",
+      "renameTitle": "Rename brand",
+      "deleteTitle": "Delete brand",
+      "deleteMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+      "created": "Brand created.",
+      "renamed": "Brand renamed.",
+      "deleted": "Brand deleted."
+    }
   }
 }

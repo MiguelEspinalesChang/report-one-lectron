@@ -34,7 +34,11 @@
     "loading": "Cargando…",
     "empty": "No hay elementos para mostrar.",
     "cancel": "Cancelar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar"
   },
   "auth": {
     "title": "Ingresar",
@@ -73,5 +77,33 @@
     "deviceNotFound": "Dispositivo no encontrado.",
     "transportMismatch": "La configuración de conexión no coincide con el transporte seleccionado.",
     "invalidConnection": "Configuración de conexión inválida."
+  },
+  "catalog": {
+    "title": "Catálogo de inventario",
+    "tabs": {
+      "brands": "Marcas",
+      "models": "Modelos",
+      "devices": "Dispositivos"
+    },
+    "brands": {
+      "title": "Marcas",
+      "new": "+ Nueva marca",
+      "columns": {
+        "name": "Nombre",
+        "actions": "Acciones"
+      },
+      "empty": "Todavía no hay marcas. Creá la primera para empezar.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. Siemens",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameTooLong": "El nombre debe tener como máximo {max} caracteres.",
+      "createTitle": "Nueva marca",
+      "renameTitle": "Renombrar marca",
+      "deleteTitle": "Eliminar marca",
+      "deleteMessage": "¿Estás seguro de eliminar \"{name}\"? Esta acción no se puede deshacer.",
+      "created": "Marca creada.",
+      "renamed": "Marca renombrada.",
+      "deleted": "Marca eliminada."
+    }
   }
 }
