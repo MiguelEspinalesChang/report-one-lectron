@@ -295,7 +295,7 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 | --- | --- | --- | --- | --- |
 | 0 | Infraestructura UI | F1 (router base), F4, F5 (skeleton), F6 | — | ✅ Hecha |
 | 1 | Autenticación y shell del admin (solo admin seed, con breadcrumbs) | R1, F1 (guards), F2 (session), F3 | 0 | ✅ Hecha (smoke visual pendiente) |
-| 2 | Catálogo: marcas | R3 | 1 | ⬜ Pendiente |
+| 2 | Catálogo: marcas | R3 | 1 | ✅ Hecha |
 | 3 | Catálogo: modelos + editor de mapa | R4 | 2 | ⬜ Pendiente |
 | 4 | Catálogo: dispositivos | R5 | 3 | ⬜ Pendiente |
 | 5 | Usuarios y permisos | R2, §5 completo | 1 | ⬜ Pendiente |
@@ -337,11 +337,11 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** primer CRUD completo de punta a punta; establece el patrón de tabla + modal + toast que reutiliza todo el catálogo.
 
-- [ ] `useCatalogStore` (parte marcas) sobre `platform.catalog.brands.*`.
-- [ ] Isla Inventory con `AppTabs` (marcas | modelos | dispositivos — las otras dos vacías).
-- [ ] Wrappers `AppTable`, `AppModal`/`ConfirmDialog`, `AppEmptyState`.
-- [ ] Lista, alta, renombrar (R3.1); borrado con confirmación y `BrandInUseError` legible (R3.2).
-- [ ] Namespace i18n `catalog` (parte marcas).
+- [x] `useCatalogStore` (parte marcas) sobre `platform.catalog.brands.*`.
+- [x] Isla Inventory con `AppTabs` (marcas | modelos | dispositivos — las otras dos vacías).
+- [x] Wrappers `AppTable`, `AppModal`/`ConfirmDialog`, `AppEmptyState`.
+- [x] Lista, alta, renombrar (R3.1); borrado con confirmación y `BrandInUseError` legible (R3.2).
+- [x] Namespace i18n `catalog` (parte marcas).
 
 **Cierre:** CRUD de marcas completo contra la app corriendo; borrar marca con modelos muestra el error de dominio, la marca sobrevive.
 
