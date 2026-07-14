@@ -80,7 +80,7 @@ onUnmounted(() => {
 
 .value {
   font-variant-numeric: tabular-nums;
-  color: var(--color-accent-700);
+  color: var(--color-primary-700);
   font-weight: 600;
 }
 </style>

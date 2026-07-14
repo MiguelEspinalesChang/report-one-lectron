@@ -9,6 +9,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@fontsource/figtree": "^5.2.10",
     "@tailwindcss/vite": "^4.3.2",
     "pinia": "^2.3.0",
     "preline": "^4.2.0",

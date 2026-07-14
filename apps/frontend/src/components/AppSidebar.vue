@@ -67,7 +67,7 @@ const navItems = [
             class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium
                    text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900
                    focus:outline-none focus:bg-slate-100"
-            active-class="bg-accent-50 text-accent-700 hover:bg-accent-100 hover:text-accent-700"
+            active-class="bg-primary-50 text-primary-800 font-semibold hover:bg-primary-100"
           >
             <!-- Dashboard icon -->
             <svg

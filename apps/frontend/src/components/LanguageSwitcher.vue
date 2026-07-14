@@ -16,7 +16,7 @@ function onChange(value: Locale): void {
 
 <!--
   Preline HSDropdown markup (https://preline.co/docs/dropdown.html).
-  Accent/slate tokens replace Preline's default blue-* palette.
+  Primary/slate tokens replace Preline's default blue-* palette.
   autoInit() fires after every route change (router.afterEach) so this
   keeps responding without a page reload.
 -->
@@ -59,8 +59,8 @@ function onChange(value: Locale): void {
           v-for="option in SUPPORTED_LOCALES"
           :key="option"
           type="button"
-          class="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm text-slate-700 hover:bg-accent-50 hover:text-accent-700"
-          :class="{ 'font-semibold text-accent-600': locale === option }"
+          class="flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-sm text-slate-700 hover:bg-primary-50 hover:text-primary-700"
+          :class="{ 'font-semibold text-primary-600': locale === option }"
           role="menuitem"
           @click="onChange(option)"
         >

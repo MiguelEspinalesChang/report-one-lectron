@@ -29,7 +29,7 @@ const items = computed<BreadcrumbItem[]>(() => {
   >
     <template v-for="(item, idx) in items" :key="item.label">
       <span v-if="idx > 0" class="text-slate-400" aria-hidden="true">/</span>
-      <RouterLink v-if="item.to" :to="item.to" class="text-slate-500 hover:text-accent-600">
+      <RouterLink v-if="item.to" :to="item.to" class="text-slate-500 hover:text-primary-600">
         {{ item.label }}
       </RouterLink>
       <span v-else class="font-medium text-slate-800">{{ item.label }}</span>

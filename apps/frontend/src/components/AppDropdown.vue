@@ -40,7 +40,7 @@ defineProps<{
           :class="
             item.danger
               ? 'text-red-600 hover:bg-red-50'
-              : 'text-slate-700 hover:bg-accent-50 hover:text-accent-700'
+              : 'text-slate-700 hover:bg-primary-50 hover:text-primary-700'
           "
           role="menuitem"
           @click="item.onClick()"

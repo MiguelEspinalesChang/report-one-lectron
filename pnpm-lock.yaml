@@ -69,6 +69,9 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@fontsource/figtree':
+        specifier: ^5.2.10
+        version: 5.2.10
       '@tailwindcss/vite':
         specifier: ^4.3.2
         version: 4.3.2(vite@6.4.3(@types/node@22.20.0)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
@@ -987,6 +990,9 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
+
+  '@fontsource/figtree@5.2.10':
+    resolution: {integrity: sha512-nlO06N1qad88ySqzi/a2xwDBkamfZ4MFilP8la5dDyRY36ED0UYTs2hhtwJf8fM52+Nn7dQO2r27reKaXOyOIg==}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -3932,6 +3938,8 @@ snapshots:
       '@floating-ui/utils': 0.2.11
 
   '@floating-ui/utils@0.2.11': {}
+
+  '@fontsource/figtree@5.2.10': {}
 
   '@hapi/address@5.1.1':
     dependencies:

@@ -3,6 +3,11 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { i18n } from './i18n'
 import router from './router'
+import '@fontsource/figtree/400.css'
+import '@fontsource/figtree/500.css'
+import '@fontsource/figtree/600.css'
+import '@fontsource/figtree/700.css'
+import '@fontsource/figtree/800.css'
 import './assets/main.css'
 
 createApp(App).use(createPinia()).use(i18n).use(router).mount('#app')
