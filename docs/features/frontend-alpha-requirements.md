@@ -211,8 +211,10 @@ apps/frontend/src/
 ├── islands/           # containers: hablan con window.platform
 │   ├── Auth/          #   login, change-password
 │   ├── Dashboard/     #   SystemStatus (existe) + resumen
-│   ├── Inventory/     #   marcas, modelos, editor de mapa, dispositivos
-│   ├── Devices/       #   DeviceLive (existe) + historial
+│   ├── Inventory/     #   marcas, modelos, editor de mapa
+│   ├── Devices/       #   CRUD de dispositivos (vista dedicada `/devices`, decisión de
+│   │                  #   UX 2026-07-17 — ya no es un tab de Catálogo) + DeviceLive
+│   │                  #   (existe) + historial; entrada propia en el sidebar
 │   └── Users/         #   tabla + alta + rol
 └── components/        # presentacionales puros: reciben props, emiten eventos
                        #   (LanguageSwitcher existe; sumar los wrappers Preline de F6:
