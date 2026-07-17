@@ -13,6 +13,7 @@ const DOMAIN_ERROR_KEYS: Record<DomainErrorName, string> = {
   [DomainErrorNames.InactiveUserError]: 'errors.inactiveUser',
   [DomainErrorNames.WeakPasswordError]: 'errors.weakPassword',
   [DomainErrorNames.RoleNotFoundError]: 'errors.roleNotFound',
+  [DomainErrorNames.UserNotFoundError]: 'errors.userNotFound',
   [DomainErrorNames.BrandInUseError]: 'errors.brandInUse',
   [DomainErrorNames.BrandNotFoundError]: 'errors.brandNotFound',
   [DomainErrorNames.MeterModelInUseError]: 'errors.meterModelInUse',

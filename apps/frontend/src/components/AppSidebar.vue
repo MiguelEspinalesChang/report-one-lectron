@@ -3,6 +3,16 @@ import { nextTick, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
+/** One entry in the sidebar nav. Visibility (permission filtering) is the
+ * container's (App.vue) responsibility — this component only renders what
+ * it's given. */
+export interface NavItem {
+  name: 'dashboard' | 'catalog' | 'devices' | 'users'
+  labelKey: string
+}
+
+const props = defineProps<{ items: NavItem[] }>()
+
 const { t } = useI18n()
 const route = useRoute()
 
@@ -30,12 +40,6 @@ onMounted(() => {
     }
   })
 })
-
-const navItems = [
-  { name: 'dashboard' as const, labelKey: 'nav.dashboard' },
-  { name: 'catalog' as const, labelKey: 'nav.catalog' },
-  { name: 'users' as const, labelKey: 'nav.users' },
-]
 </script>
 
 <template>
@@ -61,7 +65,7 @@ const navItems = [
     <!-- Nav -->
     <nav class="p-3" :aria-label="t('nav.main')">
       <ul role="list" class="space-y-0.5">
-        <li v-for="item in navItems" :key="item.name">
+        <li v-for="item in props.items" :key="item.name">
           <RouterLink
             :to="{ name: item.name }"
             class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium
@@ -102,6 +106,24 @@ const navItems = [
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
+              />
+            </svg>
+
+            <!-- Devices icon -->
+            <svg
+              v-else-if="item.name === 'devices'"
+              class="size-4 shrink-0"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 7.5h16.5M3.75 12h16.5M3.75 16.5h16.5"
               />
             </svg>
 

@@ -1,10 +1,10 @@
-import type { PublicUser } from '../domain/user'
-import { RoleNotFoundError, WeakPasswordError } from '../domain/errors'
+import type { PublicUser, Role } from '../domain/user'
+import { RoleNotFoundError, UserNotFoundError, WeakPasswordError } from '../domain/errors'
 import { toPublicUser, validatePasswordPolicy } from '../domain/user'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { CreateUserInput, RoleRepository, UserRepository } from '../ports/user-repository'
 
-export { RoleNotFoundError, WeakPasswordError } from '../domain/errors'
+export { RoleNotFoundError, UserNotFoundError, WeakPasswordError } from '../domain/errors'
 
 export interface CreateUserParams {
   username: string
@@ -50,11 +50,25 @@ export class UserManagementService {
     return all.map(toPublicUser)
   }
 
-  async assignRole(userId: number, roleId: number): Promise<void> {
+  async listRoles(): Promise<Role[]> {
+    return this.roles.findAll()
+  }
+
+  /**
+   * Assigns a role and returns the updated user so callers can refresh their
+   * view without fabricating fields (e.g. `updatedAt`) on the renderer side.
+   */
+  async assignRole(userId: number, roleId: number): Promise<PublicUser> {
     const role = await this.roles.findById(roleId)
     if (role === null) {
       throw new RoleNotFoundError(roleId)
     }
     await this.users.updateRole(userId, roleId)
+
+    const updated = await this.users.findById(userId)
+    if (updated === null) {
+      throw new UserNotFoundError(userId)
+    }
+    return toPublicUser(updated)
   }
 }

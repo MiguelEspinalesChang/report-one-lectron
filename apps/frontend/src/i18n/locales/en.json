@@ -59,6 +59,50 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password"
   },
+  "users": {
+    "title": "Users",
+    "new": "+ New user",
+    "empty": "No users yet.",
+    "createTitle": "New user",
+    "created": "User created.",
+    "roleUpdated": "Role updated.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "mustChange": "Must change password",
+    "passwordOk": "Password updated",
+    "columns": {
+      "username": "Username",
+      "displayName": "Display name",
+      "role": "Role",
+      "active": "Status",
+      "mustChangePassword": "Password",
+      "createdAt": "Created"
+    },
+    "form": {
+      "username": "Username",
+      "usernamePlaceholder": "e.g. operator1",
+      "displayName": "Display name",
+      "displayNamePlaceholder": "e.g. Operator One",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "role": "Role",
+      "mustChangePassword": "Force password change on first sign in"
+    },
+    "roles": {
+      "admin": "Admin",
+      "operator": "Operator",
+      "viewer": "Viewer",
+      "unknown": "Unknown"
+    },
+    "validation": {
+      "usernameRequired": "Username is required.",
+      "usernameTooLong": "Username must be at most {max} characters.",
+      "displayNameRequired": "Display name is required.",
+      "displayNameTooLong": "Display name must be at most {max} characters.",
+      "passwordMin": "Password must be at least {min} characters.",
+      "roleRequired": "Role is required."
+    }
+  },
   "health": {
     "up": "Sidecar OK",
     "down": "Sidecar unavailable",
@@ -70,6 +114,7 @@
     "inactiveUser": "This account is inactive. Contact an administrator.",
     "weakPassword": "The password does not meet the minimum requirements.",
     "roleNotFound": "The selected role does not exist.",
+    "userNotFound": "User not found.",
     "brandNotFound": "Brand not found.",
     "meterModelNotFound": "Meter model not found.",
     "invalidRegisterMap": "The register map is invalid.",

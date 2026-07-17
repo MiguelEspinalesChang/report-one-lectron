@@ -25,13 +25,13 @@ const router = createRouter({
       path: '/catalog',
       name: 'catalog',
       component: CatalogView,
-      meta: { breadcrumb: 'nav.catalog' },
+      meta: { breadcrumb: 'nav.catalog', permission: 'devices.view' },
     },
     {
       path: '/devices',
       name: 'devices',
       component: DevicesView,
-      meta: { breadcrumb: 'nav.devices' },
+      meta: { breadcrumb: 'nav.devices', permission: 'devices.view' },
     },
     {
       path: '/catalog/models/new',
@@ -40,6 +40,7 @@ const router = createRouter({
       meta: {
         breadcrumb: 'catalog.models.createTitle',
         parent: { path: '/catalog', breadcrumb: 'nav.catalog' },
+        permission: 'devices.manage',
       },
     },
     {
@@ -49,13 +50,14 @@ const router = createRouter({
       meta: {
         breadcrumb: 'catalog.models.editTitle',
         parent: { path: '/catalog', breadcrumb: 'nav.catalog' },
+        permission: 'devices.manage',
       },
     },
     {
       path: '/users',
       name: 'users',
       component: UsersView,
-      meta: { breadcrumb: 'nav.users' },
+      meta: { breadcrumb: 'nav.users', permission: 'users.manage' },
     },
     {
       path: '/change-password',
@@ -93,6 +95,11 @@ router.beforeEach(async (to) => {
 
   // Session OK — redirect away from auth-only routes
   if (to.name === 'login' || to.name === 'change-password') {
+    return { name: 'dashboard' }
+  }
+
+  const requiredPermission = typeof to.meta.permission === 'string' ? to.meta.permission : null
+  if (requiredPermission !== null && !sessionStore.hasPermission(requiredPermission)) {
     return { name: 'dashboard' }
   }
 

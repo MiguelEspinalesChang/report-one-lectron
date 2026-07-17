@@ -10,6 +10,7 @@ import type {
   MeterModelDto,
   PlatformApi,
   RegisterMap,
+  RoleDto,
 } from '@platform/shared-types'
 import { IpcChannels } from '@platform/shared-types'
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
@@ -40,6 +41,7 @@ const api: PlatformApi = {
     create: (dto: CreateUserDto) => ipcRenderer.invoke(IpcChannels.UsersCreate, dto),
     list: () => ipcRenderer.invoke(IpcChannels.UsersList),
     assignRole: (dto: AssignRoleDto) => ipcRenderer.invoke(IpcChannels.UsersAssignRole, dto),
+    listRoles: (): Promise<RoleDto[]> => ipcRenderer.invoke(IpcChannels.UsersListRoles),
   },
   catalog: {
     brands: {

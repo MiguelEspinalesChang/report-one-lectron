@@ -6,6 +6,7 @@ import AppBreadcrumb from './components/AppBreadcrumb.vue'
 import AppDropdown from './components/AppDropdown.vue'
 import type { DropdownItem } from './components/AppDropdown.vue'
 import AppSidebar from './components/AppSidebar.vue'
+import type { NavItem } from './components/AppSidebar.vue'
 import AppToast from './components/AppToast.vue'
 import LanguageSwitcher from './components/LanguageSwitcher.vue'
 import SidecarHealth from './islands/Dashboard/SidecarHealth.vue'
@@ -19,6 +20,19 @@ const hasBridge = 'platform' in window
 
 const session = computed(() => sessionStore.session)
 const hasBreadcrumbs = computed(() => route.matched.some((r) => r.meta.breadcrumb != null))
+
+// Sidebar nav config + permission gating live here — AppSidebar is a pure
+// presentational component that only renders the items it's given.
+const NAV_ITEMS: Array<NavItem & { permission: string | null }> = [
+  { name: 'dashboard', labelKey: 'nav.dashboard', permission: null },
+  { name: 'catalog', labelKey: 'nav.catalog', permission: 'devices.view' },
+  { name: 'devices', labelKey: 'nav.devices', permission: 'devices.view' },
+  { name: 'users', labelKey: 'nav.users', permission: 'users.manage' },
+]
+
+const visibleNavItems = computed<NavItem[]>(() =>
+  NAV_ITEMS.filter((item) => item.permission === null || sessionStore.hasPermission(item.permission)),
+)
 
 // Show the dashboard shell only when there is a fully-authenticated session
 // and the user is not on the change-password route. Guards guarantee that
@@ -45,7 +59,7 @@ const userMenuItems = computed<DropdownItem[]>(() => [
 <template>
   <!-- ── Dashboard shell layout ──────────────────────────────────────────── -->
   <template v-if="showShell">
-    <AppSidebar />
+    <AppSidebar :items="visibleNavItems" />
 
     <!-- Content wrapper — offset by sidebar width on lg+ -->
     <div class="lg:ps-64">

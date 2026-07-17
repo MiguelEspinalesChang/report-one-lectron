@@ -15,11 +15,16 @@ interface Emits {
   (e: 'update:modelValue', value: T): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 function handleChange(event: Event) {
   const target = event.target as HTMLSelectElement
+  const selected = props.options.find((option) => String(option.value) === target.value)
+  if (selected) {
+    emit('update:modelValue', selected.value)
+    return
+  }
   emit('update:modelValue', target.value as T)
 }
 </script>

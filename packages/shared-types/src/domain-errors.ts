@@ -3,6 +3,7 @@ export const DomainErrorNames = {
   InactiveUserError: 'InactiveUserError',
   WeakPasswordError: 'WeakPasswordError',
   RoleNotFoundError: 'RoleNotFoundError',
+  UserNotFoundError: 'UserNotFoundError',
   BrandInUseError: 'BrandInUseError',
   BrandNotFoundError: 'BrandNotFoundError',
   MeterModelInUseError: 'MeterModelInUseError',

@@ -113,6 +113,13 @@ export interface AssignRoleDto {
   roleId: number
 }
 
+export interface RoleDto {
+  id: number
+  name: string
+  description: string | null
+  isSystem: boolean
+}
+
 export interface UserDto {
   id: number
   username: string
@@ -148,6 +155,7 @@ export const IpcChannels = {
   UsersCreate: 'users:create',
   UsersList: 'users:list',
   UsersAssignRole: 'users:assignRole',
+  UsersListRoles: 'users:listRoles',
   // Catalog — brands
   CatalogBrandsCreate: 'catalog:brands:create',
   CatalogBrandsList: 'catalog:brands:list',
@@ -193,7 +201,8 @@ export interface PlatformApi {
   users: {
     create(dto: CreateUserDto): Promise<UserDto>
     list(): Promise<UserDto[]>
-    assignRole(dto: AssignRoleDto): Promise<void>
+    assignRole(dto: AssignRoleDto): Promise<UserDto>
+    listRoles(): Promise<RoleDto[]>
   }
   catalog: {
     brands: {

@@ -21,6 +21,7 @@ import {
   type BrandDto,
   type MeterModelDto,
   type DeviceDto,
+  type RoleDto,
 } from '@platform/shared-types'
 import { ipcMain } from 'electron'
 
@@ -51,6 +52,15 @@ function toSessionUserDto(user: {
 
 function toBrandDto(brand: { id: number; name: string }): BrandDto {
   return { id: brand.id, name: brand.name }
+}
+
+function toRoleDto(role: { id: number; name: string; description: string | null; isSystem: boolean }): RoleDto {
+  return {
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    isSystem: role.isSystem,
+  }
 }
 
 function toMeterModelDto(model: {
@@ -133,6 +143,10 @@ export function registerHandlers(core: Core): void {
   ipcMain.handle(IpcChannels.UsersAssignRole, (_event, raw: unknown) => {
     const dto = AssignRoleSchema.parse(raw)
     return core.userManagement.assignRole(dto.userId, dto.roleId)
+  })
+  ipcMain.handle(IpcChannels.UsersListRoles, async () => {
+    const all = await core.userManagement.listRoles()
+    return all.map(toRoleDto)
   })
 
   // Catalog — brands

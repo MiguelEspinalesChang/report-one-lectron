@@ -59,6 +59,50 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña"
   },
+  "users": {
+    "title": "Usuarios",
+    "new": "+ Nuevo usuario",
+    "empty": "Todavía no hay usuarios.",
+    "createTitle": "Nuevo usuario",
+    "created": "Usuario creado.",
+    "roleUpdated": "Rol actualizado.",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "mustChange": "Debe cambiar contraseña",
+    "passwordOk": "Contraseña actualizada",
+    "columns": {
+      "username": "Usuario",
+      "displayName": "Nombre visible",
+      "role": "Rol",
+      "active": "Estado",
+      "mustChangePassword": "Contraseña",
+      "createdAt": "Creado"
+    },
+    "form": {
+      "username": "Usuario",
+      "usernamePlaceholder": "ej. operador1",
+      "displayName": "Nombre visible",
+      "displayNamePlaceholder": "ej. Operador Uno",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Al menos 8 caracteres",
+      "role": "Rol",
+      "mustChangePassword": "Forzar cambio de contraseña en el primer ingreso"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "operator": "Operador",
+      "viewer": "Visualizador",
+      "unknown": "Desconocido"
+    },
+    "validation": {
+      "usernameRequired": "El usuario es obligatorio.",
+      "usernameTooLong": "El usuario debe tener como máximo {max} caracteres.",
+      "displayNameRequired": "El nombre visible es obligatorio.",
+      "displayNameTooLong": "El nombre visible debe tener como máximo {max} caracteres.",
+      "passwordMin": "La contraseña debe tener al menos {min} caracteres.",
+      "roleRequired": "El rol es obligatorio."
+    }
+  },
   "health": {
     "up": "Sidecar OK",
     "down": "Sidecar no disponible",
@@ -70,6 +114,7 @@
     "inactiveUser": "Esta cuenta está inactiva. Contactá a un administrador.",
     "weakPassword": "La contraseña no cumple los requisitos mínimos.",
     "roleNotFound": "El rol seleccionado no existe.",
+    "userNotFound": "Usuario no encontrado.",
     "brandNotFound": "Marca no encontrada.",
     "meterModelNotFound": "Modelo no encontrado.",
     "invalidRegisterMap": "El mapa de registros es inválido.",

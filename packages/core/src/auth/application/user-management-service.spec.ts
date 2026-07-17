@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { UserManagementService, WeakPasswordError, RoleNotFoundError } from './user-management-service'
+import { UserManagementService, WeakPasswordError, RoleNotFoundError, UserNotFoundError } from './user-management-service'
 import type { UserRepository, RoleRepository, CreateUserInput } from '../ports/user-repository'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { User, Role } from '../domain/user'
@@ -177,7 +177,7 @@ describe('UserManagementService', () => {
   })
 
   describe('assignRole', () => {
-    it('assigns role to user', async () => {
+    it('assigns role to user and returns the updated user', async () => {
       rolesRepo.seed(adminRole)
       const viewerRole: Role = { id: 2, name: 'viewer', description: null, isSystem: true }
       rolesRepo.seed(viewerRole)
@@ -189,7 +189,10 @@ describe('UserManagementService', () => {
         roleId: 1,
       })
 
-      await service.assignRole(user.id, 2)
+      const returned = await service.assignRole(user.id, 2)
+
+      expect(returned.roleId).toBe(2)
+      expect(returned).not.toHaveProperty('passwordHash')
 
       const updated = await usersRepo.findById(user.id)
       expect(updated?.roleId).toBe(2)
@@ -197,6 +200,29 @@ describe('UserManagementService', () => {
 
     it('throws RoleNotFoundError when target role does not exist', async () => {
       await expect(service.assignRole(1, 999)).rejects.toThrow(RoleNotFoundError)
+    })
+
+    it('throws UserNotFoundError when the user does not exist', async () => {
+      rolesRepo.seed(adminRole)
+
+      await expect(service.assignRole(999, 1)).rejects.toThrow(UserNotFoundError)
+    })
+  })
+
+  describe('listRoles', () => {
+    it('returns all seeded roles', async () => {
+      rolesRepo.seed(adminRole)
+      const viewerRole: Role = { id: 2, name: 'viewer', description: null, isSystem: true }
+      rolesRepo.seed(viewerRole)
+
+      const result = await service.listRoles()
+
+      expect(result).toEqual([adminRole, viewerRole])
+    })
+
+    it('returns empty array when no roles are seeded', async () => {
+      const result = await service.listRoles()
+      expect(result).toEqual([])
     })
   })
 })
