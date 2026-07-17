@@ -3,7 +3,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import type { BrandDto, MeterModelDto } from '@platform/shared-types'
-import AppEmptyState from '../../components/AppEmptyState.vue'
 import AppInput from '../../components/AppInput.vue'
 import AppModal from '../../components/AppModal.vue'
 import AppTable from '../../components/AppTable.vue'
@@ -12,30 +11,34 @@ import type { TabItem } from '../../components/AppTabs.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import { useApiCall } from '../../composables/useApiCall'
 import { useCatalogStore } from '../../stores/catalog'
+import { useSessionStore } from '../../stores/session'
 import { useToastStore } from '../../stores/toast'
 
 // Mirrors packages/shared-types/src/catalog-schemas.ts CreateBrandSchema/RenameBrandSchema
 // (name: z.string().min(1).max(128)) — UX-only pre-validation, the backend re-validates.
 const BRAND_NAME_MAX_LENGTH = 128
 
-type CatalogTab = 'brands' | 'models' | 'devices'
+type CatalogTab = 'brands' | 'models'
 
 const { t } = useI18n()
 const router = useRouter()
 const catalogStore = useCatalogStore()
+const sessionStore = useSessionStore()
 const toastStore = useToastStore()
 const { loading, call } = useApiCall()
+
+const canManageDevices = computed(() => sessionStore.hasPermission('devices.manage'))
 
 const activeTab = ref<CatalogTab>('brands')
 const tabs = computed<TabItem[]>(() => [
   { name: 'brands', label: t('catalog.tabs.brands') },
   { name: 'models', label: t('catalog.tabs.models') },
-  { name: 'devices', label: t('catalog.tabs.devices') },
 ])
 
 onMounted(async () => {
-  await call(() => catalogStore.loadBrands())
-  await call(() => catalogStore.loadModels())
+  await call(async () => {
+    await Promise.all([catalogStore.loadBrands(), catalogStore.loadModels()])
+  })
 })
 
 function validateBrandName(name: string): string | undefined {
@@ -55,8 +58,7 @@ function modelRowKey(model: MeterModelDto): number {
   return model.id
 }
 
-// ========== Brands section (unchanged) ==========
-// Create brand
+// ========== Brands section ==========
 const createOpen = ref(false)
 const createName = ref('')
 const createError = computed(() => validateBrandName(createName.value))
@@ -67,6 +69,7 @@ function openCreate(): void {
 }
 
 async function submitCreate(): Promise<void> {
+  if (!canManageDevices.value) return
   if (createError.value) return
   const brand = await call(() => catalogStore.createBrand(createName.value.trim()))
   if (brand) {
@@ -75,7 +78,6 @@ async function submitCreate(): Promise<void> {
   }
 }
 
-// Rename brand
 const renameOpen = ref(false)
 const renameName = ref('')
 const renamingBrand = ref<BrandDto | null>(null)
@@ -88,6 +90,7 @@ function openRename(brand: BrandDto): void {
 }
 
 async function submitRename(): Promise<void> {
+  if (!canManageDevices.value) return
   const target = renamingBrand.value
   if (renameError.value || !target) return
   const ok = await call(async () => {
@@ -100,7 +103,6 @@ async function submitRename(): Promise<void> {
   }
 }
 
-// Delete brand
 const deleteOpen = ref(false)
 const deletingBrand = ref<BrandDto | null>(null)
 
@@ -110,10 +112,9 @@ function openDelete(brand: BrandDto): void {
 }
 
 async function confirmDelete(): Promise<void> {
+  if (!canManageDevices.value) return
   const target = deletingBrand.value
   if (!target) return
-  // If the backend rejects (BrandInUseError), call() returns undefined and
-  // deleteBrand's local filter never ran — the brand survives, matching R3.2.
   const ok = await call(async () => {
     await catalogStore.deleteBrand(target.id)
     return true
@@ -132,15 +133,16 @@ const modelsWithBrand = computed(() => {
   })
 })
 
-// Delete model
 const deleteModelOpen = ref(false)
 const deletingModel = ref<MeterModelDto | null>(null)
 
 function navigateToNewModel(): void {
+  if (!canManageDevices.value) return
   void router.push({ name: 'catalog-model-new' })
 }
 
 function navigateToEditModel(model: MeterModelDto): void {
+  if (!canManageDevices.value) return
   void router.push({ name: 'catalog-model-edit', params: { id: model.id } })
 }
 
@@ -150,6 +152,7 @@ function openDeleteModel(model: MeterModelDto): void {
 }
 
 async function confirmDeleteModel(): Promise<void> {
+  if (!canManageDevices.value) return
   const target = deletingModel.value
   if (!target) return
   const ok = await call(async () => {
@@ -171,7 +174,7 @@ async function confirmDeleteModel(): Promise<void> {
       <div v-if="activeTab === 'brands'" class="island">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-base font-semibold text-slate-900">{{ t('catalog.brands.title') }}</h2>
-          <button type="button" class="btn btn-primary" @click="openCreate">
+          <button v-if="canManageDevices" type="button" class="btn btn-primary" @click="openCreate">
             {{ t('catalog.brands.new') }}
           </button>
         </div>
@@ -189,6 +192,7 @@ async function confirmDeleteModel(): Promise<void> {
               {{ t('catalog.brands.columns.name') }}
             </th>
             <th
+              v-if="canManageDevices"
               class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400"
             >
               {{ t('catalog.brands.columns.actions') }}
@@ -196,7 +200,7 @@ async function confirmDeleteModel(): Promise<void> {
           </template>
           <template #row="{ row }">
             <td class="px-4 py-3 text-sm text-slate-700">{{ row.name }}</td>
-            <td class="px-4 py-3 text-right text-sm">
+            <td v-if="canManageDevices" class="px-4 py-3 text-right text-sm">
               <button type="button" class="btn-ghost btn" @click="openRename(row)">
                 {{ t('common.edit') }}
               </button>
@@ -215,7 +219,7 @@ async function confirmDeleteModel(): Promise<void> {
       <div v-else-if="activeTab === 'models'" class="island">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-base font-semibold text-slate-900">{{ t('catalog.models.title') }}</h2>
-          <button type="button" class="btn btn-primary" @click="navigateToNewModel">
+          <button v-if="canManageDevices" type="button" class="btn btn-primary" @click="navigateToNewModel">
             {{ t('catalog.models.new') }}
           </button>
         </div>
@@ -243,6 +247,7 @@ async function confirmDeleteModel(): Promise<void> {
               {{ t('catalog.models.columns.metrics') }}
             </th>
             <th
+              v-if="canManageDevices"
               class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400"
             >
               {{ t('catalog.models.columns.actions') }}
@@ -254,7 +259,7 @@ async function confirmDeleteModel(): Promise<void> {
             <td class="px-4 py-3 text-sm text-slate-500">
               {{ row.registerMap.registers.length }}
             </td>
-            <td class="px-4 py-3 text-right text-sm">
+            <td v-if="canManageDevices" class="px-4 py-3 text-right text-sm">
               <button type="button" class="btn-ghost btn" @click="navigateToEditModel(row)">
                 {{ t('common.edit') }}
               </button>
@@ -269,11 +274,9 @@ async function confirmDeleteModel(): Promise<void> {
           </template>
         </AppTable>
       </div>
-
-      <AppEmptyState v-else :message="t('common.comingSoon')" />
     </AppTabs>
 
-    <AppModal v-model:open="createOpen">
+    <AppModal v-if="canManageDevices" v-model:open="createOpen">
       <template #title>{{ t('catalog.brands.createTitle') }}</template>
       <template #body>
         <AppInput
@@ -299,7 +302,7 @@ async function confirmDeleteModel(): Promise<void> {
       </template>
     </AppModal>
 
-    <AppModal v-model:open="renameOpen">
+    <AppModal v-if="canManageDevices" v-model:open="renameOpen">
       <template #title>{{ t('catalog.brands.renameTitle') }}</template>
       <template #body>
         <AppInput
@@ -326,6 +329,7 @@ async function confirmDeleteModel(): Promise<void> {
     </AppModal>
 
     <ConfirmDialog
+      v-if="canManageDevices"
       v-model:open="deleteOpen"
       :title="t('catalog.brands.deleteTitle')"
       :message="t('catalog.brands.deleteMessage', { name: deletingBrand?.name ?? '' })"
@@ -335,6 +339,7 @@ async function confirmDeleteModel(): Promise<void> {
     />
 
     <ConfirmDialog
+      v-if="canManageDevices"
       v-model:open="deleteModelOpen"
       :title="t('catalog.models.deleteTitle')"
       :message="t('catalog.models.deleteMessage', { name: deletingModel?.name ?? '' })"

@@ -1,4 +1,4 @@
-import type { BrandDto, MeterModelDto, RegisterMap } from '@platform/shared-types'
+import type { BrandDto, DeviceDto, MeterModelDto, RegisterMap } from '@platform/shared-types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -94,6 +94,43 @@ export const useCatalogStore = defineStore('catalog', () => {
     models.value = models.value.filter((m) => m.id !== id)
   }
 
+  // ========== Devices ==========
+  const devices = ref<DeviceDto[]>([])
+  const devicesLoaded = ref(false)
+
+  async function loadDevices(): Promise<void> {
+    devices.value = await window.platform.catalog.devices.list()
+    devicesLoaded.value = true
+  }
+
+  async function createDevice(dto: Omit<DeviceDto, 'id' | 'createdAt' | 'updatedAt'>): Promise<DeviceDto> {
+    const device = await window.platform.catalog.devices.create(dto)
+    devices.value.push(device)
+    return device
+  }
+
+  async function updateDevice(
+    dto: Partial<Omit<DeviceDto, 'createdAt' | 'updatedAt'>> & { id: number },
+  ): Promise<DeviceDto> {
+    const device = await window.platform.catalog.devices.update(dto)
+    const index = devices.value.findIndex((d) => d.id === dto.id)
+    if (index >= 0) {
+      devices.value[index] = device
+    }
+    return device
+  }
+
+  async function enableDevice(id: number, enabled: boolean): Promise<void> {
+    await window.platform.catalog.devices.enable({ id, enabled })
+    const device = devices.value.find((d) => d.id === id)
+    if (device) device.enabled = enabled
+  }
+
+  async function deleteDevice(id: number): Promise<void> {
+    await window.platform.catalog.devices.delete({ id })
+    devices.value = devices.value.filter((d) => d.id !== id)
+  }
+
   return {
     brands,
     brandsLoaded,
@@ -109,5 +146,12 @@ export const useCatalogStore = defineStore('catalog', () => {
     updateModelMap,
     updateModel,
     deleteModel,
+    devices,
+    devicesLoaded,
+    loadDevices,
+    createDevice,
+    updateDevice,
+    enableDevice,
+    deleteDevice,
   }
 })

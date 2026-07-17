@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { useSessionStore } from '../stores/session'
 import ChangePasswordView from '../islands/Auth/ChangePasswordView.vue'
 import DashboardView from '../islands/Dashboard/DashboardView.vue'
+import DevicesView from '../islands/Devices/DevicesView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
 import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
 import LoginView from '../islands/Auth/LoginView.vue'
@@ -25,6 +26,12 @@ const router = createRouter({
       name: 'catalog',
       component: CatalogView,
       meta: { breadcrumb: 'nav.catalog' },
+    },
+    {
+      path: '/devices',
+      name: 'devices',
+      component: DevicesView,
+      meta: { breadcrumb: 'nav.devices' },
     },
     {
       path: '/catalog/models/new',
