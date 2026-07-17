@@ -11,13 +11,34 @@ interface BreadcrumbItem {
   to: string | null
 }
 
+interface ParentMeta {
+  path: string
+  breadcrumb: string
+}
+
 const items = computed<BreadcrumbItem[]>(() => {
-  return route.matched
-    .filter((r) => r.meta.breadcrumb != null)
-    .map((r, idx, arr) => ({
+  const matched = route.matched.filter((r) => r.meta.breadcrumb != null)
+  const result: BreadcrumbItem[] = []
+
+  // If the current route has a parent, inject it first
+  const currentMeta = matched[matched.length - 1]?.meta
+  const parent = currentMeta?.parent as ParentMeta | undefined
+  if (parent) {
+    result.push({
+      label: t(parent.breadcrumb),
+      to: parent.path,
+    })
+  }
+
+  // Then add the matched routes
+  matched.forEach((r, idx) => {
+    result.push({
       label: t(r.meta.breadcrumb as string),
-      to: idx < arr.length - 1 ? (r.path || '/') : null,
-    }))
+      to: idx < matched.length - 1 ? (r.path || '/') : null,
+    })
+  })
+
+  return result
 })
 </script>
 

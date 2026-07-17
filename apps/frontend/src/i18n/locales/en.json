@@ -104,6 +104,84 @@
       "created": "Brand created.",
       "renamed": "Brand renamed.",
       "deleted": "Brand deleted."
+    },
+    "models": {
+      "title": "Models",
+      "new": "+ New model",
+      "columns": {
+        "brand": "Brand",
+        "name": "Name",
+        "metrics": "Metrics",
+        "actions": "Actions"
+      },
+      "empty": "No models yet. Create the first one to get started.",
+      "brandLabel": "Brand",
+      "brandPlaceholder": "Select a brand",
+      "brandRequired": "Brand is required.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. SIM-100",
+      "nameRequired": "Name is required.",
+      "nameTooLong": "Name must be at most {max} characters.",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Optional notes about this model",
+      "registerMapLabel": "Register map",
+      "createTitle": "New model",
+      "editTitle": "Edit model",
+      "deleteTitle": "Delete model",
+      "deleteMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+      "created": "Model created.",
+      "updated": "Model updated.",
+      "deleted": "Model deleted.",
+      "metricWarningTitle": "Warning: metric change",
+      "metricWarningMessage": "Changing metric names affects how future readings are recorded in the telemetry database. Are you sure you want to continue?"
+    },
+    "registerMap": {
+      "address": "Address",
+      "function": "Function",
+      "metric": "Metric",
+      "datatype": "Data type",
+      "wordOrder": "Word order",
+      "scale": "Scale",
+      "unit": "Unit",
+      "addRegister": "+ Add register",
+      "removeRegister": "Remove",
+      "minOne": "At least one register is required.",
+      "duplicateMetric": "Duplicate metric name: {metric}",
+      "addressOutOfRange": "Address must be between 0 and 65535.",
+      "placeholders": {
+        "address": "e.g. 0",
+        "metric": "e.g. voltage",
+        "scale": "e.g. 1.0",
+        "unit": "e.g. V"
+      },
+      "help": {
+        "title": "Register Map Guide",
+        "intro": "The register map defines which Modbus registers to read from the device and how to interpret the data.",
+        "address": "Address: The Modbus register address (0-65535) to read from.",
+        "function": "Function: Modbus function code — Holding (read/write) or Input (read-only).",
+        "metric": "Metric: A unique name for this measurement (e.g., voltage, current, temperature).",
+        "datatype": "Data type: How to interpret the register bytes (Int16, Uint16, Int32, Float32, etc.).",
+        "wordOrder": "Word order: Byte order for multi-register types — Big endian or Little endian.",
+        "scale": "Scale: Multiplier applied to the raw value (e.g., 0.1 to convert 230 to 23.0).",
+        "unit": "Unit: Measurement unit for display (e.g., V, A, °C, kWh)."
+      },
+      "functions": {
+        "holding": "Holding",
+        "input": "Input"
+      },
+      "datatypes": {
+        "int16": "Int16",
+        "uint16": "Uint16",
+        "int32": "Int32",
+        "uint32": "Uint32",
+        "int64": "Int64",
+        "float32": "Float32",
+        "float64": "Float64"
+      },
+      "wordOrders": {
+        "big_endian": "Big endian",
+        "little_endian": "Little endian"
+      }
     }
   }
 }

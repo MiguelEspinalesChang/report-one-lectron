@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { BrandDto } from '@platform/shared-types'
+import { useRouter } from 'vue-router'
+import type { BrandDto, MeterModelDto } from '@platform/shared-types'
 import AppEmptyState from '../../components/AppEmptyState.vue'
 import AppInput from '../../components/AppInput.vue'
 import AppModal from '../../components/AppModal.vue'
@@ -20,6 +21,7 @@ const BRAND_NAME_MAX_LENGTH = 128
 type CatalogTab = 'brands' | 'models' | 'devices'
 
 const { t } = useI18n()
+const router = useRouter()
 const catalogStore = useCatalogStore()
 const toastStore = useToastStore()
 const { loading, call } = useApiCall()
@@ -33,6 +35,7 @@ const tabs = computed<TabItem[]>(() => [
 
 onMounted(async () => {
   await call(() => catalogStore.loadBrands())
+  await call(() => catalogStore.loadModels())
 })
 
 function validateBrandName(name: string): string | undefined {
@@ -48,6 +51,11 @@ function brandRowKey(brand: BrandDto): number {
   return brand.id
 }
 
+function modelRowKey(model: MeterModelDto): number {
+  return model.id
+}
+
+// ========== Brands section (unchanged) ==========
 // Create brand
 const createOpen = ref(false)
 const createName = ref('')
@@ -115,6 +123,44 @@ async function confirmDelete(): Promise<void> {
     toastStore.show('success', t('catalog.brands.deleted'))
   }
 }
+
+// ========== Models section ==========
+const modelsWithBrand = computed(() => {
+  return catalogStore.models.map((model) => {
+    const brand = catalogStore.brands.find((b) => b.id === model.brandId)
+    return { ...model, brandName: brand?.name ?? '—' }
+  })
+})
+
+// Delete model
+const deleteModelOpen = ref(false)
+const deletingModel = ref<MeterModelDto | null>(null)
+
+function navigateToNewModel(): void {
+  void router.push({ name: 'catalog-model-new' })
+}
+
+function navigateToEditModel(model: MeterModelDto): void {
+  void router.push({ name: 'catalog-model-edit', params: { id: model.id } })
+}
+
+function openDeleteModel(model: MeterModelDto): void {
+  deletingModel.value = model
+  deleteModelOpen.value = true
+}
+
+async function confirmDeleteModel(): Promise<void> {
+  const target = deletingModel.value
+  if (!target) return
+  const ok = await call(async () => {
+    await catalogStore.deleteModel(target.id)
+    return true
+  })
+  if (ok) {
+    deleteModelOpen.value = false
+    toastStore.show('success', t('catalog.models.deleted'))
+  }
+}
 </script>
 
 <template>
@@ -158,6 +204,64 @@ async function confirmDelete(): Promise<void> {
                 type="button"
                 class="btn-ghost btn text-danger-600"
                 @click="openDelete(row)"
+              >
+                {{ t('common.delete') }}
+              </button>
+            </td>
+          </template>
+        </AppTable>
+      </div>
+
+      <div v-else-if="activeTab === 'models'" class="island">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-900">{{ t('catalog.models.title') }}</h2>
+          <button type="button" class="btn btn-primary" @click="navigateToNewModel">
+            {{ t('catalog.models.new') }}
+          </button>
+        </div>
+
+        <AppTable
+          :rows="modelsWithBrand"
+          :loading="loading"
+          :row-key="modelRowKey"
+          :empty-message="t('catalog.models.empty')"
+        >
+          <template #header>
+            <th
+              class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+            >
+              {{ t('catalog.models.columns.brand') }}
+            </th>
+            <th
+              class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+            >
+              {{ t('catalog.models.columns.name') }}
+            </th>
+            <th
+              class="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+            >
+              {{ t('catalog.models.columns.metrics') }}
+            </th>
+            <th
+              class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400"
+            >
+              {{ t('catalog.models.columns.actions') }}
+            </th>
+          </template>
+          <template #row="{ row }">
+            <td class="px-4 py-3 text-sm text-slate-700">{{ row.brandName }}</td>
+            <td class="px-4 py-3 text-sm text-slate-700">{{ row.name }}</td>
+            <td class="px-4 py-3 text-sm text-slate-500">
+              {{ row.registerMap.registers.length }}
+            </td>
+            <td class="px-4 py-3 text-right text-sm">
+              <button type="button" class="btn-ghost btn" @click="navigateToEditModel(row)">
+                {{ t('common.edit') }}
+              </button>
+              <button
+                type="button"
+                class="btn-ghost btn text-danger-600"
+                @click="openDeleteModel(row)"
               >
                 {{ t('common.delete') }}
               </button>
@@ -228,6 +332,15 @@ async function confirmDelete(): Promise<void> {
       :confirm-label="t('common.delete')"
       variant="danger"
       @confirm="confirmDelete"
+    />
+
+    <ConfirmDialog
+      v-model:open="deleteModelOpen"
+      :title="t('catalog.models.deleteTitle')"
+      :message="t('catalog.models.deleteMessage', { name: deletingModel?.name ?? '' })"
+      :confirm-label="t('common.delete')"
+      variant="danger"
+      @confirm="confirmDeleteModel"
     />
   </div>
 </template>

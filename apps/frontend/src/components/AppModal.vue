@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // HSOverlay expects a static DOM node wired up at autoInit time (data attributes +
@@ -12,6 +12,7 @@ import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   open: boolean
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }>()
 
 const emit = defineEmits<{
@@ -21,6 +22,21 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const titleId = useId()
+
+const maxWidthClass = computed(() => {
+  switch (props.size ?? 'md') {
+    case 'sm':
+      return 'max-w-sm'
+    case 'md':
+      return 'max-w-lg'
+    case 'lg':
+      return 'max-w-2xl'
+    case 'xl':
+      return 'max-w-4xl'
+    default:
+      return 'max-w-lg'
+  }
+})
 
 function close(): void {
   emit('update:open', false)
@@ -57,7 +73,8 @@ onBeforeUnmount(unlock)
     <div v-if="open" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div class="fixed inset-0 bg-slate-900/50" @click="close" />
       <div
-        class="island relative z-10 w-full max-w-lg"
+        class="island relative z-10 w-full"
+        :class="maxWidthClass"
         role="dialog"
         aria-modal="true"
         :aria-labelledby="titleId"

@@ -52,6 +52,8 @@ const api: PlatformApi = {
       create: (dto: Omit<MeterModelDto, 'id'>) => ipcRenderer.invoke(IpcChannels.CatalogModelsCreate, dto),
       list: () => ipcRenderer.invoke(IpcChannels.CatalogModelsList),
       listByBrand: (brandId: number) => ipcRenderer.invoke(IpcChannels.CatalogModelsListByBrand, { brandId }),
+      update: (dto: { id: number; brandId: number; name: string; registerMap: RegisterMap; notes: string | null }) =>
+        ipcRenderer.invoke(IpcChannels.CatalogModelsUpdate, dto),
       updateMap: (dto: { id: number; registerMap: RegisterMap }) =>
         ipcRenderer.invoke(IpcChannels.CatalogModelsUpdateMap, dto),
       delete: (dto: { id: number }) => ipcRenderer.invoke(IpcChannels.CatalogModelsDelete, dto),

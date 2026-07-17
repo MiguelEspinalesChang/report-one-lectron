@@ -4,6 +4,7 @@ import { useSessionStore } from '../stores/session'
 import ChangePasswordView from '../islands/Auth/ChangePasswordView.vue'
 import DashboardView from '../islands/Dashboard/DashboardView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
+import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
 import LoginView from '../islands/Auth/LoginView.vue'
 import UsersView from '../islands/Users/UsersView.vue'
 
@@ -24,6 +25,24 @@ const router = createRouter({
       name: 'catalog',
       component: CatalogView,
       meta: { breadcrumb: 'nav.catalog' },
+    },
+    {
+      path: '/catalog/models/new',
+      name: 'catalog-model-new',
+      component: CatalogModelFormView,
+      meta: {
+        breadcrumb: 'catalog.models.createTitle',
+        parent: { path: '/catalog', breadcrumb: 'nav.catalog' },
+      },
+    },
+    {
+      path: '/catalog/models/:id/edit',
+      name: 'catalog-model-edit',
+      component: CatalogModelFormView,
+      meta: {
+        breadcrumb: 'catalog.models.editTitle',
+        parent: { path: '/catalog', breadcrumb: 'nav.catalog' },
+      },
     },
     {
       path: '/users',

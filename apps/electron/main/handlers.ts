@@ -10,6 +10,7 @@ import {
   DeleteBrandSchema,
   CreateMeterModelSchema,
   ListModelsByBrandSchema,
+  UpdateMeterModelSchema,
   UpdateRegisterMapSchema,
   DeleteMeterModelSchema,
   CreateDeviceSchema,
@@ -167,6 +168,15 @@ export function registerHandlers(core: Core): void {
     const dto = ListModelsByBrandSchema.parse(raw)
     const all = await core.catalog.models.listByBrand(dto.brandId)
     return all.map(toMeterModelDto)
+  })
+  ipcMain.handle(IpcChannels.CatalogModelsUpdate, async (_event, raw: unknown) => {
+    const dto = UpdateMeterModelSchema.parse(raw)
+    return core.catalog.models.update(dto.id, {
+      brandId: dto.brandId,
+      name: dto.name,
+      registerMap: dto.registerMap,
+      notes: dto.notes,
+    })
   })
   ipcMain.handle(IpcChannels.CatalogModelsUpdateMap, async (_event, raw: unknown) => {
     const dto = UpdateRegisterMapSchema.parse(raw)

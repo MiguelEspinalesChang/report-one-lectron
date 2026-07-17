@@ -104,6 +104,84 @@
       "created": "Marca creada.",
       "renamed": "Marca renombrada.",
       "deleted": "Marca eliminada."
+    },
+    "models": {
+      "title": "Modelos",
+      "new": "+ Nuevo modelo",
+      "columns": {
+        "brand": "Marca",
+        "name": "Nombre",
+        "metrics": "Métricas",
+        "actions": "Acciones"
+      },
+      "empty": "Todavía no hay modelos. Creá el primero para empezar.",
+      "brandLabel": "Marca",
+      "brandPlaceholder": "Seleccioná una marca",
+      "brandRequired": "La marca es obligatoria.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. SIM-100",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameTooLong": "El nombre debe tener como máximo {max} caracteres.",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Notas opcionales sobre este modelo",
+      "registerMapLabel": "Mapa de registros",
+      "createTitle": "Nuevo modelo",
+      "editTitle": "Editar modelo",
+      "deleteTitle": "Eliminar modelo",
+      "deleteMessage": "¿Estás seguro de eliminar \"{name}\"? Esta acción no se puede deshacer.",
+      "created": "Modelo creado.",
+      "updated": "Modelo actualizado.",
+      "deleted": "Modelo eliminado.",
+      "metricWarningTitle": "Advertencia: cambio de métrica",
+      "metricWarningMessage": "Cambiar los nombres de las métricas afecta cómo se registran las lecturas futuras en la base de telemetría. ¿Estás seguro de continuar?"
+    },
+    "registerMap": {
+      "address": "Dirección",
+      "function": "Función",
+      "metric": "Métrica",
+      "datatype": "Tipo de dato",
+      "wordOrder": "Orden de palabra",
+      "scale": "Escala",
+      "unit": "Unidad",
+      "addRegister": "+ Agregar registro",
+      "removeRegister": "Eliminar",
+      "minOne": "Se requiere al menos un registro.",
+      "duplicateMetric": "Nombre de métrica duplicado: {metric}",
+      "addressOutOfRange": "La dirección debe estar entre 0 y 65535.",
+      "placeholders": {
+        "address": "ej. 0",
+        "metric": "ej. tension",
+        "scale": "ej. 1.0",
+        "unit": "ej. V"
+      },
+      "help": {
+        "title": "Guía del Mapa de Registros",
+        "intro": "El mapa de registros define qué registros Modbus leer del dispositivo y cómo interpretar los datos.",
+        "address": "Dirección: La dirección del registro Modbus (0-65535) a leer.",
+        "function": "Función: Código de función Modbus — Holding (lectura/escritura) o Input (solo lectura).",
+        "metric": "Métrica: Un nombre único para esta medición (ej. tension, corriente, temperatura).",
+        "datatype": "Tipo de dato: Cómo interpretar los bytes del registro (Int16, Uint16, Int32, Float32, etc.).",
+        "wordOrder": "Orden de palabra: Orden de bytes para tipos multi-registro — Big endian o Little endian.",
+        "scale": "Escala: Multiplicador aplicado al valor crudo (ej. 0.1 para convertir 230 a 23.0).",
+        "unit": "Unidad: Unidad de medida para mostrar (ej. V, A, °C, kWh)."
+      },
+      "functions": {
+        "holding": "Holding",
+        "input": "Input"
+      },
+      "datatypes": {
+        "int16": "Int16",
+        "uint16": "Uint16",
+        "int32": "Int32",
+        "uint32": "Uint32",
+        "int64": "Int64",
+        "float32": "Float32",
+        "float64": "Float64"
+      },
+      "wordOrders": {
+        "big_endian": "Big endian",
+        "little_endian": "Little endian"
+      }
     }
   }
 }

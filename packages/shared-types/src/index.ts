@@ -157,6 +157,7 @@ export const IpcChannels = {
   CatalogModelsCreate: 'catalog:models:create',
   CatalogModelsList: 'catalog:models:list',
   CatalogModelsListByBrand: 'catalog:models:listByBrand',
+  CatalogModelsUpdate: 'catalog:models:update',
   CatalogModelsUpdateMap: 'catalog:models:updateMap',
   CatalogModelsDelete: 'catalog:models:delete',
   // Catalog — devices
@@ -205,6 +206,7 @@ export interface PlatformApi {
       create(dto: Omit<MeterModelDto, 'id'>): Promise<MeterModelDto>
       list(): Promise<MeterModelDto[]>
       listByBrand(brandId: number): Promise<MeterModelDto[]>
+      update(dto: { id: number; brandId: number; name: string; registerMap: RegisterMap; notes: string | null }): Promise<void>
       updateMap(dto: { id: number; registerMap: RegisterMap }): Promise<void>
       delete(dto: { id: number }): Promise<void>
     }
@@ -313,6 +315,7 @@ export {
   DeleteBrandSchema,
   CreateMeterModelSchema,
   ListModelsByBrandSchema,
+  UpdateMeterModelSchema,
   UpdateRegisterMapSchema,
   DeleteMeterModelSchema,
   CreateDeviceSchema,
