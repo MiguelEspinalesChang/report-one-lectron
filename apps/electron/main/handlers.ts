@@ -17,6 +17,8 @@ import {
   UpdateDeviceSchema,
   DeleteDeviceSchema,
   EnableDeviceSchema,
+  SimulatedPollParamsSchema,
+  TelemetryHistoryParamsSchema,
   type SessionUserDto,
   type BrandDto,
   type MeterModelDto,
@@ -103,6 +105,13 @@ function toDeviceDto(device: {
     createdAt: device.createdAt,
     updatedAt: device.updatedAt,
   }
+}
+
+function getTelemetry(core: Core): NonNullable<Core['telemetry']> {
+  if (core.telemetry === null) {
+    throw new Error('Telemetry service is not configured')
+  }
+  return core.telemetry
 }
 
 /**
@@ -235,5 +244,17 @@ export function registerHandlers(core: Core): void {
   ipcMain.handle(IpcChannels.CatalogDevicesDelete, async (_event, raw: unknown) => {
     const dto = DeleteDeviceSchema.parse(raw)
     return core.catalog.devices.delete(dto.id)
+  })
+
+  // Telemetry
+  ipcMain.handle(IpcChannels.TelemetryGetHistory, (_event, raw: unknown) => {
+    const dto = TelemetryHistoryParamsSchema.parse(raw)
+    return getTelemetry(core).getHistory(dto)
+  })
+
+  // Acquisition
+  ipcMain.handle(IpcChannels.AcquisitionSimulatedPoll, (_event, raw: unknown) => {
+    const dto = SimulatedPollParamsSchema.parse(raw)
+    return core.acquisition.runSimulatedPoll(dto.deviceId, dto.registerMap, dto.ticks)
   })
 }

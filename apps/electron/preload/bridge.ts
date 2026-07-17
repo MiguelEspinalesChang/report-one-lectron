@@ -11,6 +11,9 @@ import type {
   PlatformApi,
   RegisterMap,
   RoleDto,
+  SimulatedPollParams,
+  SimulatedPollResult,
+  TelemetryHistoryParams,
 } from '@platform/shared-types'
 import { IpcChannels } from '@platform/shared-types'
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
@@ -69,6 +72,13 @@ const api: PlatformApi = {
       enable: (dto: { id: number; enabled: boolean }) => ipcRenderer.invoke(IpcChannels.CatalogDevicesEnable, dto),
       delete: (dto: { id: number }) => ipcRenderer.invoke(IpcChannels.CatalogDevicesDelete, dto),
     },
+  },
+  telemetry: {
+    getHistory: (params: TelemetryHistoryParams) => ipcRenderer.invoke(IpcChannels.TelemetryGetHistory, params),
+  },
+  acquisition: {
+    simulatedPoll: (params: SimulatedPollParams): Promise<SimulatedPollResult> =>
+      ipcRenderer.invoke(IpcChannels.AcquisitionSimulatedPoll, params),
   },
 }
 

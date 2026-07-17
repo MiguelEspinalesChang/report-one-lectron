@@ -174,6 +174,8 @@ export const IpcChannels = {
   CatalogDevicesUpdate: 'catalog:devices:update',
   CatalogDevicesEnable: 'catalog:devices:enable',
   CatalogDevicesDelete: 'catalog:devices:delete',
+  TelemetryGetHistory: 'telemetry:getHistory',
+  AcquisitionSimulatedPoll: 'acquisition:simulatedPoll',
 } as const
 
 /**
@@ -226,6 +228,12 @@ export interface PlatformApi {
       enable(dto: { id: number; enabled: boolean }): Promise<void>
       delete(dto: { id: number }): Promise<void>
     }
+  }
+  telemetry: {
+    getHistory(params: TelemetryHistoryParams): Promise<TelemetryPoint[]>
+  }
+  acquisition: {
+    simulatedPoll(params: SimulatedPollParams): Promise<SimulatedPollResult>
   }
 }
 
@@ -333,3 +341,7 @@ export {
   EnableDeviceSchema,
 } from './catalog-schemas'
 export type { RegisterEntry, RegisterMap, Transport } from './catalog-schemas'
+export {
+  TelemetryHistoryParamsSchema,
+  SimulatedPollParamsSchema,
+} from './telemetry-schemas'
