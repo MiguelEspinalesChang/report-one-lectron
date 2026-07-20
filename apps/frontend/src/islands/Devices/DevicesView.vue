@@ -10,8 +10,14 @@ import AppTable from '../../components/AppTable.vue'
 import AppToggle from '../../components/AppToggle.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import { useApiCall } from '../../composables/useApiCall'
+import {
+  SIMULATED_POLL_DEFAULT_TICKS,
+  SIMULATED_POLL_MAX_TICKS,
+  SIMULATED_POLL_MIN_TICKS,
+} from '../../constants/telemetry'
 import { useCatalogStore } from '../../stores/catalog'
 import { useSessionStore } from '../../stores/session'
+import { useTelemetryStore } from '../../stores/telemetry'
 import { useToastStore } from '../../stores/toast'
 
 const DEVICE_NAME_MAX_LENGTH = 128
@@ -60,9 +66,11 @@ const DEFAULT_TCP_CONNECTION: TcpConnectionForm = {
 const { t } = useI18n()
 const catalogStore = useCatalogStore()
 const sessionStore = useSessionStore()
+const telemetryStore = useTelemetryStore()
 const toastStore = useToastStore()
 const { loading, call } = useApiCall()
 const canManageDevices = computed(() => sessionStore.hasPermission('devices.manage'))
+const canViewTelemetry = computed(() => sessionStore.hasPermission('telemetry.view'))
 
 onMounted(async () => {
   await call(async () => {
@@ -328,6 +336,54 @@ async function toggleDeviceEnabled(device: DeviceDto, nextEnabled: boolean): Pro
     )
   }
 }
+
+// ========== Simulated poll (R8) ==========
+const pollModalOpen = ref(false)
+const pollDevice = ref<DeviceDto | null>(null)
+const pollTicks = ref(SIMULATED_POLL_DEFAULT_TICKS)
+
+const pollTicksValid = computed(() => {
+  const parsed = toInt(pollTicks.value)
+  return parsed !== null && parsed >= SIMULATED_POLL_MIN_TICKS && parsed <= SIMULATED_POLL_MAX_TICKS
+})
+
+function openGeneratePoll(device: DeviceDto): void {
+  if (!canManageDevices.value) return
+  pollDevice.value = device
+  pollTicks.value = SIMULATED_POLL_DEFAULT_TICKS
+  pollModalOpen.value = true
+}
+
+async function submitGeneratePoll(): Promise<void> {
+  if (!canManageDevices.value) return
+  const device = pollDevice.value
+  const ticks = toInt(pollTicks.value)
+  if (!device || ticks === null || !pollTicksValid.value) return
+
+  const model = modelsById.value.get(device.modelId)
+  if (!model) return
+
+  const result = await call(() =>
+    telemetryStore.triggerSimulatedPoll({
+      deviceId: device.id,
+      registerMap: model.registerMap,
+      ticks,
+    }),
+  )
+
+  if (result) {
+    pollModalOpen.value = false
+    toastStore.show(
+      'success',
+      t('telemetry.poll.resultToast', {
+        inserted: result.inserted,
+        ignored: result.ignored,
+        ticks: result.ticks,
+        metrics: result.metrics,
+      }),
+    )
+  }
+}
 </script>
 
 <template>
@@ -371,7 +427,7 @@ async function toggleDeviceEnabled(device: DeviceDto, nextEnabled: boolean): Pro
             {{ t('catalog.devices.columns.toggle') }}
           </th>
           <th
-            v-if="canManageDevices"
+            v-if="canManageDevices || canViewTelemetry"
             class="px-4 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400"
           >
             {{ t('catalog.devices.columns.actions') }}
@@ -400,11 +456,27 @@ async function toggleDeviceEnabled(device: DeviceDto, nextEnabled: boolean): Pro
               @update:model-value="toggleDeviceEnabled(row, $event)"
             />
           </td>
-          <td v-if="canManageDevices" class="px-4 py-3 text-right text-sm">
-            <button type="button" class="btn-ghost btn" @click="openEditDevice(row)">
+          <td v-if="canManageDevices || canViewTelemetry" class="px-4 py-3 text-right text-sm">
+            <router-link v-if="canViewTelemetry" :to="`/telemetry/${row.id}`" class="btn-ghost btn">
+              {{ t('telemetry.history.link') }}
+            </router-link>
+            <button
+              v-if="canManageDevices && row.transport === 'simulated'"
+              type="button"
+              class="btn-ghost btn"
+              @click="openGeneratePoll(row)"
+            >
+              {{ t('telemetry.poll.action') }}
+            </button>
+            <button v-if="canManageDevices" type="button" class="btn-ghost btn" @click="openEditDevice(row)">
               {{ t('common.edit') }}
             </button>
-            <button type="button" class="btn-ghost btn text-danger-600" @click="openDeleteDevice(row)">
+            <button
+              v-if="canManageDevices"
+              type="button"
+              class="btn-ghost btn text-danger-600"
+              @click="openDeleteDevice(row)"
+            >
               {{ t('common.delete') }}
             </button>
           </td>
@@ -561,5 +633,35 @@ async function toggleDeviceEnabled(device: DeviceDto, nextEnabled: boolean): Pro
       variant="danger"
       @confirm="confirmDeleteDevice"
     />
+
+    <AppModal v-if="canManageDevices" v-model:open="pollModalOpen" size="sm">
+      <template #title>
+        {{ t('telemetry.poll.title', { name: pollDevice?.name ?? '' }) }}
+      </template>
+      <template #body>
+        <AppInput
+          v-model="pollTicks"
+          :label="t('telemetry.poll.ticksLabel')"
+          type="number"
+          :disabled="loading"
+        />
+        <p v-if="!pollTicksValid" class="mt-2 text-sm text-red-600">
+          {{ t('telemetry.poll.ticksValidation', { max: SIMULATED_POLL_MAX_TICKS }) }}
+        </p>
+      </template>
+      <template #footer>
+        <button type="button" class="btn" @click="pollModalOpen = false">
+          {{ t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          :disabled="loading || !pollTicksValid"
+          @click="submitGeneratePoll"
+        >
+          {{ t('telemetry.poll.confirm') }}
+        </button>
+      </template>
+    </AppModal>
   </div>
 </template>

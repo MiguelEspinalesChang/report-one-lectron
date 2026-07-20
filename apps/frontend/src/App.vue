@@ -27,6 +27,7 @@ const NAV_ITEMS: Array<NavItem & { permission: string | null }> = [
   { name: 'dashboard', labelKey: 'nav.dashboard', permission: null },
   { name: 'catalog', labelKey: 'nav.catalog', permission: 'devices.view' },
   { name: 'devices', labelKey: 'nav.devices', permission: 'devices.view' },
+  { name: 'telemetry', labelKey: 'nav.telemetry', permission: 'telemetry.view' },
   { name: 'users', labelKey: 'nav.users', permission: 'users.manage' },
 ]
 

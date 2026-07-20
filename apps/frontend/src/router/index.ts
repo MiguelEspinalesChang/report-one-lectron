@@ -7,6 +7,7 @@ import DevicesView from '../islands/Devices/DevicesView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
 import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
 import LoginView from '../islands/Auth/LoginView.vue'
+import TelemetryView from '../islands/Telemetry/TelemetryView.vue'
 import UsersView from '../islands/Users/UsersView.vue'
 
 // Hash history is required because Electron loads the app from file:// in
@@ -32,6 +33,12 @@ const router = createRouter({
       name: 'devices',
       component: DevicesView,
       meta: { breadcrumb: 'nav.devices', permission: 'devices.view' },
+    },
+    {
+      path: '/telemetry/:deviceId?',
+      name: 'telemetry',
+      component: TelemetryView,
+      meta: { breadcrumb: 'nav.telemetry', permission: 'telemetry.view' },
     },
     {
       path: '/catalog/models/new',

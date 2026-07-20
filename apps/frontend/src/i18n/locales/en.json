@@ -25,6 +25,7 @@
     "dashboard": "Dashboard",
     "catalog": "Catalog",
     "devices": "Devices",
+    "telemetry": "Telemetry",
     "users": "Users",
     "login": "Login",
     "openMenu": "Open menu"
@@ -295,6 +296,38 @@
         "big_endian": "Big endian",
         "little_endian": "Little endian"
       }
+    }
+  },
+  "telemetry": {
+    "deviceSelector": {
+      "label": "Device",
+      "placeholder": "Select a device…",
+      "empty": "Select a device to view its telemetry."
+    },
+    "history": {
+      "title": "History — {name}",
+      "link": "History",
+      "metricLabel": "Metric",
+      "rangeLabel": "Range",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "avgLabel": "Average",
+      "bandLabel": "Min–max",
+      "empty": "No telemetry data in this range yet.",
+      "ranges": {
+        "oneHour": "Last hour",
+        "oneDay": "Last 24 hours",
+        "sevenDays": "Last 7 days",
+        "custom": "Custom range"
+      }
+    },
+    "poll": {
+      "action": "Generate data",
+      "title": "Generate simulated data — {name}",
+      "ticksLabel": "Ticks",
+      "ticksValidation": "Ticks must be between 1 and {max}.",
+      "confirm": "Generate",
+      "resultToast": "Generated {ticks} ticks across {metrics} metrics — {inserted} inserted, {ignored} ignored."
     }
   }
 }
