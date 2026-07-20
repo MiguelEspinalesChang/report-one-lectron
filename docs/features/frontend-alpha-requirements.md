@@ -1,6 +1,6 @@
 # Requerimientos del frontend — Fase Alfa avanzada
 
-**Estado:** DEFINIDO — pendiente de implementación
+**Estado:** Fases 0-8 implementadas — pendiente la pasada final del checklist de aceptación (§8) con los 3 roles
 **Alcance:** `apps/frontend` (renderer Vue) + los gaps de IPC mínimos que el alfa necesita
 **Documentos normativos:** `docs/ARCHITECTURE.md`, `docs/HEXAGONAL.md`, `docs/features/vue-backend-integration.md`
 **Sistema de diseño:** Vue 3 + Tailwind CSS v4 + [Preline UI](https://preline.co/docs/) (ver F6)
@@ -298,12 +298,12 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 | 0 | Infraestructura UI | F1 (router base), F4, F5 (skeleton), F6 | — | ✅ Hecha |
 | 1 | Autenticación y shell del admin (solo admin seed, con breadcrumbs) | R1, F1 (guards), F2 (session), F3 | 0 | ✅ Hecha (smoke visual pendiente) |
 | 2 | Catálogo: marcas | R3 | 1 | ✅ Hecha |
-| 3 | Catálogo: modelos + editor de mapa | R4 | 2 | ⬜ Pendiente |
-| 4 | Catálogo: dispositivos | R5 | 3 | ⬜ Pendiente |
-| 5 | Usuarios y permisos | R2, §5 completo | 1 | ⬜ Pendiente |
-| 6 | Backend: gaps de IPC | §6.1, §6.2 | — (backend) | ⬜ Pendiente |
-| 7 | Telemetría: poll + historial | R8, R7 | 4, 6 | ⬜ Pendiente |
-| 8 | Vivo real y pulido | R6, §6.3 | 4 | ⬜ Pendiente |
+| 3 | Catálogo: modelos + editor de mapa | R4 | 2 | ✅ Hecha |
+| 4 | Catálogo: dispositivos | R5 | 3 | ✅ Hecha |
+| 5 | Usuarios y permisos | R2, §5 completo | 1 | ✅ Hecha |
+| 6 | Backend: gaps de IPC | §6.1, §6.2 | — (backend) | ✅ Hecha |
+| 7 | Telemetría: poll + historial | R8, R7 | 4, 6 | ✅ Hecha |
+| 8 | Vivo real y pulido | R6, §6.3 | 4 | ✅ Hecha |
 
 ### Fase 0 — Infraestructura UI
 
@@ -351,11 +351,11 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** la pieza de UI más grande del alfa. Fase dedicada exclusivamente a esto.
 
-- [ ] Lista por marca y global (R4.1) reutilizando `AppTable`.
-- [ ] Alta de modelo (R4.2) y editor de mapa (R4.3): tabla editable compuesta con `AppSelect` + `AppInput`, validación espejo del schema zod (R4.4).
-- [ ] Edición de mapa existente con advertencia sobre `metric` (R4.5) vía `ConfirmDialog`.
-- [ ] Borrado con `MeterModelInUseError` (R4.6).
-- [ ] Verificación con el seed `SIM-100` (R4.7).
+- [x] Lista por marca y global (R4.1) reutilizando `AppTable`.
+- [x] Alta de modelo (R4.2) y editor de mapa (R4.3): tabla editable compuesta con `AppSelect` + `AppInput`, validación espejo del schema zod (R4.4).
+- [x] Edición de mapa existente con advertencia sobre `metric` (R4.5) vía `ConfirmDialog`.
+- [x] Borrado con `MeterModelInUseError` (R4.6).
+- [x] Verificación con el seed `SIM-100` (R4.7).
 
 **Cierre:** crear un modelo con 3+ métricas desde la UI, editarlo, y ver `SIM-100` renderizado correcto; métricas duplicadas y address fuera de rango se rechazan ANTES de enviar.
 
@@ -363,10 +363,10 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** cerrar el catálogo con el formulario condicional por transporte.
 
-- [ ] Lista con `AppBadge` (transporte, enabled) y `AppToggle` para enable/disable (R5.1, R5.4).
-- [ ] Alta/edición con formulario condicional por transporte (R5.2, R5.3): `serial`/`tcp` con sus campos, `simulated`/`csv` sin conexión.
-- [ ] Borrado con confirmación (R5.5).
-- [ ] Namespace i18n `catalog` completo.
+- [x] Lista con `AppBadge` (transporte, enabled) y `AppToggle` para enable/disable (R5.1, R5.4).
+- [x] Alta/edición con formulario condicional por transporte (R5.2, R5.3): `serial`/`tcp` con sus campos, `simulated`/`csv` sin conexión.
+- [x] Borrado con confirmación (R5.5).
+- [x] Namespace i18n `catalog` completo.
 
 **Cierre:** crear dispositivos `simulated`, `tcp` y `csv` desde la UI; el seed `Test simulator` visible y editable; validación de conexión por transporte funcionando.
 
@@ -374,10 +374,10 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** gestión de usuarios y enforcement de permisos en TODA la app (recién acá hay usuarios no-admin para probarlo).
 
-- [ ] `useUsersStore`; tabla de usuarios (R2.1), alta (R2.2), cambio de rol (R2.3); `isActive` visible sin acción (R2.4).
-- [ ] Guard de permisos en `meta` de cada ruta (§5) + navegación que oculta secciones sin permiso.
-- [ ] Acciones de escritura del catálogo ocultas sin `devices.manage` (modo solo-lectura con `devices.view`).
-- [ ] Namespace i18n `users`.
+- [x] `useUsersStore`; tabla de usuarios (R2.1), alta (R2.2), cambio de rol (R2.3); `isActive` visible sin acción (R2.4).
+- [x] Guard de permisos en `meta` de cada ruta (§5) + navegación que oculta secciones sin permiso.
+- [x] Acciones de escritura del catálogo ocultas sin `devices.manage` (modo solo-lectura con `devices.view`).
+- [x] Namespace i18n `users`.
 
 **Cierre:** crear un `operator` y un `viewer`; login con cada uno y verificar visibilidad exacta según §5.
 
@@ -385,9 +385,9 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** habilitar telemetría desde el renderer. Sigue `.claude/skills/add-rpc-method/SKILL.md`; se puede hacer en paralelo con las fases 2–5.
 
-- [ ] `telemetry:getHistory` (§6.1): canal IPC + `PlatformApi.telemetry` + preload + handler delegación.
-- [ ] `acquisition:simulatedPoll` (§6.2): ídem con `PlatformApi.acquisition`.
-- [ ] Tests de frontera (zod en IPC) según el patrón existente.
+- [x] `telemetry:getHistory` (§6.1): canal IPC + `PlatformApi.telemetry` + preload + handler delegación.
+- [x] `acquisition:simulatedPoll` (§6.2): ídem con `PlatformApi.acquisition`.
+- [x] Tests de frontera (zod en IPC) según el patrón existente.
 
 **Cierre:** ambos métodos invocables desde la consola del renderer con datos reales; `pnpm test` verde (recordar `rebuild:node`).
 
@@ -395,10 +395,12 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** el ciclo de datos completo visible: generar → persistir → graficar.
 
-- [ ] Acción "generar datos" en dispositivos `simulated` con resultado visible (R8).
-- [ ] Elegir e integrar la librería de gráficos (R7.4) — un solo componente presentacional de gráfico.
-- [ ] Vista de historial: selector de métrica (derivado del mapa del modelo), presets de rango, `bucketMs` acorde (R7.1); gráfico avg con banda min–max (R7.2); estado vacío correcto (R7.3).
-- [ ] Namespace i18n `telemetry`.
+- [x] Acción "generar datos" en dispositivos `simulated` con resultado visible (R8).
+- [x] Elegir e integrar la librería de gráficos (R7.4) — un solo componente presentacional de gráfico (`TelemetryChart.vue`, Chart.js + vue-chartjs).
+- [x] Vista de historial: selector de métrica (derivado del mapa del modelo), presets de rango, `bucketMs` acorde (R7.1); gráfico avg con banda min–max (R7.2); estado vacío correcto (R7.3).
+- [x] Namespace i18n `telemetry`.
+
+**Decisión de UX 2026-07-20:** telemetría pasó a tener entrada propia en el sidebar (`Telemetría` → `/telemetry/:deviceId?`, con selector de dispositivo) en vez de vivir únicamente colgada de una fila de `/devices`. Los botones "historial" y "generar datos" de cada fila de `DevicesView.vue` se mantienen como accesos rápidos (deep-link a la vista consolidada / acción inline), no se duplicó lógica de negocio.
 
 **Cierre:** poll de 100 ticks sobre el seed → historial graficado min/avg/max; rango sin datos muestra vacío, no error.
 
@@ -406,8 +408,8 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** cerrar el alfa con la vista en vivo alimentada por datos coherentes.
 
-- [ ] Backend §6.3: reemplazar `_emit_readings` placeholder por `SimulatedReader` con el mapa del dispositivo.
-- [ ] Vista en vivo completa (R6): estado por `AppBadge`, últimas lecturas por métrica, gráfico de ventana reciente reutilizando el componente de Fase 7, cleanup verificado en unmount.
-- [ ] Pasada final del checklist §8 completo con los 3 roles.
+- [x] Backend §6.3: reemplazar `_emit_readings` placeholder por `SimulatedReader` con el mapa del dispositivo.
+- [x] Vista en vivo completa (R6): estado por `AppBadge`, últimas lecturas por métrica, gráfico de ventana reciente reutilizando el componente de Fase 7, cleanup verificado en unmount.
+- [ ] Pasada final del checklist §8 completo con los 3 roles — pendiente de smoke manual.
 
 **Cierre:** checklist §8 íntegro en verde — fin del alfa.
