@@ -75,6 +75,20 @@ export interface DeviceStatus {
   state: DeviceState
 }
 
+/**
+ * Params sent to device.watch over RPC.
+ *
+ * Internal core <-> python contract only — NOT part of `PlatformApi`.
+ * The renderer/IPC boundary keeps `devices.watch(deviceId)` as a single
+ * argument; core resolves the device's register map from the catalog
+ * repositories and forwards it here so python (which never touches
+ * app.db, see docs/ARCHITECTURE.md §11) can drive SimulatedReader.
+ */
+export interface DeviceWatchRpcParams {
+  deviceId: number
+  registerMap: RegisterMap
+}
+
 // ---------------------------------------------------------------------------
 // DTOs — auth
 // ---------------------------------------------------------------------------

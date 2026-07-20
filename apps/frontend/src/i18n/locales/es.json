@@ -10,11 +10,31 @@
     "pinging": "Consultando…",
     "answer": "Python {version} respondió desde el PID {pid}"
   },
-  "devices": {
-    "title": "Vista en vivo (dispositivo demo)",
-    "start": "Iniciar vista en vivo",
-    "stop": "Detener vista en vivo",
-    "empty": "Sin lecturas todavía — iniciá la vista en vivo."
+  "live": {
+    "title": "En vivo — {name}",
+    "link": "En vivo",
+    "breadcrumb": "En vivo",
+    "status": {
+      "connecting": "Conectando…",
+      "connected": "Conectado",
+      "degraded": "Degradado",
+      "disconnected": "Desconectado"
+    },
+    "readings": {
+      "columns": {
+        "metric": "Métrica",
+        "value": "Valor",
+        "timestamp": "Hora"
+      }
+    },
+    "metricSelector": {
+      "label": "Métrica"
+    },
+    "chart": {
+      "avgLabel": "Valor",
+      "bandLabel": "Rango"
+    },
+    "empty": "Todavía no hay lecturas en vivo — esperando datos del dispositivo."
   },
   "language": {
     "label": "Idioma"

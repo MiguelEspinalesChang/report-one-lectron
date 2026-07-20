@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { useSessionStore } from '../stores/session'
 import ChangePasswordView from '../islands/Auth/ChangePasswordView.vue'
 import DashboardView from '../islands/Dashboard/DashboardView.vue'
+import DeviceLiveView from '../islands/Devices/DeviceLiveView.vue'
 import DevicesView from '../islands/Devices/DevicesView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
 import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
@@ -39,6 +40,16 @@ const router = createRouter({
       name: 'telemetry',
       component: TelemetryView,
       meta: { breadcrumb: 'nav.telemetry', permission: 'telemetry.view' },
+    },
+    {
+      path: '/devices/:deviceId/live',
+      name: 'device-live',
+      component: DeviceLiveView,
+      meta: {
+        breadcrumb: 'live.breadcrumb',
+        parent: { path: '/devices', breadcrumb: 'nav.devices' },
+        permission: 'telemetry.view',
+      },
     },
     {
       path: '/catalog/models/new',

@@ -460,6 +460,9 @@ async function submitGeneratePoll(): Promise<void> {
             <router-link v-if="canViewTelemetry" :to="`/telemetry/${row.id}`" class="btn-ghost btn">
               {{ t('telemetry.history.link') }}
             </router-link>
+            <router-link v-if="canViewTelemetry" :to="`/devices/${row.id}/live`" class="btn-ghost btn">
+              {{ t('live.link') }}
+            </router-link>
             <button
               v-if="canManageDevices && row.transport === 'simulated'"
               type="button"

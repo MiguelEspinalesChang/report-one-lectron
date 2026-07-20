@@ -103,7 +103,7 @@ export async function createCore(options: CreateCoreOptions): Promise<Core> {
   return {
     bridge,
     system: new SystemService(bridge),
-    devices: new DeviceService(bridge),
+    devices: new DeviceService(bridge, catalogDeviceRepository, meterModelRepository),
     auth: new AuthService(userRepository, roleRepository, hasher, session),
     userManagement: new UserManagementService(userRepository, roleRepository, hasher),
     catalog: {

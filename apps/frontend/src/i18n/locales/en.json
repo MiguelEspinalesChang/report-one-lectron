@@ -10,11 +10,31 @@
     "pinging": "Pinging…",
     "answer": "Python {version} answered from PID {pid}"
   },
-  "devices": {
-    "title": "Live view (demo device)",
-    "start": "Start live view",
-    "stop": "Stop live view",
-    "empty": "No readings yet — start the live view."
+  "live": {
+    "title": "Live — {name}",
+    "link": "Live",
+    "breadcrumb": "Live",
+    "status": {
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "degraded": "Degraded",
+      "disconnected": "Disconnected"
+    },
+    "readings": {
+      "columns": {
+        "metric": "Metric",
+        "value": "Value",
+        "timestamp": "Time"
+      }
+    },
+    "metricSelector": {
+      "label": "Metric"
+    },
+    "chart": {
+      "avgLabel": "Value",
+      "bandLabel": "Range"
+    },
+    "empty": "No live readings yet — waiting for data from the device."
   },
   "language": {
     "label": "Language"
