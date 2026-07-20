@@ -9,6 +9,9 @@ defineProps<{
   triggerId: string
   menuId: string
   items: DropdownItem[]
+  /** Overrides the trigger's styling. Defaults to the shared `.btn` look;
+   * pass a custom class for a lighter trigger (e.g. the topbar user chip). */
+  triggerClass?: string
 }>()
 </script>
 
@@ -17,7 +20,8 @@ defineProps<{
     <button
       :id="triggerId"
       type="button"
-      class="btn hs-dropdown-toggle"
+      class="hs-dropdown-toggle"
+      :class="triggerClass ?? 'btn'"
       aria-haspopup="menu"
       aria-expanded="false"
       :aria-controls="menuId"

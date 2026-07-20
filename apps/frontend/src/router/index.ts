@@ -8,7 +8,6 @@ import DevicesView from '../islands/Devices/DevicesView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
 import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
 import LoginView from '../islands/Auth/LoginView.vue'
-import DesignSystemView from '../islands/Settings/DesignSystemView.vue'
 import TelemetryView from '../islands/Telemetry/TelemetryView.vue'
 import UsersView from '../islands/Users/UsersView.vue'
 
@@ -78,12 +77,19 @@ const router = createRouter({
       component: UsersView,
       meta: { breadcrumb: 'nav.users', permission: 'users.manage' },
     },
-    {
-      path: '/design-system',
-      name: 'design-system',
-      component: DesignSystemView,
-      meta: { breadcrumb: 'nav.designSystem' },
-    },
+    // Design System is a dev-only reference page. In production builds
+    // import.meta.env.DEV is the literal `false`, so this branch (and the
+    // lazy import) is dead-code-eliminated — the view never ships.
+    ...(import.meta.env.DEV
+      ? [
+          {
+            path: '/design-system',
+            name: 'design-system',
+            component: () => import('../islands/Settings/DesignSystemView.vue'),
+            meta: { breadcrumb: 'nav.designSystem' },
+          },
+        ]
+      : []),
     {
       path: '/change-password',
       name: 'change-password',

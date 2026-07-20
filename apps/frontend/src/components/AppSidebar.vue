@@ -2,6 +2,7 @@
 import { nextTick, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
+import AppBadge from './AppBadge.vue'
 
 /** One entry in the sidebar nav. Visibility (permission filtering) is the
  * container's (App.vue) responsibility — this component only renders what
@@ -9,6 +10,9 @@ import { RouterLink, useRoute } from 'vue-router'
 export interface NavItem {
   name: 'dashboard' | 'catalog' | 'devices' | 'telemetry' | 'users' | 'design-system'
   labelKey: string
+  /** Optional count pill rendered at the right of the item. Only shown when
+   * set — the container passes a real count or nothing; never placeholder data. */
+  badge?: string | number
 }
 
 /** A titled group of nav items (e.g. "General", "System"). Groups already
@@ -80,17 +84,17 @@ onMounted(() => {
     <!-- Nav -->
     <nav class="p-3" :aria-label="t('nav.main')">
       <div v-for="group in props.groups" :key="group.titleKey" class="mb-4 last:mb-0">
-        <p class="mb-1 px-3 text-[11px] font-semibold tracking-wide text-slate-400 uppercase">
+        <p class="mb-2 px-3 text-[11px] font-semibold tracking-wide text-slate-400 uppercase">
           {{ t(group.titleKey) }}
         </p>
-        <ul role="list" class="space-y-0.5">
+        <ul role="list" class="space-y-1">
           <li v-for="item in group.items" :key="item.name">
               <RouterLink
                 :to="{ name: item.name }"
-                class="flex items-center gap-x-3 rounded-btn px-3 py-2 text-sm font-medium
-                       text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900
-                       focus:outline-none focus:bg-slate-100"
-                active-class="bg-primary-50 text-primary-800 font-semibold hover:bg-primary-100"
+                class="flex items-center gap-x-3 rounded-btn px-3 py-2.5 text-sm font-medium
+                       text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900
+                       focus:outline-none focus:bg-slate-50"
+                active-class="bg-primary-50 text-primary-700 font-semibold hover:bg-primary-100"
               >
                 <!-- Dashboard icon -->
                 <svg
@@ -210,7 +214,12 @@ onMounted(() => {
                   />
                 </svg>
 
-                {{ t(item.labelKey) }}
+                <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
+                <AppBadge
+                  v-if="item.badge != null"
+                  :label="String(item.badge)"
+                  tone="success"
+                />
               </RouterLink>
             </li>
           </ul>

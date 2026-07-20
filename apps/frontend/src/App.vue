@@ -37,7 +37,12 @@ const NAV_GROUPS: Array<{ titleKey: string; items: Array<NavItem & { permission:
   },
   {
     titleKey: 'nav.groups.system',
-    items: [{ name: 'design-system', labelKey: 'nav.designSystem', permission: null }],
+    // Design System is a dev-only reference page: in production builds
+    // import.meta.env.DEV is the literal `false`, so this group ends up with
+    // no items and visibleNavGroups drops it entirely (no empty group renders).
+    items: import.meta.env.DEV
+      ? [{ name: 'design-system', labelKey: 'nav.designSystem', permission: null }]
+      : [],
   },
 ]
 
@@ -81,8 +86,8 @@ const userMenuItems = computed<DropdownItem[]>(() => [
     <div class="lg:ps-64">
       <!-- Topbar -->
       <header
-        class="sticky top-0 z-40 flex h-14 items-center gap-x-3 border-b border-line
-               bg-white px-4"
+        class="sticky top-0 z-40 flex h-16 items-center gap-x-3 border-b border-line
+               bg-white px-6"
       >
         <!-- Hamburger (mobile only) -->
         <button
@@ -117,28 +122,30 @@ const userMenuItems = computed<DropdownItem[]>(() => [
         </div>
 
         <!-- Right-side controls -->
-        <div class="flex shrink-0 items-center gap-3">
+        <div class="flex shrink-0 items-center gap-4">
           <SidecarHealth />
           <LanguageSwitcher />
+
+          <!-- Divider between controls and the user chip -->
+          <span class="h-8 w-px bg-line" aria-hidden="true" />
 
           <AppDropdown
             trigger-id="user-menu-btn"
             menu-id="user-menu"
             :items="userMenuItems"
+            trigger-class="flex items-center gap-2.5 rounded-btn px-2 py-1.5 text-left transition-colors hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
           >
-            <span class="flex items-center gap-2">
-              <AvatarInitials :name="session!.displayName" size="sm" />
-              <span class="flex flex-col items-start text-left">
-                <span class="text-sm font-medium">{{ session!.displayName }}</span>
-                <span class="text-xs text-slate-500">{{ session!.roleName }}</span>
-              </span>
+            <AvatarInitials :name="session!.displayName" size="sm" />
+            <span class="flex flex-col items-start leading-tight">
+              <span class="text-sm font-medium text-slate-900">{{ session!.displayName }}</span>
+              <span class="text-xs text-slate-500">{{ session!.roleName }}</span>
             </span>
           </AppDropdown>
         </div>
       </header>
 
       <!-- Page content -->
-      <main class="min-h-[calc(100vh-3.5rem)] bg-slate-50 p-7">
+      <main class="min-h-[calc(100vh-4rem)] bg-slate-50 p-7">
         <div class="mx-auto max-w-content">
           <p
             v-if="!hasBridge"
