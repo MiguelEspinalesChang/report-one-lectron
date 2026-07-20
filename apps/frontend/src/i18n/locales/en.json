@@ -4,6 +4,15 @@
     "subtitle": "Device management, Modbus acquisition and reporting",
     "noBridge": "Bridge not available — open this UI through the Electron shell, not a plain browser."
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Hi {name}, here's a quick overview of the platform.",
+    "kpi": {
+      "sidecar": "Python sidecar",
+      "devices": "Catalog devices",
+      "role": "Current role"
+    }
+  },
   "system": {
     "title": "Python sidecar",
     "ping": "Ping sidecar",
@@ -48,7 +57,12 @@
     "telemetry": "Telemetry",
     "users": "Users",
     "login": "Login",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "designSystem": "Design System",
+    "groups": {
+      "general": "General",
+      "system": "System"
+    }
   },
   "common": {
     "comingSoon": "Coming soon — not yet implemented.",
@@ -348,6 +362,82 @@
       "ticksValidation": "Ticks must be between 1 and {max}.",
       "confirm": "Generate",
       "resultToast": "Generated {ticks} ticks across {metrics} metrics — {inserted} inserted, {ignored} ignored."
+    }
+  },
+  "designSystem": {
+    "eyebrow": "Design System",
+    "title": "Component library",
+    "subtitle": "Live documentation of every base component used across the app — built straight from the design tokens, not a mockup.",
+    "backToDashboard": "Back to dashboard",
+    "sections": {
+      "palette": {
+        "title": "Color palette",
+        "primary": "Primary",
+        "success": "Success",
+        "slate": "Slate"
+      },
+      "typography": {
+        "title": "Typography",
+        "display": "Display — 30px / 800",
+        "h1": "Heading 1 — 24px / 700",
+        "h2": "Heading 2 — 18px / 700",
+        "body": "Body — 14px / 400",
+        "caption": "Caption — 12px / 500"
+      },
+      "buttons": {
+        "title": "Buttons",
+        "primary": "Primary",
+        "success": "Success",
+        "soft": "Soft",
+        "ghost": "Ghost",
+        "danger": "Danger"
+      },
+      "forms": {
+        "title": "Forms",
+        "inputLabel": "Display name",
+        "inputPlaceholder": "e.g. Operator One",
+        "inputErrorLabel": "Username",
+        "inputErrorText": "Username is required.",
+        "selectLabel": "Role",
+        "toggleLabel": "Enable notifications",
+        "checkboxLabel": "Force password change",
+        "selectOptions": {
+          "operator": "Operator",
+          "admin": "Admin",
+          "viewer": "Viewer"
+        }
+      },
+      "badges": {
+        "title": "Badges",
+        "neutral": "Neutral",
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "danger": "Danger"
+      },
+      "avatars": {
+        "title": "Avatars"
+      },
+      "alerts": {
+        "title": "Alerts",
+        "successTitle": "Device saved",
+        "successDescription": "The device configuration was saved successfully.",
+        "infoTitle": "Heads up",
+        "infoDescription": "This action affects how future telemetry readings are recorded.",
+        "dangerTitle": "Connection failed",
+        "dangerDescription": "Could not reach the sidecar. Check the serial connection."
+      },
+      "cards": {
+        "title": "Cards",
+        "basicTitle": "Basic island",
+        "basicBody": "Any content can live inside an .island card — the shared border, radius and padding come from the design system.",
+        "kpiLabel": "Active devices",
+        "kpiValue": "24",
+        "kpiValueDown": "18",
+        "kpiComparison": "vs. last week",
+        "highlightTitle": "Gradient card",
+        "highlightBody": "primary-600 → success-600, for callouts that need extra emphasis."
+      }
     }
   }
 }

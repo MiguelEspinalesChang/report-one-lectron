@@ -6,8 +6,9 @@ import AppBreadcrumb from './components/AppBreadcrumb.vue'
 import AppDropdown from './components/AppDropdown.vue'
 import type { DropdownItem } from './components/AppDropdown.vue'
 import AppSidebar from './components/AppSidebar.vue'
-import type { NavItem } from './components/AppSidebar.vue'
+import type { NavGroup, NavItem } from './components/AppSidebar.vue'
 import AppToast from './components/AppToast.vue'
+import AvatarInitials from './components/AvatarInitials.vue'
 import LanguageSwitcher from './components/LanguageSwitcher.vue'
 import SidecarHealth from './islands/Dashboard/SidecarHealth.vue'
 import { useSessionStore } from './stores/session'
@@ -22,17 +23,31 @@ const session = computed(() => sessionStore.session)
 const hasBreadcrumbs = computed(() => route.matched.some((r) => r.meta.breadcrumb != null))
 
 // Sidebar nav config + permission gating live here — AppSidebar is a pure
-// presentational component that only renders the items it's given.
-const NAV_ITEMS: Array<NavItem & { permission: string | null }> = [
-  { name: 'dashboard', labelKey: 'nav.dashboard', permission: null },
-  { name: 'catalog', labelKey: 'nav.catalog', permission: 'devices.view' },
-  { name: 'devices', labelKey: 'nav.devices', permission: 'devices.view' },
-  { name: 'telemetry', labelKey: 'nav.telemetry', permission: 'telemetry.view' },
-  { name: 'users', labelKey: 'nav.users', permission: 'users.manage' },
+// presentational component that only renders the groups/items it's given.
+const NAV_GROUPS: Array<{ titleKey: string; items: Array<NavItem & { permission: string | null }> }> = [
+  {
+    titleKey: 'nav.groups.general',
+    items: [
+      { name: 'dashboard', labelKey: 'nav.dashboard', permission: null },
+      { name: 'catalog', labelKey: 'nav.catalog', permission: 'devices.view' },
+      { name: 'devices', labelKey: 'nav.devices', permission: 'devices.view' },
+      { name: 'telemetry', labelKey: 'nav.telemetry', permission: 'telemetry.view' },
+      { name: 'users', labelKey: 'nav.users', permission: 'users.manage' },
+    ],
+  },
+  {
+    titleKey: 'nav.groups.system',
+    items: [{ name: 'design-system', labelKey: 'nav.designSystem', permission: null }],
+  },
 ]
 
-const visibleNavItems = computed<NavItem[]>(() =>
-  NAV_ITEMS.filter((item) => item.permission === null || sessionStore.hasPermission(item.permission)),
+const visibleNavGroups = computed<NavGroup[]>(() =>
+  NAV_GROUPS.map((group) => ({
+    titleKey: group.titleKey,
+    items: group.items.filter(
+      (item) => item.permission === null || sessionStore.hasPermission(item.permission),
+    ),
+  })).filter((group) => group.items.length > 0),
 )
 
 // Show the dashboard shell only when there is a fully-authenticated session
@@ -60,13 +75,13 @@ const userMenuItems = computed<DropdownItem[]>(() => [
 <template>
   <!-- ── Dashboard shell layout ──────────────────────────────────────────── -->
   <template v-if="showShell">
-    <AppSidebar :items="visibleNavItems" />
+    <AppSidebar :groups="visibleNavGroups" />
 
     <!-- Content wrapper — offset by sidebar width on lg+ -->
     <div class="lg:ps-64">
       <!-- Topbar -->
       <header
-        class="sticky top-0 z-40 flex h-14 items-center gap-x-3 border-b border-slate-200
+        class="sticky top-0 z-40 flex h-14 items-center gap-x-3 border-b border-line
                bg-white px-4"
       >
         <!-- Hamburger (mobile only) -->
@@ -111,24 +126,29 @@ const userMenuItems = computed<DropdownItem[]>(() => [
             menu-id="user-menu"
             :items="userMenuItems"
           >
-            <span class="flex flex-col items-start text-left">
-              <span class="text-sm font-medium">{{ session!.displayName }}</span>
-              <span class="text-xs text-slate-500">{{ session!.roleName }}</span>
+            <span class="flex items-center gap-2">
+              <AvatarInitials :name="session!.displayName" size="sm" />
+              <span class="flex flex-col items-start text-left">
+                <span class="text-sm font-medium">{{ session!.displayName }}</span>
+                <span class="text-xs text-slate-500">{{ session!.roleName }}</span>
+              </span>
             </span>
           </AppDropdown>
         </div>
       </header>
 
       <!-- Page content -->
-      <main class="min-h-[calc(100vh-3.5rem)] bg-slate-50 p-6">
-        <p
-          v-if="!hasBridge"
-          class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm
-                 text-amber-800"
-        >
-          {{ t('app.noBridge') }}
-        </p>
-        <RouterView />
+      <main class="min-h-[calc(100vh-3.5rem)] bg-slate-50 p-7">
+        <div class="mx-auto max-w-content">
+          <p
+            v-if="!hasBridge"
+            class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm
+                   text-amber-800"
+          >
+            {{ t('app.noBridge') }}
+          </p>
+          <RouterView />
+        </div>
       </main>
     </div>
   </template>

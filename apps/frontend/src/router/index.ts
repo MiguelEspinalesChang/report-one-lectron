@@ -8,6 +8,7 @@ import DevicesView from '../islands/Devices/DevicesView.vue'
 import CatalogView from '../islands/Inventory/CatalogView.vue'
 import CatalogModelFormView from '../islands/Inventory/CatalogModelFormView.vue'
 import LoginView from '../islands/Auth/LoginView.vue'
+import DesignSystemView from '../islands/Settings/DesignSystemView.vue'
 import TelemetryView from '../islands/Telemetry/TelemetryView.vue'
 import UsersView from '../islands/Users/UsersView.vue'
 
@@ -76,6 +77,12 @@ const router = createRouter({
       name: 'users',
       component: UsersView,
       meta: { breadcrumb: 'nav.users', permission: 'users.manage' },
+    },
+    {
+      path: '/design-system',
+      name: 'design-system',
+      component: DesignSystemView,
+      meta: { breadcrumb: 'nav.designSystem' },
     },
     {
       path: '/change-password',

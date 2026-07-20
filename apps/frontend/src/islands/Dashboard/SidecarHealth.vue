@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AppBadge from '../../components/AppBadge.vue'
 
 const { t } = useI18n()
 
@@ -25,19 +26,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="flex items-center gap-1.5"
-    :title="healthy === false ? t('health.down') : t('health.up')"
-  >
-    <span
-      class="size-2 rounded-full"
-      :class="
-        healthy === null ? 'bg-slate-300' : healthy ? 'bg-emerald-500' : 'bg-red-500'
-      "
-      aria-hidden="true"
-    />
-    <span class="text-xs text-slate-500">
-      {{ healthy === null ? t('health.checking') : healthy ? t('health.up') : t('health.down') }}
-    </span>
-  </div>
+  <AppBadge
+    variant="outline"
+    :tone="healthy === null ? 'neutral' : healthy ? 'success' : 'danger'"
+    :label="healthy === null ? t('health.checking') : healthy ? t('health.up') : t('health.down')"
+  />
 </template>

@@ -1,6 +1,6 @@
 # Rediseño UI del frontend — Tokens, componentes base y Design System
 
-**Estado:** DEFINIDO — pendiente de implementación
+**Estado:** IMPLEMENTADO (T1–T6) — pendiente smoke visual con la app corriendo
 **Rama sugerida:** `feature/frontend-ui-redesign`
 **Origen:** handoff de diseño "NubiaAdmin" (Tailwind v3 + Preline + Vue 3), adaptado a la realidad de este proyecto.
 **Relación con el plan alfa:** transversal a `frontend-alpha-requirements.md`. No bloquea las fases 2–5; conviene hacerlo ANTES de construir el CRUD de catálogo/usuarios para no re-estilizar después.
@@ -130,40 +130,42 @@ En `@layer components` de `main.css`:
   - `.btn-danger` — rojo suave (`bg-danger-50 text-danger-800 border-danger-200`).
 - [x] Estado disabled consistente en todas las variantes (ya existe en `.btn`).
 
-### T4 — Componentes base nuevos (presentacionales, en `src/components/`)
+### T4 — Componentes base nuevos (presentacionales, en `src/components/`) ✅
 
 Todos puros (props in, eventos out), sin acceso a `window.platform`, textos vía i18n:
 
-- [ ] `StatusBadge.vue` — pill con variantes `success` / `info` / `warning` / `danger` / `neutral` + variante outline con punto de color (para "Activo"/"En línea"). Mapea a las paletas de estado de la sección 2.
-- [ ] `AvatarInitials.vue` — iniciales sobre fondo suave o sólido (primary/success), tamaño configurable, indicador online opcional. Se usa en el chip de usuario del topbar y en futuras tablas de usuarios (Fase 5).
-- [ ] `KpiCard.vue` — etiqueta (13px `slate-500`), valor (26px bold), badge de variación opcional (pill success/danger suave) + texto comparativo. Reutiliza `.island`.
-- [ ] `AppAlert.vue` — variantes success/info/danger: fondo suave, borde a juego, icono circular, título bold + descripción.
-- [ ] Formularios: extender `AppInput.vue` con estado de error (borde `danger-600` + ring rojo suave + mensaje) y focus estándar (`border-primary-600` + `shadow-ring`); agregar `AppSelect.vue`, `AppToggle.vue` (verde) y `AppCheckbox.vue` (azul) envolviendo markup Preline con nuestra paleta.
-- [ ] Claves i18n nuevas en `en.json` Y `es.json` para cada texto visible.
+- [x] Badge de estado con variante outline + punto de color. **Decisión 2026-07-20**: en vez de crear `StatusBadge.vue`, se EXTENDIÓ `AppBadge.vue` (que ya existía, genérico y migrado a tokens) con una prop `variant?: 'soft' | 'outline'` (default `soft` = comportamiento previo intacto; `outline` = borde del tono + fondo blanco + punto `{tone}-500`). Una sola pieza de badge, sin duplicar. Tonos: `neutral`/`primary`/`success`/`warning`/`danger`.
+- [x] `AvatarInitials.vue` — iniciales sobre fondo suave o sólido (primary/success), tamaño configurable (`sm`/`md`/`lg`), indicador online opcional. Se usa en el chip de usuario del topbar (T6) y en futuras tablas de usuarios.
+- [x] `KpiCard.vue` — etiqueta (13px `slate-500`), valor (26px bold), badge de variación opcional (pill success/danger suave) + texto comparativo. Reutiliza `.island`.
+- [x] `AppAlert.vue` — variantes success/info/danger (info = paleta primary): fondo suave, borde a juego, icono circular, título bold + descripción.
+- [x] Formularios: `AppInput.vue`/`AppPasswordInput.vue` rediseñados a tokens del DS (error `danger-600` + `shadow-ring-danger` + mensaje `danger-800`; focus `border-primary-600` + `shadow-ring`; radio `rounded-btn`); `AppSelect.vue` (nativo estilizado) suma prop `errorText`; `AppToggle.vue` (verde, ya existía) suma foco visible por teclado; `AppCheckbox.vue` creado (azul/primary). Nota: los inputs NO envuelven Preline — son nativos estilizados con `@tailwindcss/forms`, que es el patrón real del proyecto.
+- [x] Claves i18n nuevas: ninguna — todos los textos visibles de estos componentes llegan traducidos por prop desde el consumidor. Las claves se agregarán en T5/T6, donde se montan con texto real.
 
-### T5 — Página Design System
+> **Nota de implementación**: se agregó `--shadow-ring-danger: 0 0 0 3px #fdecec` en `@theme` (mirror de `--shadow-ring` con `danger-50`) para el "ring rojo suave" del estado de error. Aditivo — no altera ningún token previo.
 
-- [ ] Ruta `/design-system` (name `design-system`, `meta.breadcrumb: 'nav.designSystem'`) → `islands/Settings/DesignSystemView.vue` (o carpeta `System/`). Contenido `max-w-ds` centrado.
-- [ ] Sidebar: introducir grupos de navegación ("General" / "System") en `AppSidebar.vue`; el ítem Design System va en "System".
+### T5 — Página Design System ✅
+
+- [x] Ruta `/design-system` (name `design-system`, `meta.breadcrumb: 'nav.designSystem'`, sin `permission` — accesible a cualquier sesión, como dashboard) → `islands/Settings/DesignSystemView.vue`. Contenido `max-w-ds` centrado.
+- [x] Sidebar: grupos de navegación ("General" / "System") en `AppSidebar.vue` — el prop pasó de `items: NavItem[]` a `groups: NavGroup[]` (`{ titleKey, items }`); el gating de permisos sigue en `App.vue` (`visibleNavGroups`). El ítem Design System va en "System".
 - [ ] Secciones de la página (documenta lo REAL del proyecto, no lo del handoff):
   - Encabezado con eyebrow verde uppercase + botón secundario de vuelta al dashboard.
   - Paleta: cards Primary / Success / Slate con swatches 50/200/400/600/800 (swatch + step + hex).
   - Tipografía: escala display 30/800, h1 24/700, h2 18/700, body 14/400, caption 12/500.
   - Botones: todas las variantes de T3 + disabled.
   - Formularios: input con label, select, input en error, toggle, checkbox.
-  - Badges: todas las variantes de `StatusBadge` + outline con punto.
-  - Avatares: variantes de `AvatarInitials` (suave, sólido, online, contador "+N").
+  - Badges: todos los tonos de `AppBadge` (soft) + variante outline con punto.
+  - Avatares: variantes de `AvatarInitials` (suave, sólido, online, tamaños). El contador "+N" se omitió: `AvatarInitials` deriva iniciales de palabras, no soporta un literal "+3" sin modificar su contrato.
   - Alertas: las tres variantes de `AppAlert`.
   - Cards: `.island` básica, `KpiCard` y card destacada con gradiente `primary-600 → success-600`.
-- [ ] Textos de la página vía i18n (EN/ES).
+- [x] Textos de la página vía i18n (EN/ES) — namespace `designSystem.*`, paridad verificada.
 
-### T6 — Re-estilizado del shell y dashboard
+### T6 — Re-estilizado del shell y dashboard ✅
 
-- [ ] `AppSidebar.vue`: fondo blanco, `border-e border-line`, grupos de nav con encabezado uppercase 11px `slate-400`, ítems `rounded-btn`, logo/marca con gradiente `primary → success`.
-- [ ] Topbar (`App.vue`): `border-b border-line`, chip de usuario con `AvatarInitials`; evaluar extraer a `AppTopbar.vue` si `App.vue` crece.
-- [ ] `<main>`: `bg-slate-50`, contenido envuelto en `max-w-content` con `p-7`.
-- [ ] `DashboardView.vue`: encabezado de página (título + subtítulo) y fila de `KpiCard` con datos REALES disponibles hoy: estado del sidecar, dispositivos del catálogo (cuando exista Fase 4), sesión activa. Sin datos inventados.
-- [ ] `SystemStatus.vue` / `SidecarHealth.vue` / `DeviceLive.vue`: adoptar `.island` actualizada y `StatusBadge`.
+- [x] `AppSidebar.vue`: fondo blanco, `border-e border-line`, grupos de nav con encabezado uppercase 11px `slate-400`, ítems `rounded-btn`, logo/marca con gradiente `primary → success`.
+- [x] Topbar (`App.vue`): `border-b border-line`, chip de usuario con `AvatarInitials`. No se extrajo `AppTopbar.vue` — `App.vue` sigue manejable.
+- [x] `<main>`: `bg-slate-50`, contenido envuelto en `max-w-content` con `p-7`.
+- [x] `DashboardView.vue`: encabezado (título + saludo con `displayName`) y fila de `KpiCard` con datos REALES: estado del sidecar (`platform.system.ping`), conteo de dispositivos (`useCatalogStore().devices.length`), rol de la sesión (`session.roleName`). Sin deltas ni datos inventados.
+- [x] `SystemStatus.vue` / `SidecarHealth.vue`: adoptan `.island` y `AppBadge` (variant outline). `DeviceLive.vue` ya no existe (reemplazado por `DeviceLiveView.vue`, que ya usa `AppBadge` desde Fase 8).
 
 ### Diferido (NO hacer ahora)
 

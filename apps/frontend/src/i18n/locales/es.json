@@ -4,6 +4,15 @@
     "subtitle": "Gestión de dispositivos, adquisición Modbus y reportería",
     "noBridge": "Bridge no disponible — abrí esta UI desde el shell de Electron, no desde un navegador."
   },
+  "dashboard": {
+    "title": "Inicio",
+    "subtitle": "Hola {name}, este es un resumen rápido de la plataforma.",
+    "kpi": {
+      "sidecar": "Sidecar de Python",
+      "devices": "Dispositivos del catálogo",
+      "role": "Rol actual"
+    }
+  },
   "system": {
     "title": "Sidecar de Python",
     "ping": "Ping al sidecar",
@@ -48,7 +57,12 @@
     "telemetry": "Telemetría",
     "users": "Usuarios",
     "login": "Ingresar",
-    "openMenu": "Abrir menú"
+    "openMenu": "Abrir menú",
+    "designSystem": "Sistema de diseño",
+    "groups": {
+      "general": "General",
+      "system": "Sistema"
+    }
   },
   "common": {
     "comingSoon": "Próximamente — todavía no implementado.",
@@ -348,6 +362,82 @@
       "ticksValidation": "Los ticks deben estar entre 1 y {max}.",
       "confirm": "Generar",
       "resultToast": "Se generaron {ticks} ticks en {metrics} métricas — {inserted} insertados, {ignored} ignorados."
+    }
+  },
+  "designSystem": {
+    "eyebrow": "Sistema de diseño",
+    "title": "Librería de componentes",
+    "subtitle": "Documentación viva de cada componente base usado en la app — construida directamente desde los tokens de diseño, no un mockup.",
+    "backToDashboard": "Volver al inicio",
+    "sections": {
+      "palette": {
+        "title": "Paleta de colores",
+        "primary": "Primary",
+        "success": "Success",
+        "slate": "Slate"
+      },
+      "typography": {
+        "title": "Tipografía",
+        "display": "Display — 30px / 800",
+        "h1": "Encabezado 1 — 24px / 700",
+        "h2": "Encabezado 2 — 18px / 700",
+        "body": "Cuerpo — 14px / 400",
+        "caption": "Caption — 12px / 500"
+      },
+      "buttons": {
+        "title": "Botones",
+        "primary": "Primary",
+        "success": "Success",
+        "soft": "Soft",
+        "ghost": "Ghost",
+        "danger": "Danger"
+      },
+      "forms": {
+        "title": "Formularios",
+        "inputLabel": "Nombre visible",
+        "inputPlaceholder": "ej. Operador Uno",
+        "inputErrorLabel": "Usuario",
+        "inputErrorText": "El usuario es obligatorio.",
+        "selectLabel": "Rol",
+        "toggleLabel": "Habilitar notificaciones",
+        "checkboxLabel": "Forzar cambio de contraseña",
+        "selectOptions": {
+          "operator": "Operador",
+          "admin": "Administrador",
+          "viewer": "Visualizador"
+        }
+      },
+      "badges": {
+        "title": "Badges",
+        "neutral": "Neutral",
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "danger": "Danger"
+      },
+      "avatars": {
+        "title": "Avatares"
+      },
+      "alerts": {
+        "title": "Alertas",
+        "successTitle": "Dispositivo guardado",
+        "successDescription": "La configuración del dispositivo se guardó correctamente.",
+        "infoTitle": "Aviso",
+        "infoDescription": "Esta acción afecta cómo se registran las próximas lecturas de telemetría.",
+        "dangerTitle": "Conexión fallida",
+        "dangerDescription": "No se pudo contactar al sidecar. Revisá la conexión serial."
+      },
+      "cards": {
+        "title": "Cards",
+        "basicTitle": "Island básica",
+        "basicBody": "Cualquier contenido puede vivir dentro de una card .island — el borde, radio y padding compartidos vienen del sistema de diseño.",
+        "kpiLabel": "Dispositivos activos",
+        "kpiValue": "24",
+        "kpiValueDown": "18",
+        "kpiComparison": "vs. semana pasada",
+        "highlightTitle": "Card con gradiente",
+        "highlightBody": "primary-600 → success-600, para destacados que necesitan más énfasis."
+      }
     }
   }
 }
