@@ -29,8 +29,8 @@ const visible = ref(false)
         :placeholder="placeholder"
         :disabled="disabled"
         :autocomplete="autocomplete"
-        class="block w-full rounded-lg border-slate-300 pr-10 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
-        :class="errorText ? 'border-red-400 focus:border-red-500 focus:ring-red-500' : ''"
+        class="block w-full rounded-btn border-slate-300 pr-10 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-600 focus:shadow-ring disabled:cursor-not-allowed disabled:opacity-50"
+        :class="errorText ? 'border-danger-600 focus:border-danger-600 focus:shadow-ring-danger' : ''"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
       <button
@@ -75,6 +75,6 @@ const visible = ref(false)
         </svg>
       </button>
     </div>
-    <p v-if="errorText" class="mt-1 text-xs text-red-600">{{ errorText }}</p>
+    <p v-if="errorText" class="mt-1 text-xs text-danger-800">{{ errorText }}</p>
   </div>
 </template>

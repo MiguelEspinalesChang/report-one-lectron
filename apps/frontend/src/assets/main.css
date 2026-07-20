@@ -51,6 +51,8 @@
 
   /* Input focus ring */
   --shadow-ring: 0 0 0 3px #e8f0fd;
+  /* Input focus ring — error state (soft danger ring, mirrors --shadow-ring using danger-50). Additive: not in the T4 spec table, needed for the error focus state of AppInput/AppPasswordInput/AppSelect. */
+  --shadow-ring-danger: 0 0 0 3px #fdecec;
 
   /* Content max widths */
   --container-content: 1240px;
