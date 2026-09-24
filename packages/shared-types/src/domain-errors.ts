@@ -6,6 +6,8 @@ export const DomainErrorNames = {
   UserNotFoundError: 'UserNotFoundError',
   CannotDeactivateSelfError: 'CannotDeactivateSelfError',
   CannotResetAdminPasswordError: 'CannotResetAdminPasswordError',
+  NotAuthenticatedError: 'NotAuthenticatedError',
+  PermissionDeniedError: 'PermissionDeniedError',
   BrandInUseError: 'BrandInUseError',
   BrandNotFoundError: 'BrandNotFoundError',
   MeterModelInUseError: 'MeterModelInUseError',

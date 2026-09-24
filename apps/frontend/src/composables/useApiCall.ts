@@ -16,6 +16,8 @@ const DOMAIN_ERROR_KEYS: Record<DomainErrorName, string> = {
   [DomainErrorNames.UserNotFoundError]: 'errors.userNotFound',
   [DomainErrorNames.CannotDeactivateSelfError]: 'errors.cannotDeactivateSelf',
   [DomainErrorNames.CannotResetAdminPasswordError]: 'errors.cannotResetAdminPassword',
+  [DomainErrorNames.NotAuthenticatedError]: 'errors.notAuthenticated',
+  [DomainErrorNames.PermissionDeniedError]: 'errors.permissionDenied',
   [DomainErrorNames.BrandInUseError]: 'errors.brandInUse',
   [DomainErrorNames.BrandNotFoundError]: 'errors.brandNotFound',
   [DomainErrorNames.MeterModelInUseError]: 'errors.meterModelInUse',

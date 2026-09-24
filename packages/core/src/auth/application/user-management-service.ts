@@ -2,18 +2,22 @@ import type { PublicUser, Role } from '../domain/user'
 import {
   CannotDeactivateSelfError,
   CannotResetAdminPasswordError,
+  NotAuthenticatedError,
+  PermissionDeniedError,
   RoleNotFoundError,
   UserNotFoundError,
   WeakPasswordError,
 } from '../domain/errors'
 import { toPublicUser, validatePasswordPolicy } from '../domain/user'
-import type { AuthSession } from '../domain/auth-session'
+import type { AuthSession, SessionUser } from '../domain/auth-session'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { CreateUserInput, RoleRepository, UserRepository } from '../ports/user-repository'
 
 export {
   CannotDeactivateSelfError,
   CannotResetAdminPasswordError,
+  NotAuthenticatedError,
+  PermissionDeniedError,
   RoleNotFoundError,
   UserNotFoundError,
   WeakPasswordError,
@@ -59,6 +63,22 @@ export class UserManagementService {
     return toPublicUser(created)
   }
 
+  /**
+   * Requires an active session holding `code`. Throws `NotAuthenticatedError`
+   * when nobody is logged in, `PermissionDeniedError` when the session lacks
+   * the permission. Returns the session user so callers can reuse it.
+   */
+  private requirePermission(code: string): SessionUser {
+    const current = this.session.current
+    if (current === null) {
+      throw new NotAuthenticatedError()
+    }
+    if (!current.permissionCodes.includes(code)) {
+      throw new PermissionDeniedError(code)
+    }
+    return current
+  }
+
   async listUsers(): Promise<PublicUser[]> {
     const all = await this.users.findAll()
     return all.map(toPublicUser)
@@ -93,7 +113,9 @@ export class UserManagementService {
    * no way to reverse it.
    */
   async setActive(userId: number, isActive: boolean): Promise<PublicUser> {
-    if (!isActive && this.session.current?.id === userId) {
+    const currentUser = this.requirePermission('users.manage')
+
+    if (!isActive && currentUser.id === userId) {
       throw new CannotDeactivateSelfError()
     }
 
@@ -119,6 +141,8 @@ export class UserManagementService {
    * never reset by another admin, only changed by the admin themself.
    */
   async resetPassword(userId: number, newPassword: string): Promise<PublicUser> {
+    this.requirePermission('users.manage')
+
     if (!validatePasswordPolicy(newPassword)) {
       throw new WeakPasswordError()
     }

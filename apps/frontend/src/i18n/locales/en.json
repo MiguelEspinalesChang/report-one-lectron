@@ -170,7 +170,9 @@
     "deviceNotFound": "Device not found.",
     "transportMismatch": "Connection settings do not match the selected transport.",
     "invalidConnection": "Invalid connection configuration.",
-    "cannotResetAdminPassword": "You cannot reset the password of an admin account."
+    "cannotResetAdminPassword": "You cannot reset the password of an admin account.",
+    "notAuthenticated": "You must be signed in to perform this action.",
+    "permissionDenied": "You do not have permission to perform this action."
   },
   "catalog": {
     "title": "Inventory catalog",

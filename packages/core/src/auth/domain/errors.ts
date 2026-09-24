@@ -48,3 +48,17 @@ export class CannotResetAdminPasswordError extends Error {
     this.name = 'CannotResetAdminPasswordError'
   }
 }
+
+export class NotAuthenticatedError extends Error {
+  constructor() {
+    super('You must be signed in to perform this action')
+    this.name = 'NotAuthenticatedError'
+  }
+}
+
+export class PermissionDeniedError extends Error {
+  constructor(public readonly permissionCode: string) {
+    super(`Missing required permission: ${permissionCode}`)
+    this.name = 'PermissionDeniedError'
+  }
+}

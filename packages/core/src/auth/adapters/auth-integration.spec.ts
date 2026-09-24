@@ -12,7 +12,7 @@ import {
 } from '../../persistence/adapters/sqlite-database'
 import { AuthSession } from '../domain/auth-session'
 import { AuthService, InactiveUserError, InvalidCredentialsError } from '../application/auth-service'
-import { UserManagementService } from '../application/user-management-service'
+import { PermissionDeniedError, UserManagementService } from '../application/user-management-service'
 import { DrizzleUserRepository } from './drizzle-user-repository'
 import { DrizzleRoleRepository } from './drizzle-role-repository'
 import { Argon2Hasher } from './argon2-hasher'
@@ -123,6 +123,7 @@ describe('auth integration', () => {
       roleId: operatorRole.id,
     })
 
+    await service.login('admin', 'admin')
     const reset = await userManagement.resetPassword(created.id, 'temporarypass')
     expect(reset.mustChangePassword).toBe(true)
 
@@ -130,5 +131,24 @@ describe('auth integration', () => {
     expect(loggedIn.mustChangePassword).toBe(true)
 
     await expect(service.login('operator1', 'originalpass')).rejects.toThrow(InvalidCredentialsError)
+  })
+
+  it('denies resetPassword for a session without users.manage', async () => {
+    const operatorRole = await roleRepo.findByName('operator')
+    if (operatorRole === null) throw new Error('seed operator role missing')
+
+    const created = await userManagement.createUser({
+      username: 'operator2',
+      password: 'originalpass',
+      displayName: 'Operator Two',
+      roleId: operatorRole.id,
+    })
+
+    // Log in as the freshly created operator: no users.manage permission.
+    await service.login('operator2', 'originalpass')
+
+    await expect(userManagement.resetPassword(created.id, 'temporarypass')).rejects.toThrow(
+      PermissionDeniedError,
+    )
   })
 })

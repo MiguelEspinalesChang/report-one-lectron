@@ -6,11 +6,13 @@ import {
   UserNotFoundError,
   CannotDeactivateSelfError,
   CannotResetAdminPasswordError,
+  NotAuthenticatedError,
+  PermissionDeniedError,
 } from './user-management-service'
 import type { UserRepository, RoleRepository, CreateUserInput } from '../ports/user-repository'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { User, Role } from '../domain/user'
-import { AuthSession } from '../domain/auth-session'
+import { AuthSession, type SessionUser } from '../domain/auth-session'
 
 // ---------------------------------------------------------------------------
 // Fake adapters
@@ -111,6 +113,26 @@ class FakeHasher implements PasswordHasher {
 }
 
 const adminRole: Role = { id: 1, name: 'admin', description: null, isSystem: true }
+
+const adminSessionUser: SessionUser = {
+  id: 100,
+  username: 'admin',
+  displayName: 'Admin',
+  roleId: adminRole.id,
+  roleName: adminRole.name,
+  mustChangePassword: false,
+  permissionCodes: ['users.manage'],
+}
+
+const viewerSessionUser: SessionUser = {
+  id: 101,
+  username: 'viewer',
+  displayName: 'Viewer',
+  roleId: 3,
+  roleName: 'viewer',
+  mustChangePassword: false,
+  permissionCodes: ['devices.view'],
+}
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -231,6 +253,42 @@ describe('UserManagementService', () => {
   })
 
   describe('setActive', () => {
+    beforeEach(() => {
+      session.set(adminSessionUser)
+    })
+
+    it('throws NotAuthenticatedError when there is no active session', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'noauth',
+        password: 'password123',
+        displayName: 'No Auth',
+        roleId: 1,
+      })
+      session.clear()
+
+      await expect(service.setActive(target.id, false)).rejects.toThrow(NotAuthenticatedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
+    it('throws PermissionDeniedError when the session lacks users.manage', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'noperm',
+        password: 'password123',
+        displayName: 'No Perm',
+        roleId: 1,
+      })
+      session.set(viewerSessionUser)
+
+      await expect(service.setActive(target.id, false)).rejects.toThrow(PermissionDeniedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
     it('deactivates another user and returns the updated user', async () => {
       rolesRepo.seed(adminRole)
       const target = await service.createUser({
@@ -279,7 +337,7 @@ describe('UserManagementService', () => {
         roleId: self.roleId,
         roleName: adminRole.name,
         mustChangePassword: false,
-        permissionCodes: [],
+        permissionCodes: ['users.manage'],
       })
 
       await expect(service.setActive(self.id, false)).rejects.toThrow(CannotDeactivateSelfError)
@@ -296,6 +354,44 @@ describe('UserManagementService', () => {
   describe('resetPassword', () => {
     const operatorRole: Role = { id: 2, name: 'operator', description: null, isSystem: true }
     const viewerRole: Role = { id: 3, name: 'viewer', description: null, isSystem: true }
+
+    beforeEach(() => {
+      session.set(adminSessionUser)
+    })
+
+    it('throws NotAuthenticatedError when there is no active session', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'noauth2',
+        password: 'password123',
+        displayName: 'No Auth',
+        roleId: operatorRole.id,
+      })
+      session.clear()
+
+      await expect(service.resetPassword(target.id, 'newpassword1')).rejects.toThrow(NotAuthenticatedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:password123')
+    })
+
+    it('throws PermissionDeniedError when the session lacks users.manage', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'noperm2',
+        password: 'password123',
+        displayName: 'No Perm',
+        roleId: operatorRole.id,
+      })
+      session.set(viewerSessionUser)
+
+      await expect(service.resetPassword(target.id, 'newpassword1')).rejects.toThrow(PermissionDeniedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:password123')
+    })
 
     it('resets an operator password and forces a change on next login', async () => {
       rolesRepo.seed(adminRole)

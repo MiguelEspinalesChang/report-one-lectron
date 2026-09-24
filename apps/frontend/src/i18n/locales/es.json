@@ -170,7 +170,9 @@
     "deviceNotFound": "Dispositivo no encontrado.",
     "transportMismatch": "La configuración de conexión no coincide con el transporte seleccionado.",
     "invalidConnection": "Configuración de conexión inválida.",
-    "cannotResetAdminPassword": "No es posible restablecer la contraseña de una cuenta de administrador."
+    "cannotResetAdminPassword": "No es posible restablecer la contraseña de una cuenta de administrador.",
+    "notAuthenticated": "Es necesario iniciar sesión para realizar esta acción.",
+    "permissionDenied": "No es posible realizar esta acción: permisos insuficientes."
   },
   "catalog": {
     "title": "Catálogo de inventario",
