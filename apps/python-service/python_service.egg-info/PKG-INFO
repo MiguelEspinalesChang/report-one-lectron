@@ -1,8 +1,0 @@
-Metadata-Version: 2.4
-Name: python-service
-Version: 0.1.0
-Summary: Data core sidecar: Modbus acquisition, telemetry ingest, CSV imports and report generation
-Requires-Python: >=3.11
-Provides-Extra: dev
-Requires-Dist: pytest>=8.3; extra == "dev"
-Requires-Dist: ruff>=0.8; extra == "dev"
