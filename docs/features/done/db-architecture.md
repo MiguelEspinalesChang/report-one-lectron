@@ -1,6 +1,6 @@
 # Feature: Modelado de base de datos
 
-> Estado: **PLANIFICADO — pendiente de orden de inicio**
+> Estado: **HECHO** — implementación y evidencia en `docs/features/done/db-architecture-progress.md`
 > Rama: `feature/db-architecture`
 > Documentos normativos: `docs/ARCHITECTURE.md` §6 (bases de datos), `docs/HEXAGONAL.md`
 

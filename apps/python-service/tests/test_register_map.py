@@ -1,7 +1,7 @@
 """Tests for the pydantic RegisterMap model.
 
 Validates the Python-side mirror of the zod register map contract
-(docs/features/db-architecture-done.md §3.4).
+(docs/features/done/db-architecture.md §3.4).
 """
 
 from __future__ import annotations

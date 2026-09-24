@@ -2,7 +2,7 @@
 
 **Estado:** Fases 0-8 implementadas — pendiente la pasada final del checklist de aceptación (§8) con los 3 roles
 **Alcance:** `apps/frontend` (renderer Vue) + los gaps de IPC mínimos que el alfa necesita
-**Documentos normativos:** `docs/ARCHITECTURE.md`, `docs/HEXAGONAL.md`, `docs/features/vue-backend-integration.md`
+**Documentos normativos:** `docs/ARCHITECTURE.md`, `docs/HEXAGONAL.md`, `docs/features/in-progress/vue-backend-integration.md`
 **Sistema de diseño:** Vue 3 + Tailwind CSS v4 + [Preline UI](https://preline.co/docs/) (ver F6)
 
 Este documento define QUÉ debe tener el frontend para una fase alfa avanzada, basado exclusivamente en lo que el backend ya soporta hoy. El objetivo del alfa: un usuario puede iniciar sesión, administrar usuarios, cargar el catálogo completo (marcas → modelos con mapa de registros → dispositivos), ver lecturas en vivo del simulador y consultar historial de telemetría — todo offline, con permisos aplicados y en EN/ES.
@@ -37,7 +37,7 @@ El frontend actual es un esqueleto: `App.vue` plano con dos islas demo, sin rout
 
 - Instalar `vue-router` y definir rutas por área: `login`, `change-password`, `dashboard`, `catalog` (marcas/modelos/dispositivos), `devices/:id/live`, `users`.
 - **Guard de autenticación:** sin sesión (`platform.auth.getSession()` → `null`) toda ruta redirige a `login`.
-- **Guard de `mustChangePassword`:** si la sesión tiene `mustChangePassword: true`, la ÚNICA ruta accesible es `change-password`. Es un requisito explícito de `vue-backend-integration.md` §4 (el usuario seed es `admin`/`admin` con cambio forzado).
+- **Guard de `mustChangePassword`:** si la sesión tiene `mustChangePassword: true`, la ÚNICA ruta accesible es `change-password`. Es un requisito explícito de `docs/features/in-progress/vue-backend-integration.md` §4 (el usuario seed es `admin`/`admin` con cambio forzado).
 - **Guard de permisos:** cada ruta declara el permiso requerido en `meta` (ver tabla §5); sin el permiso se redirige al dashboard.
 
 ### F2 — Stores Pinia
@@ -166,7 +166,7 @@ El mapa de registros es el contrato central del catálogo — el editor es la pi
 | Req | Detalle |
 | --- | --- |
 | R5.1 | Lista de dispositivos con nombre, modelo, transporte, habilitado, intervalo de polling. |
-| R5.2 | Alta/edición con **formulario condicional por transporte** (requisito explícito de `vue-backend-integration.md` §3): `serial` → vid/pid/serialNumber?/baudrate/parity/timeoutMs; `tcp` → host/puerto (1–65535)/timeoutMs; `simulated` y `csv` → sin campos de conexión (`{}`). |
+| R5.2 | Alta/edición con **formulario condicional por transporte** (requisito explícito de `docs/features/in-progress/vue-backend-integration.md` §3): `serial` → vid/pid/serialNumber?/baudrate/parity/timeoutMs; `tcp` → host/puerto (1–65535)/timeoutMs; `simulated` y `csv` → sin campos de conexión (`{}`). |
 | R5.3 | Campos comunes: `slaveId` (0–247), `pollingIntervalS`, `enabled`. |
 | R5.4 | Toggle habilitar/deshabilitar (`devices.enable`) directo desde la lista. |
 | R5.5 | Borrado con confirmación (`devices.delete`). |

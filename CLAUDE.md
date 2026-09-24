@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Plataforma de escritorio offline-first para gestión de dispositivos Modbus, adquisición de datos y reportería. Documentos normativos: `docs/ARCHITECTURE.md` (qué hace cada proceso) y `docs/HEXAGONAL.md` (cómo se organiza el código dentro de cada proceso: dominio/puertos/adaptadores). Ante cualquier duda, esos documentos mandan.
 
+Planes de features: `docs/features/`, organizados como pipeline por carpeta (raíz = backlog, `in-progress/`, `paused/`, `rejected/`, `done/`). La carpeta ES el estado; al cambiar de etapa se mueve con `git mv` y se actualizan las referencias. Reglas en `docs/features/README.md`.
+
 ## Comandos
 
 ```bash
