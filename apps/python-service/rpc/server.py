@@ -165,7 +165,7 @@ class RpcServer:
         # ── validate ticks ─────────────────────────────────────────────────────
         raw_ticks = params.get("ticks", 10)
         if not isinstance(raw_ticks, int) or isinstance(raw_ticks, bool):
-            raise ValueError("ticks must be an integer")
+            raise ValueError("ticks must be an integer")  # noqa: TRY004 — ValueError maps to INVALID_PARAMS
         if raw_ticks < 1 or raw_ticks > 1000:
             raise ValueError("ticks must be between 1 and 1000")
         ticks: int = raw_ticks
@@ -221,7 +221,7 @@ def _require_device_id(params: dict) -> int:
 def _require_register_map(params: dict) -> RegisterMap:
     raw_map = params.get("registerMap")
     if not isinstance(raw_map, dict):
-        raise ValueError("registerMap must be an object")
+        raise ValueError("registerMap must be an object")  # noqa: TRY004 — ValueError maps to INVALID_PARAMS
     try:
         return RegisterMap.model_validate(raw_map)
     except Exception as exc:

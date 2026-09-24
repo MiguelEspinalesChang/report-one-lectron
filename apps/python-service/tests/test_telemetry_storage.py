@@ -16,7 +16,6 @@ from storage.adapters.sqlite_writer import SqliteTelemetryWriter
 from storage.domain import Reading
 from storage.migrations import CURRENT_SCHEMA_VERSION, apply_migrations
 
-
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 

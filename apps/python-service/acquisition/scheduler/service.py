@@ -14,7 +14,8 @@ each Reading batch into `device.reading` notifications.
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from acquisition.scheduler.domain import next_tick
 

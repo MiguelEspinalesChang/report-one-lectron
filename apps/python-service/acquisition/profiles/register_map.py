@@ -20,7 +20,6 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
-
 # ── Allowed literals, mirroring the zod union types ──────────────────────────
 
 DataType = Literal["int16", "uint16", "int32", "uint32", "int64", "float32", "float64"]
