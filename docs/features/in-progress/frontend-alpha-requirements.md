@@ -1,6 +1,6 @@
 # Requerimientos del frontend — Fase Alfa avanzada
 
-**Estado:** Fases 0-8 implementadas — pendiente la pasada final del checklist de aceptación (§8) con los 3 roles
+**Estado:** Fases 0-8 implementadas + gaps §6.4 y §6.5 cerrados — pendiente la pasada final del checklist de aceptación (§8) con los 3 roles
 **Alcance:** `apps/frontend` (renderer Vue) + los gaps de IPC mínimos que el alfa necesita
 **Documentos normativos:** `docs/ARCHITECTURE.md`, `docs/HEXAGONAL.md`, `docs/features/in-progress/vue-backend-integration.md`
 **Sistema de diseño:** Vue 3 + Tailwind CSS v4 + [Preline UI](https://preline.co/docs/) (ver F6)
@@ -50,6 +50,8 @@ Pinia está instalado y registrado pero sin uso. Stores mínimos:
 | `useCatalogStore` | marcas, modelos, dispositivos; acciones CRUD que delegan en `platform.catalog.*` y refrescan | `platform.catalog.*` |
 | `useUsersStore` | lista de usuarios, acciones `create/assignRole` | `platform.users.*` |
 | `useLiveStore` | lecturas y estado por dispositivo observado, suscripciones activas | `platform.devices.*` |
+
+> **Nota de implementación (2026-09-24):** `useLiveStore` no se creó. Las lecturas en vivo son efímeras y tienen un único consumidor, así que `DeviceLiveView.vue` mantiene las lecturas, el estado y los unsubscribe en estado local del componente y los limpia en unmount. Además se sumaron `useTelemetryStore` (Fase 7) y `useToastStore` (Fase 1; `composables/useToast.ts` es un shim de re-export). Si una segunda vista necesita las lecturas en vivo, recién ahí se extrae el store.
 
 Regla de `docs/HEXAGONAL.md`: los stores solo invocan `window.platform`, escuchan y guardan — cero lógica de negocio (la validación real vive en core/python; la UI solo pre-valida para UX).
 
@@ -138,7 +140,8 @@ El editor de mapa de registros (R4.3) se compone con estas piezas (`AppTable` ed
 | R2.1 | Tabla de usuarios (`platform.users.list()`): username, displayName, rol, activo, debe-cambiar-contraseña, fecha de creación (`createdAt` es epoch ms — formatear por locale). |
 | R2.2 | Alta de usuario (`platform.users.create(dto)`): username, contraseña (min 8), displayName, rol (los 3 roles del sistema: `admin`, `operator`, `viewer`), checkbox `mustChangePassword` (default activado). |
 | R2.3 | Cambio de rol (`platform.users.assignRole({ userId, roleId })`). |
-| R2.4 | Desactivar usuario: NO existe caso de uso en backend (solo el campo `isActive`). Mostrar el estado, sin acción. Marcado como gap deseable en §6.4. |
+| R2.4 | Activar/desactivar usuario (`platform.users.setActive({ userId, isActive })`) con `AppToggle` en la tabla. Reversible; el backend rechaza desactivar la propia cuenta (`CannotDeactivateSelfError`) y la UI deshabilita el toggle en la fila propia. Cerrado por §6.4. |
+| R2.5 | Resetear contraseña (`platform.users.resetPassword({ userId, newPassword })`): el admin asigna una contraseña temporal (mín. 8, confirmada en la UI) a un usuario `operator` o `viewer`; el usuario queda con `mustChangePassword: true` y el gate F1 lo obliga a cambiarla en su próximo login. No aplica a usuarios con rol `admin` (el backend lo rechaza; la UI oculta la acción en esas filas). Requiere gap §6.5. |
 
 ### R3 — Catálogo: marcas (requiere `devices.manage`; solo lectura con `devices.view`)
 
@@ -251,7 +254,8 @@ Trabajo FUERA de `apps/frontend`, mínimo y acotado. Cada método nuevo sigue `.
 | 6.1 | `telemetry:getHistory` | Canal IPC + namespace `PlatformApi.telemetry` + preload. `TelemetryService.getHistory` ya existe en core con sus DTOs (`TelemetryHistoryParams`, `TelemetryPoint`). | R7 |
 | 6.2 | `acquisition:simulatedPoll` | Canal IPC + namespace `PlatformApi.acquisition` + preload. `AcquisitionService.runSimulatedPoll` ya existe; el RPC a Python ya existe. | R8 |
 | 6.3 | Live watch real | Reemplazar `_emit_readings` placeholder (`random.uniform`, métrica fija) por `SimulatedReader` con el mapa de registros del dispositivo. Ya listado como pendiente de Fase 4. | R6 con datos coherentes |
-| 6.4 | `users:deactivate` (deseable, no bloqueante) | Caso de uso `deactivateUser` + IPC. El campo `isActive` ya existe. | R2.4 completo |
+| 6.4 | ✅ `users:setActive` (hecho 2026-09-24) | Caso de uso `setActive` en `UserManagementService` + IPC `UsersSetActive` + preload. Guard de auto-desactivación en core. | R2.4 completo |
+| 6.5 | ✅ `users:resetPassword` (hecho 2026-09-24) | Caso de uso `resetPassword` en `UserManagementService` (política de contraseña, rechaza rol `admin`, fuerza `mustChangePassword`) + IPC + preload. | R2.5 |
 
 ---
 
@@ -285,7 +289,7 @@ Recorrido de humo completo, con la app corriendo vía `pnpm dev`:
 - [ ] Cambiar de idioma EN↔ES en cualquier pantalla: todo texto visible cambia; sin claves faltantes en consola.
 - [ ] Componentes Preline vivos tras navegar entre rutas (dropdowns, modales y selects responden — el `autoInit` de F6 está cableado en el router).
 - [ ] Matar el sidecar Python a mano → el indicador de salud lo refleja; la app no crashea.
-- [ ] `pnpm build` y `pnpm lint` pasan (typecheck estricto del preset compartido incluido).
+- [x] `pnpm build` y `pnpm lint` pasan (typecheck estricto del preset compartido incluido).
 
 ---
 
@@ -309,12 +313,12 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Objetivo:** dejar el esqueleto técnico listo para que las fases siguientes solo agreguen features.
 
-- [ ] Instalar `vue-router`, `preline`, `@tailwindcss/forms`.
-- [ ] Integración Preline según F6: imports en `main.css`, `import('preline/dist/index.js')` post-mount, tipado `HSStaticMethods` en `env.d.ts`, `autoInit` en `router.afterEach`.
-- [ ] Router con rutas placeholder (dashboard, catalog, users, login) SIN guards todavía — solo la estructura y el layout de navegación mínimo.
-- [ ] Composable `useApiCall` (F4) + wrapper `AppToast` para feedback de errores/éxito.
-- [ ] Namespaces i18n `nav`, `common`, `errors` en `en.json` y `es.json`.
-- [ ] Migrar `SystemStatus` y `DeviceLive` a sus rutas sin cambios funcionales.
+- [x] Instalar `vue-router`, `preline`, `@tailwindcss/forms`.
+- [x] Integración Preline según F6: imports en `main.css`, `import('preline/dist/index.js')` post-mount, tipado `HSStaticMethods` en `env.d.ts`, `autoInit` en `router.afterEach`.
+- [x] Router con rutas placeholder (dashboard, catalog, users, login) SIN guards todavía — solo la estructura y el layout de navegación mínimo.
+- [x] Composable `useApiCall` (F4) + wrapper `AppToast` para feedback de errores/éxito.
+- [x] Namespaces i18n `nav`, `common`, `errors` en `en.json` y `es.json`.
+- [x] Migrar `SystemStatus` y `DeviceLive` a sus rutas sin cambios funcionales.
 
 **Cierre:** `pnpm dev` levanta, se navega entre rutas, un dropdown Preline de prueba sigue vivo tras navegar, `pnpm build` y `pnpm lint` pasan.
 
@@ -324,14 +328,14 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 
 **Alcance acotado (decisión 2026-07-10):** en esta fase NO se trabaja con usuarios reales múltiples — se diseña la experiencia del **admin seed únicamente**: login, su shell con rutas y breadcrumbs. El login es REAL contra `platform.auth.login` (el backend de auth ya está completo; el seed `admin`/`admin` existe) — no se mockea. Todo lo multi-usuario (alta, roles, visibilidad por permisos) queda en Fase 5; en esta fase `hasPermission` existe en el store pero no se aplica en navegación ni rutas.
 
-- [ ] `useSessionStore` (F2): `login/logout/changePassword/restore`, helper `hasPermission(code)` (sin consumo todavía).
-- [ ] Pantallas de login y cambio de contraseña (R1.1, R1.3) con `AppInput`/`AppPasswordInput`.
-- [ ] Guards F1: sin sesión → `login`; con `mustChangePassword` → solo `change-password`. El guard de permisos (§5) queda para Fase 5.
-- [ ] Shell F3 del admin: header con `displayName`/`roleName`, `AppDropdown` de usuario con logout, `LanguageSwitcher`, indicador de salud del sidecar.
-- [ ] **Breadcrumbs (F3)**: `AppBreadcrumb` sobre Preline Breadcrumb, derivado de `route.matched` + `meta.breadcrumb` (claves i18n); visible en toda vista interna.
-- [ ] Rehidratación al montar (R1.2) y logout limpio (R1.4).
-- [ ] Migrar `useToast` a store Pinia y extraer las constantes de nombres de error de dominio a `@platform/shared-types` (deudas diferidas del arch-guard de Fase 0).
-- [ ] Namespace i18n `auth`.
+- [x] `useSessionStore` (F2): `login/logout/changePassword/restore`, helper `hasPermission(code)` (sin consumo todavía).
+- [x] Pantallas de login y cambio de contraseña (R1.1, R1.3) con `AppInput`/`AppPasswordInput`.
+- [x] Guards F1: sin sesión → `login`; con `mustChangePassword` → solo `change-password`. El guard de permisos (§5) queda para Fase 5.
+- [x] Shell F3 del admin: header con `displayName`/`roleName`, `AppDropdown` de usuario con logout, `LanguageSwitcher`, indicador de salud del sidecar.
+- [x] **Breadcrumbs (F3)**: `AppBreadcrumb` sobre Preline Breadcrumb, derivado de `route.matched` + `meta.breadcrumb` (claves i18n); visible en toda vista interna.
+- [x] Rehidratación al montar (R1.2) y logout limpio (R1.4).
+- [x] Migrar `useToast` a store Pinia y extraer las constantes de nombres de error de dominio a `@platform/shared-types` (deudas diferidas del arch-guard de Fase 0).
+- [x] Namespace i18n `auth`.
 
 **Cierre:** flujo `admin`/`admin` → cambio forzado → dashboard (R1.5); imposible navegar con el gate activo; reload del renderer conserva la sesión.
 
@@ -389,7 +393,7 @@ Cada fase es un PR encadenado propio: chica, revisable, con criterios de cierre 
 - [x] `acquisition:simulatedPoll` (§6.2): ídem con `PlatformApi.acquisition`.
 - [x] Tests de frontera (zod en IPC) según el patrón existente.
 
-**Cierre:** ambos métodos invocables desde la consola del renderer con datos reales; `pnpm test` verde (recordar `rebuild:node`).
+**Cierre:** ambos métodos invocables desde la consola del renderer con datos reales; `pnpm test` verde.
 
 ### Fase 7 — Telemetría: poll simulado + historial
 
