@@ -9,24 +9,24 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@fontsource/figtree": "^5.2.10",
-    "@tailwindcss/vite": "^4.3.2",
+    "@fontsource/figtree": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
     "chart.js": "^4.5.1",
-    "pinia": "^2.3.0",
+    "pinia": "^2.3.1",
     "preline": "^4.2.0",
-    "tailwindcss": "^4.3.2",
-    "vue": "^3.5.0",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.43",
     "vue-chartjs": "^5.3.4",
-    "vue-i18n": "^11.4.6",
-    "vue-router": "^5.1.0"
+    "vue-i18n": "^11.4.12",
+    "vue-router": "^5.3.1"
   },
   "devDependencies": {
     "@platform/shared-types": "workspace:*",
     "@platform/tsconfig": "workspace:*",
     "@tailwindcss/forms": "^0.5.11",
-    "@vitejs/plugin-vue": "^5.2.0",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0",
-    "vue-tsc": "^2.2.0"
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vue-tsc": "^2.2.12"
   }
 }

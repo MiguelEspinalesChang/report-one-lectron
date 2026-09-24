@@ -3,7 +3,7 @@
 **Estado:** IMPLEMENTADO (T1–T6) — pendiente smoke visual con la app corriendo
 **Rama sugerida:** `feature/frontend-ui-redesign`
 **Origen:** handoff de diseño "NubiaAdmin" (Tailwind v3 + Preline + Vue 3), adaptado a la realidad de este proyecto.
-**Relación con el plan alfa:** transversal a `frontend-alpha-requirements.md`. No bloquea las fases 2–5; conviene hacerlo ANTES de construir el CRUD de catálogo/usuarios para no re-estilizar después.
+**Relación con el plan alfa:** transversal a `docs/features/in-progress/frontend-alpha-requirements.md`. No bloquea las fases 2–5; conviene hacerlo ANTES de construir el CRUD de catálogo/usuarios para no re-estilizar después.
 
 ---
 

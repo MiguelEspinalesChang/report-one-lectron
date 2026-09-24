@@ -1,8 +1,8 @@
 # Progreso: Modelado de base de datos
 
 > Rama: `feature/db-architecture` — trabajo commiteado en 7 commits agrupados por feature (`abf4c3d..e34e74c`).
-> Plan de referencia: `docs/features/db-architecture-done.md`
-> Lo pendiente de Fase 4 ahora se trackea en `docs/features/vue-backend-integration.md` §5.
+> Plan de referencia: `docs/features/done/db-architecture.md`
+> Lo pendiente de Fase 4 ahora se trackea en `docs/features/in-progress/vue-backend-integration.md` §5.
 > Última actualización: 2026-07-09
 
 ## Tareas realizadas

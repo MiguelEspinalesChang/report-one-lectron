@@ -2,7 +2,7 @@
 
 > Estado: **EN CURSO — la UI puede arrancar con el catálogo hoy; telemetría/adquisición requieren cableado IPC previo**
 > Documentos normativos: `docs/ARCHITECTURE.md` §11, `docs/PYTHON-DB.md`
-> Antecedentes: `db-architecture-done.md` (plan de DB) y `db-architecture-progress-done.md` (implementación)
+> Antecedentes: `docs/features/done/db-architecture.md` (plan de DB) y `docs/features/done/db-architecture-progress.md` (implementación)
 
 Qué cubre: lo que el backend **espera recibir** desde Vue para gestionar marcas, mapas de registros y dispositivos, cómo llega la data (Modbus o import CSV), y qué falta cablear antes de que la UI pueda leer telemetría.
 

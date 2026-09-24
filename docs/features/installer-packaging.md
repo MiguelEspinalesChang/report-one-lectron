@@ -13,7 +13,7 @@ Sí, es totalmente posible, y es el modelo estándar de distribución de apps El
 | Node.js | **NO** | Electron embebe su propio Node + Chromium dentro del ejecutable |
 | Python | **NO** | El sidecar se congela con PyInstaller: binario autocontenido con el intérprete adentro |
 | SQLite | **NO** | `better-sqlite3` compila SQLite estáticamente; Python congelado lleva su propio `sqlite3` |
-| Módulos nativos | **NO** | `better-sqlite3` (recompilado a ABI de Electron) y `argon2` (N-API prebuilt) viajan dentro del paquete |
+| Módulos nativos | **NO** | `better-sqlite3` (≥ 13) y `argon2` son N-API prebuilt y viajan dentro del paquete |
 
 ## Decisión de stack
 
@@ -29,7 +29,7 @@ Sí, es totalmente posible, y es el modelo estándar de distribución de apps El
 | 2 | Python cae al `python3` del sistema | `packages/core/src/python-bridge/resolve-python.ts` (fallback final) | PyInstaller congela `main.py` → `PythonManager` en modo empaquetado spawnea el binario directo (sin resolver intérprete) |
 | 3 | Migraciones de `app.db` se resuelven relativo al fuente | `apps/electron/main/index.ts` — `TODO(installer)` explícito, `__dirname/../../../../database/migrations/app` | `extraResources: database/migrations/app` + resolver vía `process.resourcesPath` cuando `app.isPackaged` |
 | 4 | El renderer se carga con path relativo al monorepo | `apps/electron/main/window.ts` — `loadFile('../../../frontend/dist/index.html')` | Incluir `apps/frontend/dist` en `files` del builder con layout que preserve esa ruta relativa (o copiar a `dist/renderer` y ajustar el path) |
-| 5 | `better-sqlite3` necesita ABI de Electron | Gotcha documentado en `CLAUDE.md` (MODULE_VERSION 132 vs 127) | electron-builder recompila módulos nativos automáticamente al empaquetar; ambos nativos van en `asarUnpack` |
+| 5 | ~~`better-sqlite3` necesita ABI de Electron~~ | Resuelto: better-sqlite3 13 es N-API (ver `docs/features/done/dependency-security-patch.md`) | Sin recompilación; ambos nativos van en `asarUnpack` (desactivar `npmRebuild` de electron-builder si intentara recompilar) |
 | 6 | El sidecar congelado no existe | `python-manager.ts` espera `process.resourcesPath/python-service` pero nada lo genera | Paso de build `pyinstaller` que emite a `apps/python-service/dist/` y el builder lo copia como `extraResources` |
 
 ## Diseño del pipeline de build
@@ -37,7 +37,7 @@ Sí, es totalmente posible, y es el modelo estándar de distribución de apps El
 ```
 pnpm build                    # typecheck + vite build + esbuild main/preload (ya existe)
 pyinstaller (onedir)          # congela el sidecar → apps/python-service/dist/python-service/
-electron-builder              # recompila nativos a ABI Electron, arma asar, copia extraResources,
+electron-builder              # arma asar (nativos N-API en asarUnpack), copia extraResources,
                               # genera el instalador por plataforma
 ```
 

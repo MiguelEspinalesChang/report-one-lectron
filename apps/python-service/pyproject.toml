@@ -17,7 +17,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3",
-    "ruff>=0.8",
+    "ruff==0.16.8",  # pinned: new ruff releases add rules and break lint
+    "pip-audit>=2.10",
 ]
 
 [tool.setuptools.packages.find]
