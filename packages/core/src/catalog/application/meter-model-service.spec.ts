@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { MeterModel, RegisterMap } from '../domain/entities'
-import type { CreateMeterModelInput, MeterModelRepository } from '../ports/repositories'
+import type { CreateMeterModelInput, MeterModelRepository, UpdateMeterModelInput } from '../ports/repositories'
 import { InvalidRegisterMapError, MeterModelInUseError, MeterModelNotFoundError, MeterModelService } from './meter-model-service'
 
 const VALID_MAP: RegisterMap = {
@@ -49,6 +49,15 @@ class FakeMeterModelRepository implements MeterModelRepository {
   async updateRegisterMap(id: number, registerMap: RegisterMap): Promise<void> {
     const model = this.store.find((m) => m.id === id)
     if (model !== undefined) model.registerMap = registerMap
+  }
+
+  async update(id: number, input: UpdateMeterModelInput): Promise<void> {
+    const model = this.store.find((m) => m.id === id)
+    if (!model) return
+    if (input.brandId !== undefined) model.brandId = input.brandId
+    if (input.name !== undefined) model.name = input.name
+    if (input.registerMap !== undefined) model.registerMap = input.registerMap
+    if (input.notes !== undefined) model.notes = input.notes
   }
 
   async delete(id: number): Promise<void> {

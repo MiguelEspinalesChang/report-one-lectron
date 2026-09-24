@@ -1,34 +1,99 @@
 @import "tailwindcss";
+/* Preline variants: use direct path — ./variants.css is not in preline's exports map */
+@import "../../node_modules/preline/variants.css";
+/* Scan Preline JS bundles so Tailwind generates all variant/component classes. */
+/* Path is relative to this file (src/assets/) → apps/frontend/node_modules/preline/dist/ */
+@source "../../node_modules/preline/dist/*.js";
+@plugin "@tailwindcss/forms";
 
-/* Design tokens — keep the palette calm: slate neutrals + one accent. */
 @theme {
-  --color-accent-50: var(--color-indigo-50);
-  --color-accent-100: var(--color-indigo-100);
-  --color-accent-500: var(--color-indigo-500);
-  --color-accent-600: var(--color-indigo-600);
-  --color-accent-700: var(--color-indigo-700);
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
+  /* Primary — blue (buttons, links, active nav) */
+  --color-primary-50: #e8f0fd;
+  --color-primary-100: #d9e7fb;
+  --color-primary-200: #b9d0f6;
+  --color-primary-300: #8fb2f0;
+  --color-primary-400: #5b8de8;
+  --color-primary-500: #3f7ce4;
+  --color-primary-600: #2f6fe0;
+  --color-primary-700: #2661c9;
+  --color-primary-800: #1d54b8;
+  --color-primary-900: #173f8a;
+
+  /* Success — green (badges, toggles, positive state) */
+  --color-success-50: #e3f5ef;
+  --color-success-100: #d4efe6;
+  --color-success-200: #c4e8db;
+  --color-success-300: #8ed4ba;
+  --color-success-400: #3cb693;
+  --color-success-500: #22a582;
+  --color-success-600: #129573;
+  --color-success-700: #0f8465;
+  --color-success-800: #0d7259;
+  --color-success-900: #0a5744;
+
+  /* State palettes */
+  --color-warning-50: #fef6e0;
+  --color-warning-600: #c98a15;
+  --color-warning-800: #9a6b0f;
+  --color-danger-50: #fdecec;
+  --color-danger-100: #fadfdf;
+  --color-danger-200: #f6d2d2;
+  --color-danger-600: #cf4444;
+  --color-danger-800: #b42323;
+
+  /* Standard border for cards, sidebar, topbar */
+  --color-line: #e7edf3;
+
+  --radius-card: 14px;
+  --radius-btn: 10px;
+
+  /* Input focus ring */
+  --shadow-ring: 0 0 0 3px #e8f0fd;
+  /* Input focus ring — error state (soft danger ring, mirrors --shadow-ring using danger-50). Additive: not in the T4 spec table, needed for the error focus state of AppInput/AppPasswordInput/AppSelect. */
+  --shadow-ring-danger: 0 0 0 3px #fdecec;
+
+  /* Content max widths */
+  --container-content: 1240px;
+  --container-ds: 1100px;
 }
 
 @layer base {
   body {
-    @apply bg-slate-100 text-slate-800 antialiased;
-    font-family: ui-sans-serif, system-ui, sans-serif;
+    @apply bg-slate-50 font-sans text-slate-800 antialiased;
   }
 }
 
 @layer components {
   /* Shared island card — every dashboard island uses this shell. */
   .island {
-    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+    @apply rounded-card border border-line bg-white p-5.5 shadow-sm;
   }
 
   .btn {
-    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300
-      bg-white px-3.5 py-1.5 text-sm font-medium text-slate-700 transition-colors
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-btn border border-slate-300
+      bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors
       hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply border-accent-600 bg-accent-600 text-white hover:bg-accent-700;
+    @apply border-primary-600 bg-primary-600 text-white hover:bg-primary-700;
+  }
+
+  .btn-success {
+    @apply border-success-600 bg-success-600 text-white hover:bg-success-700;
+  }
+
+  .btn-soft {
+    @apply border-transparent bg-primary-50 text-primary-800 hover:bg-primary-100;
+  }
+
+  .btn-ghost {
+    @apply border-transparent bg-transparent hover:bg-slate-100;
+  }
+
+  .btn-danger {
+    @apply border-danger-200 bg-danger-50 text-danger-800 hover:bg-danger-100;
   }
 }

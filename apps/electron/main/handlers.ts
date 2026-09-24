@@ -10,16 +10,20 @@ import {
   DeleteBrandSchema,
   CreateMeterModelSchema,
   ListModelsByBrandSchema,
+  UpdateMeterModelSchema,
   UpdateRegisterMapSchema,
   DeleteMeterModelSchema,
   CreateDeviceSchema,
   UpdateDeviceSchema,
   DeleteDeviceSchema,
   EnableDeviceSchema,
+  SimulatedPollParamsSchema,
+  TelemetryHistoryParamsSchema,
   type SessionUserDto,
   type BrandDto,
   type MeterModelDto,
   type DeviceDto,
+  type RoleDto,
 } from '@platform/shared-types'
 import { ipcMain } from 'electron'
 
@@ -50,6 +54,15 @@ function toSessionUserDto(user: {
 
 function toBrandDto(brand: { id: number; name: string }): BrandDto {
   return { id: brand.id, name: brand.name }
+}
+
+function toRoleDto(role: { id: number; name: string; description: string | null; isSystem: boolean }): RoleDto {
+  return {
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    isSystem: role.isSystem,
+  }
 }
 
 function toMeterModelDto(model: {
@@ -94,6 +107,13 @@ function toDeviceDto(device: {
   }
 }
 
+function getTelemetry(core: Core): NonNullable<Core['telemetry']> {
+  if (core.telemetry === null) {
+    throw new Error('Telemetry service is not configured')
+  }
+  return core.telemetry
+}
+
 /**
  * Thin IPC handlers: every handler is a one-line delegation to
  * packages/core. Business logic never lives here.
@@ -133,6 +153,10 @@ export function registerHandlers(core: Core): void {
     const dto = AssignRoleSchema.parse(raw)
     return core.userManagement.assignRole(dto.userId, dto.roleId)
   })
+  ipcMain.handle(IpcChannels.UsersListRoles, async () => {
+    const all = await core.userManagement.listRoles()
+    return all.map(toRoleDto)
+  })
 
   // Catalog — brands
   ipcMain.handle(IpcChannels.CatalogBrandsCreate, async (_event, raw: unknown) => {
@@ -167,6 +191,15 @@ export function registerHandlers(core: Core): void {
     const dto = ListModelsByBrandSchema.parse(raw)
     const all = await core.catalog.models.listByBrand(dto.brandId)
     return all.map(toMeterModelDto)
+  })
+  ipcMain.handle(IpcChannels.CatalogModelsUpdate, async (_event, raw: unknown) => {
+    const dto = UpdateMeterModelSchema.parse(raw)
+    return core.catalog.models.update(dto.id, {
+      brandId: dto.brandId,
+      name: dto.name,
+      registerMap: dto.registerMap,
+      notes: dto.notes,
+    })
   })
   ipcMain.handle(IpcChannels.CatalogModelsUpdateMap, async (_event, raw: unknown) => {
     const dto = UpdateRegisterMapSchema.parse(raw)
@@ -211,5 +244,17 @@ export function registerHandlers(core: Core): void {
   ipcMain.handle(IpcChannels.CatalogDevicesDelete, async (_event, raw: unknown) => {
     const dto = DeleteDeviceSchema.parse(raw)
     return core.catalog.devices.delete(dto.id)
+  })
+
+  // Telemetry
+  ipcMain.handle(IpcChannels.TelemetryGetHistory, (_event, raw: unknown) => {
+    const dto = TelemetryHistoryParamsSchema.parse(raw)
+    return getTelemetry(core).getHistory(dto)
+  })
+
+  // Acquisition
+  ipcMain.handle(IpcChannels.AcquisitionSimulatedPoll, (_event, raw: unknown) => {
+    const dto = SimulatedPollParamsSchema.parse(raw)
+    return core.acquisition.runSimulatedPoll(dto.deviceId, dto.registerMap, dto.ticks)
   })
 }

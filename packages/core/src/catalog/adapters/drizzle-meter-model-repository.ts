@@ -3,7 +3,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import type { AppSchema } from '../../persistence/adapters/sqlite-database'
 import { devices, meterModels } from '../../persistence/adapters/schema'
 import type { MeterModel, RegisterMap } from '../domain/entities'
-import type { CreateMeterModelInput, MeterModelRepository } from '../ports/repositories'
+import type { CreateMeterModelInput, MeterModelRepository, UpdateMeterModelInput } from '../ports/repositories'
 
 type ModelRow = typeof meterModels.$inferSelect
 
@@ -49,6 +49,19 @@ export class DrizzleMeterModelRepository implements MeterModelRepository {
 
   async updateRegisterMap(id: number, registerMap: RegisterMap): Promise<void> {
     this.db.update(meterModels).set({ registerMap: JSON.stringify(registerMap) }).where(eq(meterModels.id, id)).run()
+  }
+
+  async update(id: number, input: UpdateMeterModelInput): Promise<void> {
+    this.db
+      .update(meterModels)
+      .set({
+        brandId: input.brandId,
+        name: input.name,
+        registerMap: JSON.stringify(input.registerMap),
+        notes: input.notes ?? null,
+      })
+      .where(eq(meterModels.id, id))
+      .run()
   }
 
   async delete(id: number): Promise<void> {

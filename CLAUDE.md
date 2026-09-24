@@ -56,6 +56,7 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 - Vite está fijado a `host: 127.0.0.1` (`apps/frontend/vite.config.ts`) porque en esta máquina se enganchaba solo a IPv6 y `wait-on tcp:127.0.0.1:5173` esperaba para siempre. Electron carga `http://127.0.0.1:5173` en dev. NO "limpiar" ese pin.
 - `apps/python-service/pyproject.toml` necesita `[tool.setuptools.packages.find] include=[...]` — setuptools rechaza el layout plano sin eso.
 - En el sidecar, stdout está reservado para JSON-RPC; loguear solo a stderr.
+- **Artefactos locales no relocalizables** (`node_modules`, `.venv`, `*.egg-info`, build nativo de better-sqlite3): si el proyecto se clona en otra máquina o se MUEVE de carpeta, se regeneran, no se copian. Pasos en la sección "Generated local artifacts" del `README.md`. `pnpm install` sin TTY aborta el purge de módulos → usar `CI=true pnpm install`.
 - **ABI de better-sqlite3 (dos builds, dos usos):** el módulo nativo tiene que estar compilado contra el ABI correcto según quién lo carga. Electron 34 usa `MODULE_VERSION 132`; Node 22 usa `MODULE_VERSION 127`. Son incompatibles.
   - `pnpm rebuild:electron` → compila para Electron (requerido para `pnpm dev` y el build de distribución).
   - `pnpm rebuild:node` → restaura el build de Node (requerido para `pnpm test` / vitest).
@@ -70,6 +71,7 @@ Vue renderer ──ipcRenderer.invoke──▶ Electron main ──llamada direc
 ## Git y hooks (husky)
 
 - Flujo: `main`, `develop`, `feature/*`, `release/*`, `hotfix/*`. Nunca commitear directo a `main` ni `develop` — el hook `pre-commit` lo BLOQUEA.
+- **NUNCA commitear sin preguntar primero.** Todo commit se propone al developer (qué archivos, qué mensaje) y se ejecuta solo con su confirmación explícita. Aplica también dentro de skills y sub-agentes.
 - `pre-commit` (`.husky/pre-commit`): guard de rama + `lint-staged` (eslint --fix sobre TS/Vue staged, ruff --fix sobre python staged vía `scripts/ruff-staged.sh`; ruff se salta con warning si falta el venv).
 - `commit-msg` (`.husky/commit-msg`): commitlint con `@commitlint/config-conventional` — el mensaje DEBE ser conventional commit (`feat:`, `fix:`, `docs:`, `chore:`...). Sin atribución de IA.
 - Los hooks se instalan con `pnpm install` (script `prepare`). Si un commit falla, leer el error del hook — no usar `--no-verify` salvo emergencia explícita del usuario.

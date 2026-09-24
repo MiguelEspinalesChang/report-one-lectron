@@ -75,6 +75,20 @@ export interface DeviceStatus {
   state: DeviceState
 }
 
+/**
+ * Params sent to device.watch over RPC.
+ *
+ * Internal core <-> python contract only — NOT part of `PlatformApi`.
+ * The renderer/IPC boundary keeps `devices.watch(deviceId)` as a single
+ * argument; core resolves the device's register map from the catalog
+ * repositories and forwards it here so python (which never touches
+ * app.db, see docs/ARCHITECTURE.md §11) can drive SimulatedReader.
+ */
+export interface DeviceWatchRpcParams {
+  deviceId: number
+  registerMap: RegisterMap
+}
+
 // ---------------------------------------------------------------------------
 // DTOs — auth
 // ---------------------------------------------------------------------------
@@ -113,6 +127,13 @@ export interface AssignRoleDto {
   roleId: number
 }
 
+export interface RoleDto {
+  id: number
+  name: string
+  description: string | null
+  isSystem: boolean
+}
+
 export interface UserDto {
   id: number
   username: string
@@ -148,6 +169,7 @@ export const IpcChannels = {
   UsersCreate: 'users:create',
   UsersList: 'users:list',
   UsersAssignRole: 'users:assignRole',
+  UsersListRoles: 'users:listRoles',
   // Catalog — brands
   CatalogBrandsCreate: 'catalog:brands:create',
   CatalogBrandsList: 'catalog:brands:list',
@@ -157,6 +179,7 @@ export const IpcChannels = {
   CatalogModelsCreate: 'catalog:models:create',
   CatalogModelsList: 'catalog:models:list',
   CatalogModelsListByBrand: 'catalog:models:listByBrand',
+  CatalogModelsUpdate: 'catalog:models:update',
   CatalogModelsUpdateMap: 'catalog:models:updateMap',
   CatalogModelsDelete: 'catalog:models:delete',
   // Catalog — devices
@@ -165,6 +188,8 @@ export const IpcChannels = {
   CatalogDevicesUpdate: 'catalog:devices:update',
   CatalogDevicesEnable: 'catalog:devices:enable',
   CatalogDevicesDelete: 'catalog:devices:delete',
+  TelemetryGetHistory: 'telemetry:getHistory',
+  AcquisitionSimulatedPoll: 'acquisition:simulatedPoll',
 } as const
 
 /**
@@ -192,7 +217,8 @@ export interface PlatformApi {
   users: {
     create(dto: CreateUserDto): Promise<UserDto>
     list(): Promise<UserDto[]>
-    assignRole(dto: AssignRoleDto): Promise<void>
+    assignRole(dto: AssignRoleDto): Promise<UserDto>
+    listRoles(): Promise<RoleDto[]>
   }
   catalog: {
     brands: {
@@ -205,6 +231,7 @@ export interface PlatformApi {
       create(dto: Omit<MeterModelDto, 'id'>): Promise<MeterModelDto>
       list(): Promise<MeterModelDto[]>
       listByBrand(brandId: number): Promise<MeterModelDto[]>
+      update(dto: { id: number; brandId: number; name: string; registerMap: RegisterMap; notes: string | null }): Promise<void>
       updateMap(dto: { id: number; registerMap: RegisterMap }): Promise<void>
       delete(dto: { id: number }): Promise<void>
     }
@@ -215,6 +242,12 @@ export interface PlatformApi {
       enable(dto: { id: number; enabled: boolean }): Promise<void>
       delete(dto: { id: number }): Promise<void>
     }
+  }
+  telemetry: {
+    getHistory(params: TelemetryHistoryParams): Promise<TelemetryPoint[]>
+  }
+  acquisition: {
+    simulatedPoll(params: SimulatedPollParams): Promise<SimulatedPollResult>
   }
 }
 
@@ -293,8 +326,18 @@ export interface TelemetryHistoryParams {
   bucketMs?: number
 }
 
+// Re-export domain error names for use across layers
+export { DomainErrorNames } from './domain-errors'
+export type { DomainErrorName } from './domain-errors'
+
 // Re-export Zod schemas for use at IPC boundaries
-export { LoginSchema, ChangePasswordSchema, CreateUserSchema, AssignRoleSchema } from './auth-schemas'
+export {
+  LoginSchema,
+  ChangePasswordSchema,
+  CreateUserSchema,
+  AssignRoleSchema,
+  PASSWORD_MIN_LENGTH,
+} from './auth-schemas'
 export {
   RegisterMapSchema,
   ConnectionSchema,
@@ -303,6 +346,7 @@ export {
   DeleteBrandSchema,
   CreateMeterModelSchema,
   ListModelsByBrandSchema,
+  UpdateMeterModelSchema,
   UpdateRegisterMapSchema,
   DeleteMeterModelSchema,
   CreateDeviceSchema,
@@ -311,3 +355,7 @@ export {
   EnableDeviceSchema,
 } from './catalog-schemas'
 export type { RegisterEntry, RegisterMap, Transport } from './catalog-schemas'
+export {
+  TelemetryHistoryParamsSchema,
+  SimulatedPollParamsSchema,
+} from './telemetry-schemas'

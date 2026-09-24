@@ -12,6 +12,13 @@ export interface CreateModelParams {
   notes?: string | null
 }
 
+export interface UpdateModelParams {
+  brandId: number
+  name: string
+  registerMap: unknown
+  notes?: string | null
+}
+
 export class MeterModelService {
   constructor(private readonly models: MeterModelRepository) {}
 
@@ -42,6 +49,18 @@ export class MeterModelService {
     if (model === null) throw new MeterModelNotFoundError(id)
     const registerMap = this.validateMap(rawMap)
     await this.models.updateRegisterMap(id, registerMap)
+  }
+
+  async update(id: number, params: UpdateModelParams): Promise<void> {
+    const model = await this.models.findById(id)
+    if (model === null) throw new MeterModelNotFoundError(id)
+    const registerMap = this.validateMap(params.registerMap)
+    await this.models.update(id, {
+      brandId: params.brandId,
+      name: params.name,
+      registerMap,
+      notes: params.notes ?? null,
+    })
   }
 
   async delete(id: number): Promise<void> {

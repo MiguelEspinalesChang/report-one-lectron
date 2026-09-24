@@ -20,11 +20,19 @@ export interface CreateMeterModelInput {
   notes?: string | null
 }
 
+export interface UpdateMeterModelInput {
+  brandId: number
+  name: string
+  registerMap: RegisterMap
+  notes?: string | null
+}
+
 export interface MeterModelRepository {
   findById(id: number): Promise<MeterModel | null>
   findAll(): Promise<MeterModel[]>
   findByBrand(brandId: number): Promise<MeterModel[]>
   create(input: CreateMeterModelInput): Promise<MeterModel>
+  update(id: number, input: UpdateMeterModelInput): Promise<void>
   updateRegisterMap(id: number, registerMap: RegisterMap): Promise<void>
   delete(id: number): Promise<void>
   hasDevices(id: number): Promise<boolean>

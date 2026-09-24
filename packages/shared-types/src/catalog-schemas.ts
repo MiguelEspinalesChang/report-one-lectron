@@ -86,6 +86,14 @@ export const UpdateRegisterMapSchema = z.object({
   registerMap: RegisterMapSchema,
 })
 
+export const UpdateMeterModelSchema = z.object({
+  id: z.number().int().positive(),
+  brandId: z.number().int().positive(),
+  name: z.string().min(1).max(128),
+  registerMap: RegisterMapSchema,
+  notes: z.string().nullable().optional(),
+})
+
 export const DeleteMeterModelSchema = z.object({
   id: z.number().int().positive(),
 })

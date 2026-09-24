@@ -4,19 +4,440 @@
     "subtitle": "Gestión de dispositivos, adquisición Modbus y reportería",
     "noBridge": "Bridge no disponible — abrí esta UI desde el shell de Electron, no desde un navegador."
   },
+  "dashboard": {
+    "title": "Inicio",
+    "subtitle": "Hola {name}, este es un resumen rápido de la plataforma.",
+    "kpi": {
+      "sidecar": "Sidecar de Python",
+      "devices": "Dispositivos del catálogo",
+      "role": "Rol actual"
+    }
+  },
   "system": {
     "title": "Sidecar de Python",
     "ping": "Ping al sidecar",
     "pinging": "Consultando…",
     "answer": "Python {version} respondió desde el PID {pid}"
   },
-  "devices": {
-    "title": "Vista en vivo (dispositivo demo)",
-    "start": "Iniciar vista en vivo",
-    "stop": "Detener vista en vivo",
-    "empty": "Sin lecturas todavía — iniciá la vista en vivo."
+  "live": {
+    "title": "En vivo — {name}",
+    "link": "En vivo",
+    "breadcrumb": "En vivo",
+    "status": {
+      "connecting": "Conectando…",
+      "connected": "Conectado",
+      "degraded": "Degradado",
+      "disconnected": "Desconectado"
+    },
+    "readings": {
+      "columns": {
+        "metric": "Métrica",
+        "value": "Valor",
+        "timestamp": "Hora"
+      }
+    },
+    "metricSelector": {
+      "label": "Métrica"
+    },
+    "chart": {
+      "avgLabel": "Valor",
+      "bandLabel": "Rango"
+    },
+    "empty": "Todavía no hay lecturas en vivo — esperando datos del dispositivo."
   },
   "language": {
     "label": "Idioma"
+  },
+  "nav": {
+    "main": "Navegación principal",
+    "breadcrumbs": "Ruta de navegación",
+    "dashboard": "Inicio",
+    "catalog": "Catálogo",
+    "devices": "Dispositivos",
+    "telemetry": "Telemetría",
+    "users": "Usuarios",
+    "login": "Ingresar",
+    "openMenu": "Abrir menú",
+    "designSystem": "Sistema de diseño",
+    "groups": {
+      "general": "General",
+      "system": "Sistema"
+    }
+  },
+  "common": {
+    "comingSoon": "Próximamente — todavía no implementado.",
+    "dismiss": "Descartar",
+    "loading": "Cargando…",
+    "empty": "No hay elementos para mostrar.",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar"
+  },
+  "auth": {
+    "title": "Ingresar",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "signIn": "Ingresar",
+    "signingIn": "Ingresando…",
+    "signOut": "Cerrar sesión",
+    "changePassword": "Cambiar contraseña",
+    "changing": "Cambiando…",
+    "passwordMin": "La contraseña debe tener al menos {min} caracteres.",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "changed": "Contraseña cambiada correctamente.",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
+  },
+  "users": {
+    "title": "Usuarios",
+    "new": "+ Nuevo usuario",
+    "empty": "Todavía no hay usuarios.",
+    "createTitle": "Nuevo usuario",
+    "created": "Usuario creado.",
+    "roleUpdated": "Rol actualizado.",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "mustChange": "Debe cambiar contraseña",
+    "passwordOk": "Contraseña actualizada",
+    "columns": {
+      "username": "Usuario",
+      "displayName": "Nombre visible",
+      "role": "Rol",
+      "active": "Estado",
+      "mustChangePassword": "Contraseña",
+      "createdAt": "Creado"
+    },
+    "form": {
+      "username": "Usuario",
+      "usernamePlaceholder": "ej. operador1",
+      "displayName": "Nombre visible",
+      "displayNamePlaceholder": "ej. Operador Uno",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Al menos 8 caracteres",
+      "role": "Rol",
+      "mustChangePassword": "Forzar cambio de contraseña en el primer ingreso"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "operator": "Operador",
+      "viewer": "Visualizador",
+      "unknown": "Desconocido"
+    },
+    "validation": {
+      "usernameRequired": "El usuario es obligatorio.",
+      "usernameTooLong": "El usuario debe tener como máximo {max} caracteres.",
+      "displayNameRequired": "El nombre visible es obligatorio.",
+      "displayNameTooLong": "El nombre visible debe tener como máximo {max} caracteres.",
+      "passwordMin": "La contraseña debe tener al menos {min} caracteres.",
+      "roleRequired": "El rol es obligatorio."
+    }
+  },
+  "health": {
+    "up": "Sidecar OK",
+    "down": "Sidecar no disponible",
+    "checking": "Verificando…"
+  },
+  "errors": {
+    "generic": "Ocurrió un error inesperado. Por favor intentá de nuevo.",
+    "invalidCredentials": "Usuario o contraseña incorrectos.",
+    "inactiveUser": "Esta cuenta está inactiva. Contactá a un administrador.",
+    "weakPassword": "La contraseña no cumple los requisitos mínimos.",
+    "roleNotFound": "El rol seleccionado no existe.",
+    "userNotFound": "Usuario no encontrado.",
+    "brandNotFound": "Marca no encontrada.",
+    "meterModelNotFound": "Modelo no encontrado.",
+    "invalidRegisterMap": "El mapa de registros es inválido.",
+    "brandInUse": "Esta marca tiene modelos asociados y no puede eliminarse.",
+    "meterModelInUse": "Este modelo tiene dispositivos asociados y no puede eliminarse.",
+    "deviceNotFound": "Dispositivo no encontrado.",
+    "transportMismatch": "La configuración de conexión no coincide con el transporte seleccionado.",
+    "invalidConnection": "Configuración de conexión inválida."
+  },
+  "catalog": {
+    "title": "Catálogo de inventario",
+    "tabs": {
+      "brands": "Marcas",
+      "models": "Modelos",
+      "devices": "Dispositivos"
+    },
+    "brands": {
+      "title": "Marcas",
+      "new": "+ Nueva marca",
+      "columns": {
+        "name": "Nombre",
+        "actions": "Acciones"
+      },
+      "empty": "Todavía no hay marcas. Creá la primera para empezar.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. Siemens",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameTooLong": "El nombre debe tener como máximo {max} caracteres.",
+      "createTitle": "Nueva marca",
+      "renameTitle": "Renombrar marca",
+      "deleteTitle": "Eliminar marca",
+      "deleteMessage": "¿Estás seguro de eliminar \"{name}\"? Esta acción no se puede deshacer.",
+      "created": "Marca creada.",
+      "renamed": "Marca renombrada.",
+      "deleted": "Marca eliminada."
+    },
+    "models": {
+      "title": "Modelos",
+      "new": "+ Nuevo modelo",
+      "columns": {
+        "brand": "Marca",
+        "name": "Nombre",
+        "metrics": "Métricas",
+        "actions": "Acciones"
+      },
+      "empty": "Todavía no hay modelos. Creá el primero para empezar.",
+      "brandLabel": "Marca",
+      "brandPlaceholder": "Seleccioná una marca",
+      "brandRequired": "La marca es obligatoria.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. SIM-100",
+      "nameRequired": "El nombre es obligatorio.",
+      "nameTooLong": "El nombre debe tener como máximo {max} caracteres.",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Notas opcionales sobre este modelo",
+      "registerMapLabel": "Mapa de registros",
+      "createTitle": "Nuevo modelo",
+      "editTitle": "Editar modelo",
+      "deleteTitle": "Eliminar modelo",
+      "deleteMessage": "¿Estás seguro de eliminar \"{name}\"? Esta acción no se puede deshacer.",
+      "created": "Modelo creado.",
+      "updated": "Modelo actualizado.",
+      "deleted": "Modelo eliminado.",
+      "metricWarningTitle": "Advertencia: cambio de métrica",
+      "metricWarningMessage": "Cambiar los nombres de las métricas afecta cómo se registran las lecturas futuras en la base de telemetría. ¿Estás seguro de continuar?"
+    },
+    "devices": {
+      "title": "Dispositivos",
+      "new": "+ Nuevo dispositivo",
+      "createTitle": "Nuevo dispositivo",
+      "editTitle": "Editar dispositivo",
+      "empty": "Todavía no hay dispositivos. Creá el primero para empezar.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej. Test simulator",
+      "modelLabel": "Modelo",
+      "modelPlaceholder": "Seleccioná un modelo",
+      "transportLabel": "Transporte",
+      "enabledLabel": "Habilitado",
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado",
+      "slaveIdLabel": "Slave ID",
+      "slaveIdPlaceholder": "0 - 247",
+      "pollingIntervalLabel": "Intervalo de polling (s)",
+      "pollingIntervalPlaceholder": "ej. 900",
+      "deleteTitle": "Eliminar dispositivo",
+      "deleteMessage": "¿Estás seguro de eliminar \"{name}\"? Esta acción no se puede deshacer.",
+      "created": "Dispositivo creado.",
+      "updated": "Dispositivo actualizado.",
+      "deleted": "Dispositivo eliminado.",
+      "enabledToast": "Dispositivo habilitado.",
+      "disabledToast": "Dispositivo deshabilitado.",
+      "columns": {
+        "name": "Nombre",
+        "model": "Modelo",
+        "transport": "Transporte",
+        "enabled": "Estado",
+        "pollingIntervalS": "Polling (s)",
+        "toggle": "Habilitar",
+        "actions": "Acciones"
+      },
+      "transportValues": {
+        "serial": "Serial",
+        "tcp": "TCP",
+        "simulated": "Simulado",
+        "csv": "CSV"
+      },
+      "connection": {
+        "serialTitle": "Conexion serial",
+        "tcpTitle": "Conexion TCP",
+        "vid": "VID",
+        "pid": "PID",
+        "serialNumber": "Numero de serie (opcional)",
+        "baudrate": "Baudrate",
+        "parity": "Paridad",
+        "timeoutMs": "Timeout (ms)",
+        "host": "Host",
+        "port": "Puerto",
+        "noneRequired": "Los transportes simulado y CSV no requieren campos de conexion."
+      },
+      "validation": {
+        "nameRequired": "El nombre es obligatorio.",
+        "nameTooLong": "El nombre debe tener como maximo {max} caracteres.",
+        "modelRequired": "El modelo es obligatorio.",
+        "slaveIdRange": "El Slave ID debe estar entre 0 y 247.",
+        "pollingRequired": "El intervalo de polling debe ser mayor a 0.",
+        "serialVidRequired": "El VID es obligatorio para transporte serial.",
+        "serialPidRequired": "El PID es obligatorio para transporte serial.",
+        "serialBaudrateRequired": "El baudrate debe ser mayor a 0.",
+        "tcpHostRequired": "El host es obligatorio para transporte TCP.",
+        "tcpPortRange": "El puerto TCP debe estar entre 1 y 65535.",
+        "timeoutRequired": "El timeout debe ser mayor a 0."
+      }
+    },
+    "registerMap": {
+      "address": "Dirección",
+      "function": "Función",
+      "metric": "Métrica",
+      "datatype": "Tipo de dato",
+      "wordOrder": "Orden de palabra",
+      "scale": "Escala",
+      "unit": "Unidad",
+      "addRegister": "+ Agregar registro",
+      "removeRegister": "Eliminar",
+      "minOne": "Se requiere al menos un registro.",
+      "duplicateMetric": "Nombre de métrica duplicado: {metric}",
+      "addressOutOfRange": "La dirección debe estar entre 0 y 65535.",
+      "placeholders": {
+        "address": "ej. 0",
+        "metric": "ej. tension",
+        "scale": "ej. 1.0",
+        "unit": "ej. V"
+      },
+      "help": {
+        "title": "Guía del Mapa de Registros",
+        "intro": "El mapa de registros define qué registros Modbus leer del dispositivo y cómo interpretar los datos.",
+        "address": "Dirección: La dirección del registro Modbus (0-65535) a leer.",
+        "function": "Función: Código de función Modbus — Holding (lectura/escritura) o Input (solo lectura).",
+        "metric": "Métrica: Un nombre único para esta medición (ej. tension, corriente, temperatura).",
+        "datatype": "Tipo de dato: Cómo interpretar los bytes del registro (Int16, Uint16, Int32, Float32, etc.).",
+        "wordOrder": "Orden de palabra: Orden de bytes para tipos multi-registro — Big endian o Little endian.",
+        "scale": "Escala: Multiplicador aplicado al valor crudo (ej. 0.1 para convertir 230 a 23.0).",
+        "unit": "Unidad: Unidad de medida para mostrar (ej. V, A, °C, kWh)."
+      },
+      "functions": {
+        "holding": "Holding",
+        "input": "Input"
+      },
+      "datatypes": {
+        "int16": "Int16",
+        "uint16": "Uint16",
+        "int32": "Int32",
+        "uint32": "Uint32",
+        "int64": "Int64",
+        "float32": "Float32",
+        "float64": "Float64"
+      },
+      "wordOrders": {
+        "big_endian": "Big endian",
+        "little_endian": "Little endian"
+      }
+    }
+  },
+  "telemetry": {
+    "deviceSelector": {
+      "label": "Dispositivo",
+      "placeholder": "Seleccioná un dispositivo…",
+      "empty": "Seleccioná un dispositivo para ver su telemetría."
+    },
+    "history": {
+      "title": "Historial — {name}",
+      "link": "Historial",
+      "metricLabel": "Métrica",
+      "rangeLabel": "Rango",
+      "fromLabel": "Desde",
+      "toLabel": "Hasta",
+      "avgLabel": "Promedio",
+      "bandLabel": "Mín–máx",
+      "empty": "Todavía no hay datos de telemetría en este rango.",
+      "ranges": {
+        "oneHour": "Última hora",
+        "oneDay": "Últimas 24 horas",
+        "sevenDays": "Últimos 7 días",
+        "custom": "Rango personalizado"
+      }
+    },
+    "poll": {
+      "action": "Generar datos",
+      "title": "Generar datos simulados — {name}",
+      "ticksLabel": "Ticks",
+      "ticksValidation": "Los ticks deben estar entre 1 y {max}.",
+      "confirm": "Generar",
+      "resultToast": "Se generaron {ticks} ticks en {metrics} métricas — {inserted} insertados, {ignored} ignorados."
+    }
+  },
+  "designSystem": {
+    "eyebrow": "Sistema de diseño",
+    "title": "Librería de componentes",
+    "subtitle": "Documentación viva de cada componente base usado en la app — construida directamente desde los tokens de diseño, no un mockup.",
+    "backToDashboard": "Volver al inicio",
+    "sections": {
+      "palette": {
+        "title": "Paleta de colores",
+        "primary": "Primary",
+        "success": "Success",
+        "slate": "Slate"
+      },
+      "typography": {
+        "title": "Tipografía",
+        "display": "Display — 30px / 800",
+        "h1": "Encabezado 1 — 24px / 700",
+        "h2": "Encabezado 2 — 18px / 700",
+        "body": "Cuerpo — 14px / 400",
+        "caption": "Caption — 12px / 500"
+      },
+      "buttons": {
+        "title": "Botones",
+        "primary": "Primary",
+        "success": "Success",
+        "soft": "Soft",
+        "ghost": "Ghost",
+        "danger": "Danger"
+      },
+      "forms": {
+        "title": "Formularios",
+        "inputLabel": "Nombre visible",
+        "inputPlaceholder": "ej. Operador Uno",
+        "inputErrorLabel": "Usuario",
+        "inputErrorText": "El usuario es obligatorio.",
+        "selectLabel": "Rol",
+        "toggleLabel": "Habilitar notificaciones",
+        "checkboxLabel": "Forzar cambio de contraseña",
+        "selectOptions": {
+          "operator": "Operador",
+          "admin": "Administrador",
+          "viewer": "Visualizador"
+        }
+      },
+      "badges": {
+        "title": "Badges",
+        "neutral": "Neutral",
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "danger": "Danger"
+      },
+      "avatars": {
+        "title": "Avatares"
+      },
+      "alerts": {
+        "title": "Alertas",
+        "successTitle": "Dispositivo guardado",
+        "successDescription": "La configuración del dispositivo se guardó correctamente.",
+        "infoTitle": "Aviso",
+        "infoDescription": "Esta acción afecta cómo se registran las próximas lecturas de telemetría.",
+        "dangerTitle": "Conexión fallida",
+        "dangerDescription": "No se pudo contactar al sidecar. Revisá la conexión serial."
+      },
+      "cards": {
+        "title": "Cards",
+        "basicTitle": "Island básica",
+        "basicBody": "Cualquier contenido puede vivir dentro de una card .island — el borde, radio y padding compartidos vienen del sistema de diseño.",
+        "kpiLabel": "Dispositivos activos",
+        "kpiValue": "24",
+        "kpiValueDown": "18",
+        "kpiComparison": "vs. semana pasada",
+        "highlightTitle": "Card con gradiente",
+        "highlightBody": "primary-600 → success-600, para destacados que necesitan más énfasis."
+      }
+    }
   }
 }

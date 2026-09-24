@@ -4,19 +4,440 @@
     "subtitle": "Device management, Modbus acquisition and reporting",
     "noBridge": "Bridge not available — open this UI through the Electron shell, not a plain browser."
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Hi {name}, here's a quick overview of the platform.",
+    "kpi": {
+      "sidecar": "Python sidecar",
+      "devices": "Catalog devices",
+      "role": "Current role"
+    }
+  },
   "system": {
     "title": "Python sidecar",
     "ping": "Ping sidecar",
     "pinging": "Pinging…",
     "answer": "Python {version} answered from PID {pid}"
   },
-  "devices": {
-    "title": "Live view (demo device)",
-    "start": "Start live view",
-    "stop": "Stop live view",
-    "empty": "No readings yet — start the live view."
+  "live": {
+    "title": "Live — {name}",
+    "link": "Live",
+    "breadcrumb": "Live",
+    "status": {
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "degraded": "Degraded",
+      "disconnected": "Disconnected"
+    },
+    "readings": {
+      "columns": {
+        "metric": "Metric",
+        "value": "Value",
+        "timestamp": "Time"
+      }
+    },
+    "metricSelector": {
+      "label": "Metric"
+    },
+    "chart": {
+      "avgLabel": "Value",
+      "bandLabel": "Range"
+    },
+    "empty": "No live readings yet — waiting for data from the device."
   },
   "language": {
     "label": "Language"
+  },
+  "nav": {
+    "main": "Main navigation",
+    "breadcrumbs": "Breadcrumbs",
+    "dashboard": "Dashboard",
+    "catalog": "Catalog",
+    "devices": "Devices",
+    "telemetry": "Telemetry",
+    "users": "Users",
+    "login": "Login",
+    "openMenu": "Open menu",
+    "designSystem": "Design System",
+    "groups": {
+      "general": "General",
+      "system": "System"
+    }
+  },
+  "common": {
+    "comingSoon": "Coming soon — not yet implemented.",
+    "dismiss": "Dismiss",
+    "loading": "Loading…",
+    "empty": "No items to display.",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close"
+  },
+  "auth": {
+    "title": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "signOut": "Sign out",
+    "changePassword": "Change password",
+    "changing": "Changing…",
+    "passwordMin": "Password must be at least {min} characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "changed": "Password changed successfully.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "users": {
+    "title": "Users",
+    "new": "+ New user",
+    "empty": "No users yet.",
+    "createTitle": "New user",
+    "created": "User created.",
+    "roleUpdated": "Role updated.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "mustChange": "Must change password",
+    "passwordOk": "Password updated",
+    "columns": {
+      "username": "Username",
+      "displayName": "Display name",
+      "role": "Role",
+      "active": "Status",
+      "mustChangePassword": "Password",
+      "createdAt": "Created"
+    },
+    "form": {
+      "username": "Username",
+      "usernamePlaceholder": "e.g. operator1",
+      "displayName": "Display name",
+      "displayNamePlaceholder": "e.g. Operator One",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "role": "Role",
+      "mustChangePassword": "Force password change on first sign in"
+    },
+    "roles": {
+      "admin": "Admin",
+      "operator": "Operator",
+      "viewer": "Viewer",
+      "unknown": "Unknown"
+    },
+    "validation": {
+      "usernameRequired": "Username is required.",
+      "usernameTooLong": "Username must be at most {max} characters.",
+      "displayNameRequired": "Display name is required.",
+      "displayNameTooLong": "Display name must be at most {max} characters.",
+      "passwordMin": "Password must be at least {min} characters.",
+      "roleRequired": "Role is required."
+    }
+  },
+  "health": {
+    "up": "Sidecar OK",
+    "down": "Sidecar unavailable",
+    "checking": "Checking…"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred. Please try again.",
+    "invalidCredentials": "Invalid username or password.",
+    "inactiveUser": "This account is inactive. Contact an administrator.",
+    "weakPassword": "The password does not meet the minimum requirements.",
+    "roleNotFound": "The selected role does not exist.",
+    "userNotFound": "User not found.",
+    "brandNotFound": "Brand not found.",
+    "meterModelNotFound": "Meter model not found.",
+    "invalidRegisterMap": "The register map is invalid.",
+    "brandInUse": "This brand has associated models and cannot be deleted.",
+    "meterModelInUse": "This model has associated devices and cannot be deleted.",
+    "deviceNotFound": "Device not found.",
+    "transportMismatch": "Connection settings do not match the selected transport.",
+    "invalidConnection": "Invalid connection configuration."
+  },
+  "catalog": {
+    "title": "Inventory catalog",
+    "tabs": {
+      "brands": "Brands",
+      "models": "Models",
+      "devices": "Devices"
+    },
+    "brands": {
+      "title": "Brands",
+      "new": "+ New brand",
+      "columns": {
+        "name": "Name",
+        "actions": "Actions"
+      },
+      "empty": "No brands yet. Create the first one to get started.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Siemens",
+      "nameRequired": "Name is required.",
+      "nameTooLong": "Name must be at most {max} characters.",
+      "createTitle": "New brand",
+      "renameTitle": "Rename brand",
+      "deleteTitle": "Delete brand",
+      "deleteMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+      "created": "Brand created.",
+      "renamed": "Brand renamed.",
+      "deleted": "Brand deleted."
+    },
+    "models": {
+      "title": "Models",
+      "new": "+ New model",
+      "columns": {
+        "brand": "Brand",
+        "name": "Name",
+        "metrics": "Metrics",
+        "actions": "Actions"
+      },
+      "empty": "No models yet. Create the first one to get started.",
+      "brandLabel": "Brand",
+      "brandPlaceholder": "Select a brand",
+      "brandRequired": "Brand is required.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. SIM-100",
+      "nameRequired": "Name is required.",
+      "nameTooLong": "Name must be at most {max} characters.",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Optional notes about this model",
+      "registerMapLabel": "Register map",
+      "createTitle": "New model",
+      "editTitle": "Edit model",
+      "deleteTitle": "Delete model",
+      "deleteMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+      "created": "Model created.",
+      "updated": "Model updated.",
+      "deleted": "Model deleted.",
+      "metricWarningTitle": "Warning: metric change",
+      "metricWarningMessage": "Changing metric names affects how future readings are recorded in the telemetry database. Are you sure you want to continue?"
+    },
+    "devices": {
+      "title": "Devices",
+      "new": "+ New device",
+      "createTitle": "New device",
+      "editTitle": "Edit device",
+      "empty": "No devices yet. Create the first one to get started.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Test simulator",
+      "modelLabel": "Model",
+      "modelPlaceholder": "Select a model",
+      "transportLabel": "Transport",
+      "enabledLabel": "Enabled",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "slaveIdLabel": "Slave ID",
+      "slaveIdPlaceholder": "0 - 247",
+      "pollingIntervalLabel": "Polling interval (s)",
+      "pollingIntervalPlaceholder": "e.g. 900",
+      "deleteTitle": "Delete device",
+      "deleteMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+      "created": "Device created.",
+      "updated": "Device updated.",
+      "deleted": "Device deleted.",
+      "enabledToast": "Device enabled.",
+      "disabledToast": "Device disabled.",
+      "columns": {
+        "name": "Name",
+        "model": "Model",
+        "transport": "Transport",
+        "enabled": "Status",
+        "pollingIntervalS": "Polling (s)",
+        "toggle": "Enable",
+        "actions": "Actions"
+      },
+      "transportValues": {
+        "serial": "Serial",
+        "tcp": "TCP",
+        "simulated": "Simulated",
+        "csv": "CSV"
+      },
+      "connection": {
+        "serialTitle": "Serial connection",
+        "tcpTitle": "TCP connection",
+        "vid": "VID",
+        "pid": "PID",
+        "serialNumber": "Serial number (optional)",
+        "baudrate": "Baud rate",
+        "parity": "Parity",
+        "timeoutMs": "Timeout (ms)",
+        "host": "Host",
+        "port": "Port",
+        "noneRequired": "No connection fields required for simulated and CSV transports."
+      },
+      "validation": {
+        "nameRequired": "Name is required.",
+        "nameTooLong": "Name must be at most {max} characters.",
+        "modelRequired": "Model is required.",
+        "slaveIdRange": "Slave ID must be between 0 and 247.",
+        "pollingRequired": "Polling interval must be greater than 0.",
+        "serialVidRequired": "VID is required for serial transport.",
+        "serialPidRequired": "PID is required for serial transport.",
+        "serialBaudrateRequired": "Baud rate must be greater than 0.",
+        "tcpHostRequired": "Host is required for TCP transport.",
+        "tcpPortRange": "TCP port must be between 1 and 65535.",
+        "timeoutRequired": "Timeout must be greater than 0."
+      }
+    },
+    "registerMap": {
+      "address": "Address",
+      "function": "Function",
+      "metric": "Metric",
+      "datatype": "Data type",
+      "wordOrder": "Word order",
+      "scale": "Scale",
+      "unit": "Unit",
+      "addRegister": "+ Add register",
+      "removeRegister": "Remove",
+      "minOne": "At least one register is required.",
+      "duplicateMetric": "Duplicate metric name: {metric}",
+      "addressOutOfRange": "Address must be between 0 and 65535.",
+      "placeholders": {
+        "address": "e.g. 0",
+        "metric": "e.g. voltage",
+        "scale": "e.g. 1.0",
+        "unit": "e.g. V"
+      },
+      "help": {
+        "title": "Register Map Guide",
+        "intro": "The register map defines which Modbus registers to read from the device and how to interpret the data.",
+        "address": "Address: The Modbus register address (0-65535) to read from.",
+        "function": "Function: Modbus function code — Holding (read/write) or Input (read-only).",
+        "metric": "Metric: A unique name for this measurement (e.g., voltage, current, temperature).",
+        "datatype": "Data type: How to interpret the register bytes (Int16, Uint16, Int32, Float32, etc.).",
+        "wordOrder": "Word order: Byte order for multi-register types — Big endian or Little endian.",
+        "scale": "Scale: Multiplier applied to the raw value (e.g., 0.1 to convert 230 to 23.0).",
+        "unit": "Unit: Measurement unit for display (e.g., V, A, °C, kWh)."
+      },
+      "functions": {
+        "holding": "Holding",
+        "input": "Input"
+      },
+      "datatypes": {
+        "int16": "Int16",
+        "uint16": "Uint16",
+        "int32": "Int32",
+        "uint32": "Uint32",
+        "int64": "Int64",
+        "float32": "Float32",
+        "float64": "Float64"
+      },
+      "wordOrders": {
+        "big_endian": "Big endian",
+        "little_endian": "Little endian"
+      }
+    }
+  },
+  "telemetry": {
+    "deviceSelector": {
+      "label": "Device",
+      "placeholder": "Select a device…",
+      "empty": "Select a device to view its telemetry."
+    },
+    "history": {
+      "title": "History — {name}",
+      "link": "History",
+      "metricLabel": "Metric",
+      "rangeLabel": "Range",
+      "fromLabel": "From",
+      "toLabel": "To",
+      "avgLabel": "Average",
+      "bandLabel": "Min–max",
+      "empty": "No telemetry data in this range yet.",
+      "ranges": {
+        "oneHour": "Last hour",
+        "oneDay": "Last 24 hours",
+        "sevenDays": "Last 7 days",
+        "custom": "Custom range"
+      }
+    },
+    "poll": {
+      "action": "Generate data",
+      "title": "Generate simulated data — {name}",
+      "ticksLabel": "Ticks",
+      "ticksValidation": "Ticks must be between 1 and {max}.",
+      "confirm": "Generate",
+      "resultToast": "Generated {ticks} ticks across {metrics} metrics — {inserted} inserted, {ignored} ignored."
+    }
+  },
+  "designSystem": {
+    "eyebrow": "Design System",
+    "title": "Component library",
+    "subtitle": "Live documentation of every base component used across the app — built straight from the design tokens, not a mockup.",
+    "backToDashboard": "Back to dashboard",
+    "sections": {
+      "palette": {
+        "title": "Color palette",
+        "primary": "Primary",
+        "success": "Success",
+        "slate": "Slate"
+      },
+      "typography": {
+        "title": "Typography",
+        "display": "Display — 30px / 800",
+        "h1": "Heading 1 — 24px / 700",
+        "h2": "Heading 2 — 18px / 700",
+        "body": "Body — 14px / 400",
+        "caption": "Caption — 12px / 500"
+      },
+      "buttons": {
+        "title": "Buttons",
+        "primary": "Primary",
+        "success": "Success",
+        "soft": "Soft",
+        "ghost": "Ghost",
+        "danger": "Danger"
+      },
+      "forms": {
+        "title": "Forms",
+        "inputLabel": "Display name",
+        "inputPlaceholder": "e.g. Operator One",
+        "inputErrorLabel": "Username",
+        "inputErrorText": "Username is required.",
+        "selectLabel": "Role",
+        "toggleLabel": "Enable notifications",
+        "checkboxLabel": "Force password change",
+        "selectOptions": {
+          "operator": "Operator",
+          "admin": "Admin",
+          "viewer": "Viewer"
+        }
+      },
+      "badges": {
+        "title": "Badges",
+        "neutral": "Neutral",
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "danger": "Danger"
+      },
+      "avatars": {
+        "title": "Avatars"
+      },
+      "alerts": {
+        "title": "Alerts",
+        "successTitle": "Device saved",
+        "successDescription": "The device configuration was saved successfully.",
+        "infoTitle": "Heads up",
+        "infoDescription": "This action affects how future telemetry readings are recorded.",
+        "dangerTitle": "Connection failed",
+        "dangerDescription": "Could not reach the sidecar. Check the serial connection."
+      },
+      "cards": {
+        "title": "Cards",
+        "basicTitle": "Basic island",
+        "basicBody": "Any content can live inside an .island card — the shared border, radius and padding come from the design system.",
+        "kpiLabel": "Active devices",
+        "kpiValue": "24",
+        "kpiValueDown": "18",
+        "kpiComparison": "vs. last week",
+        "highlightTitle": "Gradient card",
+        "highlightBody": "primary-600 → success-600, for callouts that need extra emphasis."
+      }
+    }
   }
 }

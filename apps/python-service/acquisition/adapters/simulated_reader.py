@@ -38,7 +38,7 @@ _ENERGY_RATE: Final = 0.25
 
 def _metric_offset(metric: str) -> int:
     """Deterministic per-metric phase offset derived from its name."""
-    return int(hashlib.md5(metric.encode(), usedforsecurity=False).hexdigest()[:4], 16)  # noqa: S324
+    return int(hashlib.md5(metric.encode(), usedforsecurity=False).hexdigest()[:4], 16)
 
 
 def _instantaneous_value(metric: str, tick: int, base: float, amplitude: float, frequency: float) -> float:
@@ -62,7 +62,7 @@ def _wave_params(metric: str) -> tuple[float, float, float]:
 
 
 def _is_energy_metric(metric: str) -> bool:
-    return metric.startswith("energy_") or metric.startswith("kwh_")
+    return metric.startswith(("energy_", "kwh_"))
 
 
 class SimulatedReader:

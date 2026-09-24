@@ -35,7 +35,15 @@ describe('PythonBridge <-> python sidecar (integration)', () => {
     expect(result.pythonVersion).toMatch(/^\d+\.\d+\.\d+/)
   })
 
-  it('pushes device.reading notifications while watching', async () => {
+  it('pushes device.reading notifications driven by the real register map while watching', async () => {
+    const watchRegisterMap = {
+      version: 1,
+      registers: [
+        { address: 100, function: 'holding', metric: 'voltage_l1', datatype: 'float32' },
+        { address: 102, function: 'holding', metric: 'current_l1', datatype: 'float32' },
+      ],
+    }
+
     const firstReading = new Promise<DeviceReading>((resolve) => {
       const handler = (method: string, params: unknown): void => {
         if (method === RpcMethods.DeviceReading) {
@@ -46,13 +54,14 @@ describe('PythonBridge <-> python sidecar (integration)', () => {
       bridge.on('notification', handler)
     })
 
-    await bridge.request(RpcMethods.DeviceWatch, { deviceId: 1 })
+    await bridge.request(RpcMethods.DeviceWatch, { deviceId: 1, registerMap: watchRegisterMap })
     const reading = await firstReading
     await bridge.request(RpcMethods.DeviceUnwatch, { deviceId: 1 })
 
     expect(reading.deviceId).toBe(1)
     expect(reading.timestamp).toBeGreaterThan(0)
     expect(typeof reading.value).toBe('number')
+    expect(['voltage_l1', 'current_l1']).toContain(reading.metric)
   })
 
   it('rejects unknown methods with a JSON-RPC error', async () => {
