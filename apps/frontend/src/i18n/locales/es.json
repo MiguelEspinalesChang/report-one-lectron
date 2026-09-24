@@ -110,6 +110,7 @@
     "resetPassword": "Restablecer contraseña",
     "resetPasswordTitle": "Restablecer contraseña",
     "resetPasswordSuccess": "Contraseña restablecida. El usuario deberá cambiarla en su próximo ingreso.",
+    "passwordCopied": "Contraseña copiada al portapapeles.",
     "columns": {
       "username": "Usuario",
       "displayName": "Nombre visible",
@@ -126,6 +127,10 @@
       "displayNamePlaceholder": "ej. Operador Uno",
       "password": "Contraseña",
       "passwordPlaceholder": "Al menos 8 caracteres",
+      "confirmPassword": "Confirmar contraseña",
+      "generatedLength": "Longitud",
+      "generatePassword": "Generar",
+      "copyPassword": "Copiar",
       "role": "Rol",
       "mustChangePassword": "Forzar cambio de contraseña en el primer ingreso"
     },

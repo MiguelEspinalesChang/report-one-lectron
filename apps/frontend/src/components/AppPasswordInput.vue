@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   modelValue: string
   label: string
   placeholder?: string
@@ -10,13 +10,27 @@ defineProps<{
   autocomplete?: string
   showPasswordLabel: string
   hidePasswordLabel: string
+  // Optional external visibility control — e.g. the Users admin screens
+  // reveal a freshly generated password so it can be copied/handed over.
+  // Toggling this value sets the field's visibility; omit it to keep the
+  // existing manual show/hide behavior (LoginView, ChangePasswordView).
+  revealed?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const visible = ref(false)
+const visible = ref(props.revealed ?? false)
+
+watch(
+  () => props.revealed,
+  (value) => {
+    if (value !== undefined) {
+      visible.value = value
+    }
+  },
+)
 </script>
 
 <template>

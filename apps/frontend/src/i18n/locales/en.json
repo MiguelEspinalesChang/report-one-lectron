@@ -110,6 +110,7 @@
     "resetPassword": "Reset password",
     "resetPasswordTitle": "Reset password",
     "resetPasswordSuccess": "Password reset. The user must change it on next login.",
+    "passwordCopied": "Password copied to clipboard.",
     "columns": {
       "username": "Username",
       "displayName": "Display name",
@@ -126,6 +127,10 @@
       "displayNamePlaceholder": "e.g. Operator One",
       "password": "Password",
       "passwordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm password",
+      "generatedLength": "Length",
+      "generatePassword": "Generate",
+      "copyPassword": "Copy",
       "role": "Role",
       "mustChangePassword": "Force password change on first sign in"
     },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { UserDto } from '@platform/shared-types'
 import AppBadge from '../../components/AppBadge.vue'
@@ -13,16 +13,53 @@ import { useApiCall } from '../../composables/useApiCall'
 import { useSessionStore } from '../../stores/session'
 import { useToastStore } from '../../stores/toast'
 import { useUsersStore } from '../../stores/users'
+import {
+  DEFAULT_GENERATED_LENGTH,
+  MAX_GENERATED_LENGTH,
+  MIN_GENERATED_LENGTH,
+  generatePassword,
+} from '../../utils/password-generator'
 
 const PASSWORD_MIN_LENGTH = 8
 const USERNAME_MAX_LENGTH = 64
 const DISPLAY_NAME_MAX_LENGTH = 128
+
+const generatedLengthOptions = Array.from(
+  { length: MAX_GENERATED_LENGTH - MIN_GENERATED_LENGTH + 1 },
+  (_, index) => {
+    const value = MIN_GENERATED_LENGTH + index
+    return { value, label: String(value) }
+  },
+)
+
+/**
+ * Forces `AppPasswordInput`'s `revealed` prop to re-trigger even when it was
+ * already `true` (e.g. the admin manually hid the field, then generated a
+ * new password): flip to `false` and back on the next tick so the watcher
+ * always fires and the freshly generated value ends up visible.
+ */
+async function revealGeneratedPassword(target: { value: boolean }): Promise<void> {
+  target.value = false
+  await nextTick()
+  target.value = true
+}
 
 const { t, locale } = useI18n()
 const usersStore = useUsersStore()
 const sessionStore = useSessionStore()
 const toastStore = useToastStore()
 const { loading, call } = useApiCall()
+
+async function copyPassword(value: string): Promise<void> {
+  if (!value) return
+  try {
+    await navigator.clipboard.writeText(value)
+    toastStore.show('success', t('users.passwordCopied'))
+  } catch {
+    // Clipboard API may be unavailable (permissions, insecure context) —
+    // fail silently, the generated value is still visible on screen.
+  }
+}
 
 // Roles come from core (app.db, seeded system roles) — never hardcode ids
 // here, they're wired end-to-end via platform.users.listRoles().
@@ -54,6 +91,9 @@ onMounted(async () => {
 const createOpen = ref(false)
 const createUsername = ref('')
 const createPassword = ref('')
+const createPasswordConfirm = ref('')
+const createPasswordRevealed = ref(false)
+const createGeneratedLength = ref<number>(DEFAULT_GENERATED_LENGTH)
 const createDisplayName = ref('')
 const createRoleId = ref<number>(0)
 const createMustChangePassword = ref(true)
@@ -70,6 +110,9 @@ const createErrors = computed(() => {
 
   if (createPassword.value.length < PASSWORD_MIN_LENGTH) {
     errors.push(t('users.validation.passwordMin', { min: PASSWORD_MIN_LENGTH }))
+  }
+  if (createPasswordConfirm.value !== createPassword.value) {
+    errors.push(t('auth.passwordMismatch'))
   }
 
   if (displayName.length === 0) errors.push(t('users.validation.displayNameRequired'))
@@ -89,10 +132,20 @@ const createValid = computed(() => createErrors.value.length === 0)
 function openCreate(): void {
   createUsername.value = ''
   createPassword.value = ''
+  createPasswordConfirm.value = ''
+  createPasswordRevealed.value = false
+  createGeneratedLength.value = DEFAULT_GENERATED_LENGTH
   createDisplayName.value = ''
   createRoleId.value = defaultRoleId()
   createMustChangePassword.value = true
   createOpen.value = true
+}
+
+async function generateCreatePassword(): Promise<void> {
+  const generated = generatePassword(createGeneratedLength.value)
+  createPassword.value = generated
+  createPasswordConfirm.value = generated
+  await revealGeneratedPassword(createPasswordRevealed)
 }
 
 function userRowKey(user: UserDto): number {
@@ -160,6 +213,8 @@ const resetPasswordOpen = ref(false)
 const resetPasswordTarget = ref<UserDto | null>(null)
 const resetPasswordValue = ref('')
 const resetPasswordConfirm = ref('')
+const resetPasswordRevealed = ref(false)
+const resetGeneratedLength = ref<number>(DEFAULT_GENERATED_LENGTH)
 
 const resetPasswordErrors = computed(() => {
   const errors: string[] = []
@@ -178,7 +233,16 @@ function openResetPassword(user: UserDto): void {
   resetPasswordTarget.value = user
   resetPasswordValue.value = ''
   resetPasswordConfirm.value = ''
+  resetPasswordRevealed.value = false
+  resetGeneratedLength.value = DEFAULT_GENERATED_LENGTH
   resetPasswordOpen.value = true
+}
+
+async function generateResetPassword(): Promise<void> {
+  const generated = generatePassword(resetGeneratedLength.value)
+  resetPasswordValue.value = generated
+  resetPasswordConfirm.value = generated
+  await revealGeneratedPassword(resetPasswordRevealed)
 }
 
 async function submitResetPassword(): Promise<void> {
@@ -304,12 +368,22 @@ function formatEpoch(value: number): string {
             :placeholder="t('users.form.displayNamePlaceholder')"
             :disabled="loading"
           />
-          <AppInput
+          <AppPasswordInput
             v-model="createPassword"
-            type="password"
             :label="t('users.form.password')"
             :placeholder="t('users.form.passwordPlaceholder')"
             :disabled="loading"
+            :show-password-label="t('auth.showPassword')"
+            :hide-password-label="t('auth.hidePassword')"
+            :revealed="createPasswordRevealed"
+          />
+          <AppPasswordInput
+            v-model="createPasswordConfirm"
+            :label="t('users.form.confirmPassword')"
+            :disabled="loading"
+            :show-password-label="t('auth.showPassword')"
+            :hide-password-label="t('auth.hidePassword')"
+            :revealed="createPasswordRevealed"
           />
           <AppSelect
             v-model="createRoleId"
@@ -317,6 +391,27 @@ function formatEpoch(value: number): string {
             :options="roleOptions"
             :disabled="loading"
           />
+          <div class="flex flex-wrap items-end gap-3">
+            <div class="w-24">
+              <AppSelect
+                v-model="createGeneratedLength"
+                :label="t('users.form.generatedLength')"
+                :options="generatedLengthOptions"
+                :disabled="loading"
+              />
+            </div>
+            <button type="button" class="btn" :disabled="loading" @click="generateCreatePassword">
+              {{ t('users.form.generatePassword') }}
+            </button>
+            <button
+              type="button"
+              class="btn"
+              :disabled="loading || !createPassword"
+              @click="copyPassword(createPassword)"
+            >
+              {{ t('users.form.copyPassword') }}
+            </button>
+          </div>
           <div class="md:col-span-2">
             <AppToggle
               v-model="createMustChangePassword"
@@ -355,6 +450,7 @@ function formatEpoch(value: number): string {
             :disabled="loading"
             :show-password-label="t('auth.showPassword')"
             :hide-password-label="t('auth.hidePassword')"
+            :revealed="resetPasswordRevealed"
           />
           <AppPasswordInput
             v-model="resetPasswordConfirm"
@@ -362,7 +458,29 @@ function formatEpoch(value: number): string {
             :disabled="loading"
             :show-password-label="t('auth.showPassword')"
             :hide-password-label="t('auth.hidePassword')"
+            :revealed="resetPasswordRevealed"
           />
+          <div class="flex flex-wrap items-end gap-3">
+            <div class="w-24">
+              <AppSelect
+                v-model="resetGeneratedLength"
+                :label="t('users.form.generatedLength')"
+                :options="generatedLengthOptions"
+                :disabled="loading"
+              />
+            </div>
+            <button type="button" class="btn" :disabled="loading" @click="generateResetPassword">
+              {{ t('users.form.generatePassword') }}
+            </button>
+            <button
+              type="button"
+              class="btn"
+              :disabled="loading || !resetPasswordValue"
+              @click="copyPassword(resetPasswordValue)"
+            >
+              {{ t('users.form.copyPassword') }}
+            </button>
+          </div>
         </div>
 
         <ul v-if="resetPasswordErrors.length > 0" class="mt-4 list-disc space-y-1 pl-5 text-sm text-red-600">
