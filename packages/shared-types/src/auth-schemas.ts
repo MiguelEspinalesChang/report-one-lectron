@@ -34,3 +34,13 @@ export const AssignRoleSchema = z.object({
   userId: z.number().int().positive(),
   roleId: z.number().int().positive(),
 })
+
+export const SetActiveSchema = z.object({
+  userId: z.number().int().positive(),
+  isActive: z.boolean(),
+})
+
+export const ResetPasswordSchema = z.object({
+  userId: z.number().int().positive(),
+  newPassword: z.string().min(PASSWORD_MIN_LENGTH),
+})

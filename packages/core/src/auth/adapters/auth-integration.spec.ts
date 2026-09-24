@@ -11,7 +11,8 @@ import {
   type SqliteAppDatabase,
 } from '../../persistence/adapters/sqlite-database'
 import { AuthSession } from '../domain/auth-session'
-import { AuthService, InvalidCredentialsError } from '../application/auth-service'
+import { AuthService, InactiveUserError, InvalidCredentialsError } from '../application/auth-service'
+import { UserManagementService } from '../application/user-management-service'
 import { DrizzleUserRepository } from './drizzle-user-repository'
 import { DrizzleRoleRepository } from './drizzle-role-repository'
 import { Argon2Hasher } from './argon2-hasher'
@@ -21,6 +22,9 @@ describe('auth integration', () => {
   let tmpDir: string
   let database: SqliteAppDatabase
   let service: AuthService
+  let userManagement: UserManagementService
+  let userRepo: DrizzleUserRepository
+  let roleRepo: DrizzleRoleRepository
 
   beforeEach(async () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'auth-integration-'))
@@ -28,11 +32,12 @@ describe('auth integration', () => {
     database.runMigrations()
     await seedAuthData(database.db)
 
-    const userRepo = new DrizzleUserRepository(database.db)
-    const roleRepo = new DrizzleRoleRepository(database.db)
+    userRepo = new DrizzleUserRepository(database.db)
+    roleRepo = new DrizzleRoleRepository(database.db)
     const hasher = new Argon2Hasher()
     const session = new AuthSession()
     service = new AuthService(userRepo, roleRepo, hasher, session)
+    userManagement = new UserManagementService(userRepo, roleRepo, hasher, session)
   })
 
   afterEach(() => {
@@ -96,5 +101,34 @@ describe('auth integration', () => {
     expect(user.permissionCodes.length).toBeGreaterThan(0)
     // Must contain devices.view
     expect(user.permissionCodes).toContain('devices.view')
+  })
+
+  it('throws InactiveUserError when a deactivated user logs in with correct credentials', async () => {
+    const admin = await userRepo.findByUsername('admin')
+    if (admin === null) throw new Error('seed admin user missing')
+
+    await userRepo.setActive(admin.id, false)
+
+    await expect(service.login('admin', 'admin')).rejects.toThrow(InactiveUserError)
+  })
+
+  it('resetting an operator password forces mustChangePassword and invalidates the old password', async () => {
+    const operatorRole = await roleRepo.findByName('operator')
+    if (operatorRole === null) throw new Error('seed operator role missing')
+
+    const created = await userManagement.createUser({
+      username: 'operator1',
+      password: 'originalpass',
+      displayName: 'Operator One',
+      roleId: operatorRole.id,
+    })
+
+    const reset = await userManagement.resetPassword(created.id, 'temporarypass')
+    expect(reset.mustChangePassword).toBe(true)
+
+    const loggedIn = await service.login('operator1', 'temporarypass')
+    expect(loggedIn.mustChangePassword).toBe(true)
+
+    await expect(service.login('operator1', 'originalpass')).rejects.toThrow(InvalidCredentialsError)
   })
 })

@@ -1,10 +1,23 @@
 import type { PublicUser, Role } from '../domain/user'
-import { RoleNotFoundError, UserNotFoundError, WeakPasswordError } from '../domain/errors'
+import {
+  CannotDeactivateSelfError,
+  CannotResetAdminPasswordError,
+  RoleNotFoundError,
+  UserNotFoundError,
+  WeakPasswordError,
+} from '../domain/errors'
 import { toPublicUser, validatePasswordPolicy } from '../domain/user'
+import type { AuthSession } from '../domain/auth-session'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { CreateUserInput, RoleRepository, UserRepository } from '../ports/user-repository'
 
-export { RoleNotFoundError, UserNotFoundError, WeakPasswordError } from '../domain/errors'
+export {
+  CannotDeactivateSelfError,
+  CannotResetAdminPasswordError,
+  RoleNotFoundError,
+  UserNotFoundError,
+  WeakPasswordError,
+} from '../domain/errors'
 
 export interface CreateUserParams {
   username: string
@@ -19,6 +32,7 @@ export class UserManagementService {
     private readonly users: UserRepository,
     private readonly roles: RoleRepository,
     private readonly hasher: PasswordHasher,
+    private readonly session: AuthSession,
   ) {}
 
   async createUser(params: CreateUserParams): Promise<PublicUser> {
@@ -64,6 +78,63 @@ export class UserManagementService {
       throw new RoleNotFoundError(roleId)
     }
     await this.users.updateRole(userId, roleId)
+
+    const updated = await this.users.findById(userId)
+    if (updated === null) {
+      throw new UserNotFoundError(userId)
+    }
+    return toPublicUser(updated)
+  }
+
+  /**
+   * Reversible toggle — an admin can also reactivate a user they (or someone
+   * else) deactivated earlier. Deactivating the currently logged-in session's
+   * own account is rejected: it would lock out the only signed-in admin with
+   * no way to reverse it.
+   */
+  async setActive(userId: number, isActive: boolean): Promise<PublicUser> {
+    if (!isActive && this.session.current?.id === userId) {
+      throw new CannotDeactivateSelfError()
+    }
+
+    const user = await this.users.findById(userId)
+    if (user === null) {
+      throw new UserNotFoundError(userId)
+    }
+
+    await this.users.setActive(userId, isActive)
+
+    const updated = await this.users.findById(userId)
+    if (updated === null) {
+      throw new UserNotFoundError(userId)
+    }
+    return toPublicUser(updated)
+  }
+
+  /**
+   * Admin-issued temporary password. Reuses `updatePasswordHash` (the same
+   * repository write `AuthService.changePassword` uses) with
+   * `mustChangePassword = true`, so the target is forced to set their own
+   * password on next login. Rejects admin targets: an admin's password is
+   * never reset by another admin, only changed by the admin themself.
+   */
+  async resetPassword(userId: number, newPassword: string): Promise<PublicUser> {
+    if (!validatePasswordPolicy(newPassword)) {
+      throw new WeakPasswordError()
+    }
+
+    const user = await this.users.findById(userId)
+    if (user === null) {
+      throw new UserNotFoundError(userId)
+    }
+
+    const role = await this.roles.findById(user.roleId)
+    if (role?.name === 'admin') {
+      throw new CannotResetAdminPasswordError()
+    }
+
+    const newHash = await this.hasher.hash(newPassword)
+    await this.users.updatePasswordHash(userId, newHash, true)
 
     const updated = await this.users.findById(userId)
     if (updated === null) {

@@ -127,6 +127,16 @@ export interface AssignRoleDto {
   roleId: number
 }
 
+export interface SetActiveDto {
+  userId: number
+  isActive: boolean
+}
+
+export interface ResetPasswordDto {
+  userId: number
+  newPassword: string
+}
+
 export interface RoleDto {
   id: number
   name: string
@@ -169,6 +179,8 @@ export const IpcChannels = {
   UsersCreate: 'users:create',
   UsersList: 'users:list',
   UsersAssignRole: 'users:assignRole',
+  UsersSetActive: 'users:setActive',
+  UsersResetPassword: 'users:resetPassword',
   UsersListRoles: 'users:listRoles',
   // Catalog — brands
   CatalogBrandsCreate: 'catalog:brands:create',
@@ -218,6 +230,8 @@ export interface PlatformApi {
     create(dto: CreateUserDto): Promise<UserDto>
     list(): Promise<UserDto[]>
     assignRole(dto: AssignRoleDto): Promise<UserDto>
+    setActive(dto: SetActiveDto): Promise<UserDto>
+    resetPassword(dto: ResetPasswordDto): Promise<UserDto>
     listRoles(): Promise<RoleDto[]>
   }
   catalog: {
@@ -336,6 +350,8 @@ export {
   ChangePasswordSchema,
   CreateUserSchema,
   AssignRoleSchema,
+  SetActiveSchema,
+  ResetPasswordSchema,
   PASSWORD_MIN_LENGTH,
 } from './auth-schemas'
 export {

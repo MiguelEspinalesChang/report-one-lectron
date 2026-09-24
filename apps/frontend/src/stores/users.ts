@@ -1,4 +1,11 @@
-import type { AssignRoleDto, CreateUserDto, RoleDto, UserDto } from '@platform/shared-types'
+import type {
+  AssignRoleDto,
+  CreateUserDto,
+  ResetPasswordDto,
+  RoleDto,
+  SetActiveDto,
+  UserDto,
+} from '@platform/shared-types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -31,6 +38,24 @@ export const useUsersStore = defineStore('users', () => {
     }
   }
 
+  async function setActive(userId: number, isActive: boolean): Promise<void> {
+    const dto: SetActiveDto = { userId, isActive }
+    const updated = await window.platform.users.setActive(dto)
+    const index = users.value.findIndex((item) => item.id === userId)
+    if (index !== -1) {
+      users.value[index] = updated
+    }
+  }
+
+  async function resetPassword(userId: number, newPassword: string): Promise<void> {
+    const dto: ResetPasswordDto = { userId, newPassword }
+    const updated = await window.platform.users.resetPassword(dto)
+    const index = users.value.findIndex((item) => item.id === userId)
+    if (index !== -1) {
+      users.value[index] = updated
+    }
+  }
+
   return {
     users,
     roles,
@@ -39,5 +64,7 @@ export const useUsersStore = defineStore('users', () => {
     loadRoles,
     createUser,
     assignRole,
+    setActive,
+    resetPassword,
   }
 })

@@ -15,6 +15,7 @@ export interface UserRepository {
   create(input: CreateUserInput): Promise<User>
   updatePasswordHash(userId: number, passwordHash: string, mustChangePassword: boolean): Promise<void>
   updateRole(userId: number, roleId: number): Promise<void>
+  setActive(userId: number, isActive: boolean): Promise<void>
 }
 
 export interface RoleRepository {

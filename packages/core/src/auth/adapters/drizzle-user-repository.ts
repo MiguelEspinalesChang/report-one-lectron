@@ -72,4 +72,12 @@ export class DrizzleUserRepository implements UserRepository {
       .where(eq(users.id, userId))
       .run()
   }
+
+  async setActive(userId: number, isActive: boolean): Promise<void> {
+    this.db
+      .update(users)
+      .set({ isActive: isActive ? 1 : 0, updatedAt: Date.now() })
+      .where(eq(users.id, userId))
+      .run()
+  }
 }

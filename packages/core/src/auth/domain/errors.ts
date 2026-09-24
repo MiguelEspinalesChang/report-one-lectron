@@ -34,3 +34,17 @@ export class UserNotFoundError extends Error {
     this.name = 'UserNotFoundError'
   }
 }
+
+export class CannotDeactivateSelfError extends Error {
+  constructor() {
+    super('You cannot deactivate your own account')
+    this.name = 'CannotDeactivateSelfError'
+  }
+}
+
+export class CannotResetAdminPasswordError extends Error {
+  constructor() {
+    super('Cannot reset the password of an admin account')
+    this.name = 'CannotResetAdminPasswordError'
+  }
+}

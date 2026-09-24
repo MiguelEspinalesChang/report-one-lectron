@@ -10,7 +10,9 @@ import type {
   MeterModelDto,
   PlatformApi,
   RegisterMap,
+  ResetPasswordDto,
   RoleDto,
+  SetActiveDto,
   SimulatedPollParams,
   SimulatedPollResult,
   TelemetryHistoryParams,
@@ -44,6 +46,8 @@ const api: PlatformApi = {
     create: (dto: CreateUserDto) => ipcRenderer.invoke(IpcChannels.UsersCreate, dto),
     list: () => ipcRenderer.invoke(IpcChannels.UsersList),
     assignRole: (dto: AssignRoleDto) => ipcRenderer.invoke(IpcChannels.UsersAssignRole, dto),
+    setActive: (dto: SetActiveDto) => ipcRenderer.invoke(IpcChannels.UsersSetActive, dto),
+    resetPassword: (dto: ResetPasswordDto) => ipcRenderer.invoke(IpcChannels.UsersResetPassword, dto),
     listRoles: (): Promise<RoleDto[]> => ipcRenderer.invoke(IpcChannels.UsersListRoles),
   },
   catalog: {

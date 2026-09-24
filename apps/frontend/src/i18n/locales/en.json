@@ -101,17 +101,23 @@
     "createTitle": "New user",
     "created": "User created.",
     "roleUpdated": "Role updated.",
+    "statusUpdated": "Status updated.",
+    "cannotDeactivateSelf": "You cannot deactivate your own account.",
     "active": "Active",
     "inactive": "Inactive",
     "mustChange": "Must change password",
     "passwordOk": "Password updated",
+    "resetPassword": "Reset password",
+    "resetPasswordTitle": "Reset password",
+    "resetPasswordSuccess": "Password reset. The user must change it on next login.",
     "columns": {
       "username": "Username",
       "displayName": "Display name",
       "role": "Role",
       "active": "Status",
       "mustChangePassword": "Password",
-      "createdAt": "Created"
+      "createdAt": "Created",
+      "actions": "Actions"
     },
     "form": {
       "username": "Username",
@@ -150,6 +156,7 @@
     "weakPassword": "The password does not meet the minimum requirements.",
     "roleNotFound": "The selected role does not exist.",
     "userNotFound": "User not found.",
+    "cannotDeactivateSelf": "You cannot deactivate your own account.",
     "brandNotFound": "Brand not found.",
     "meterModelNotFound": "Meter model not found.",
     "invalidRegisterMap": "The register map is invalid.",
@@ -157,7 +164,8 @@
     "meterModelInUse": "This model has associated devices and cannot be deleted.",
     "deviceNotFound": "Device not found.",
     "transportMismatch": "Connection settings do not match the selected transport.",
-    "invalidConnection": "Invalid connection configuration."
+    "invalidConnection": "Invalid connection configuration.",
+    "cannotResetAdminPassword": "You cannot reset the password of an admin account."
   },
   "catalog": {
     "title": "Inventory catalog",
