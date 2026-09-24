@@ -1,5 +1,7 @@
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { app, BrowserWindow } from 'electron'
+import { isAllowedNavigation } from './navigation-policy'
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL ?? 'http://127.0.0.1:5173'
 
@@ -17,8 +19,17 @@ export async function createWindow(): Promise<BrowserWindow> {
     },
   })
 
+  const rendererIndex = path.join(__dirname, '../../../frontend/dist/index.html')
+  const allowedBase = app.isPackaged ? pathToFileURL(rendererIndex).href : DEV_SERVER_URL
+
+  // The app never opens secondary windows, and the renderer only shows the app itself.
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+  win.webContents.on('will-navigate', (event) => {
+    if (!isAllowedNavigation(event.url, allowedBase)) event.preventDefault()
+  })
+
   if (app.isPackaged) {
-    await win.loadFile(path.join(__dirname, '../../../frontend/dist/index.html'))
+    await win.loadFile(rendererIndex)
   } else {
     await win.loadURL(DEV_SERVER_URL)
   }
