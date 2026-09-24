@@ -34,24 +34,23 @@ export interface NavigationEvent {
   preventDefault(): void
 }
 
-type GuardedNavigation = 'will-navigate' | 'will-redirect' | 'will-frame-navigate'
+export interface FrameNavigationEvent extends NavigationEvent {
+  isMainFrame: boolean
+}
 
 /** The slice of Electron's `WebContents` the guards need; kept structural so it is testable. */
 export interface GuardableWebContents {
   setWindowOpenHandler(handler: (details: { url: string }) => { action: 'deny' }): void
   on(event: 'will-navigate', listener: (event: NavigationEvent) => void): unknown
   on(event: 'will-redirect', listener: (event: NavigationEvent) => void): unknown
-  on(event: 'will-frame-navigate', listener: (event: NavigationEvent) => void): unknown
+  on(event: 'will-frame-navigate', listener: (event: FrameNavigationEvent) => void): unknown
 }
 
-const GUARDED_NAVIGATIONS: readonly GuardedNavigation[] = [
-  'will-navigate',
-  'will-redirect',
-  'will-frame-navigate',
-]
+/** Empty, same-origin documents that iframes (often inside libraries) load before real content. */
+const INERT_SUBFRAME_URLS: ReadonlySet<string> = new Set(['about:blank', 'about:srcdoc'])
 
 /**
- * Denies every `window.open` and cancels any navigation, redirect or frame
+ * Denies every `window.open` and cancels any navigation, redirect or subframe
  * navigation that leaves `allowedBase`. Each block is logged so a legitimate
  * navigation broken by the policy is visible instead of silently ignored.
  */
@@ -60,17 +59,28 @@ export function installNavigationGuards(
   allowedBase: string,
   log: (message: string) => void = console.warn,
 ): void {
+  const block = (kind: string, event: NavigationEvent): void => {
+    event.preventDefault()
+    log(`[navigation-guard] blocked ${kind} to ${event.url}`)
+  }
+
   contents.setWindowOpenHandler(({ url }) => {
     log(`[navigation-guard] denied window.open to ${url}`)
     return { action: 'deny' }
   })
 
-  for (const kind of GUARDED_NAVIGATIONS) {
-    // Each literal is a separate overload of `on`; the cast keeps one loop for all three.
-    contents.on(kind as 'will-navigate', (event) => {
-      if (isAllowedNavigation(event.url, allowedBase)) return
-      event.preventDefault()
-      log(`[navigation-guard] blocked ${kind} to ${event.url}`)
-    })
-  }
+  contents.on('will-navigate', (event) => {
+    if (!isAllowedNavigation(event.url, allowedBase)) block('will-navigate', event)
+  })
+
+  contents.on('will-redirect', (event) => {
+    if (!isAllowedNavigation(event.url, allowedBase)) block('will-redirect', event)
+  })
+
+  // Electron also emits this for the main frame, which `will-navigate` already guards;
+  // handling it here too would block and log the same navigation twice.
+  contents.on('will-frame-navigate', (event) => {
+    if (event.isMainFrame || INERT_SUBFRAME_URLS.has(event.url)) return
+    if (!isAllowedNavigation(event.url, allowedBase)) block('will-frame-navigate', event)
+  })
 }

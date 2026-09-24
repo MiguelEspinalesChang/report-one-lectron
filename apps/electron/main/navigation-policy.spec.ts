@@ -2,6 +2,7 @@ import { pathToFileURL } from 'node:url'
 import { describe, expect, it, vi } from 'vitest'
 import {
   type GuardableWebContents,
+  type FrameNavigationEvent,
   type NavigationEvent,
   installNavigationGuards,
   isAllowedNavigation,
@@ -73,43 +74,56 @@ describe('isAllowedNavigation', () => {
 })
 
 type NavigationListener = (event: NavigationEvent) => void
+type FrameNavigationListener = (event: FrameNavigationEvent) => void
 
 function createFakeWebContents() {
-  const listeners = new Map<string, NavigationListener>()
+  const listeners = new Map<string, NavigationListener | FrameNavigationListener>()
   let windowOpenHandler: ((details: { url: string }) => { action: 'deny' }) | undefined
   const contents: GuardableWebContents = {
     setWindowOpenHandler: (handler) => {
       windowOpenHandler = handler
     },
-    on: (eventName: string, listener: NavigationListener) => {
+    on: (eventName: string, listener: NavigationListener | FrameNavigationListener) => {
       listeners.set(eventName, listener)
     },
   }
-  const emit = (eventName: string, url: string) => {
+  /** `isMainFrame` only matters for `will-frame-navigate`; the other events ignore it. */
+  const emit = (eventName: string, url: string, isMainFrame = true) => {
     const preventDefault = vi.fn()
-    listeners.get(eventName)?.({ url, preventDefault })
+    listeners.get(eventName)?.({ url, isMainFrame, preventDefault })
     return preventDefault
   }
-  return { contents, listeners, emit, openWindow: (url: string) => windowOpenHandler?.({ url }) }
+  return { contents, emit, openWindow: (url: string) => windowOpenHandler?.({ url }) }
 }
 
 describe('installNavigationGuards', () => {
   const base = 'http://127.0.0.1:5173'
-  const guardedEvents = ['will-navigate', 'will-redirect', 'will-frame-navigate'] as const
+  const mainFrameEvents = ['will-navigate', 'will-redirect'] as const
 
-  it('denies every window.open request', () => {
-    const fake = createFakeWebContents()
-    installNavigationGuards(fake.contents, base, vi.fn())
-    expect(fake.openWindow('https://example.com/')).toEqual({ action: 'deny' })
-    expect(fake.openWindow('http://127.0.0.1:5173/')).toEqual({ action: 'deny' })
-  })
-
-  it.each(guardedEvents)('blocks and logs off-origin %s', (eventName) => {
+  function setup() {
     const fake = createFakeWebContents()
     const log = vi.fn()
     installNavigationGuards(fake.contents, base, log)
+    return { ...fake, log }
+  }
 
-    const preventDefault = fake.emit(eventName, 'https://evil.example/')
+  it('denies every window.open request', () => {
+    const { openWindow } = setup()
+    expect(openWindow('https://example.com/')).toEqual({ action: 'deny' })
+    expect(openWindow('http://127.0.0.1:5173/')).toEqual({ action: 'deny' })
+  })
+
+  it('logs window.open denials', () => {
+    const { openWindow, log } = setup()
+    openWindow('https://example.com/')
+    expect(log).toHaveBeenCalledOnce()
+    expect(log.mock.calls[0]?.[0]).toContain('https://example.com/')
+  })
+
+  it.each(mainFrameEvents)('blocks and logs off-origin %s', (eventName) => {
+    const { emit, log } = setup()
+
+    const preventDefault = emit(eventName, 'https://evil.example/')
 
     expect(preventDefault).toHaveBeenCalledOnce()
     expect(log).toHaveBeenCalledOnce()
@@ -117,23 +131,55 @@ describe('installNavigationGuards', () => {
     expect(log.mock.calls[0]?.[0]).toContain('https://evil.example/')
   })
 
-  it.each(guardedEvents)('lets same-origin %s through without logging', (eventName) => {
-    const fake = createFakeWebContents()
-    const log = vi.fn()
-    installNavigationGuards(fake.contents, base, log)
+  it.each(mainFrameEvents)('lets same-origin %s through without logging', (eventName) => {
+    const { emit, log } = setup()
 
-    const preventDefault = fake.emit(eventName, 'http://127.0.0.1:5173/#/catalog')
+    const preventDefault = emit(eventName, 'http://127.0.0.1:5173/#/catalog')
 
     expect(preventDefault).not.toHaveBeenCalled()
     expect(log).not.toHaveBeenCalled()
   })
 
-  it('logs window.open denials', () => {
-    const fake = createFakeWebContents()
-    const log = vi.fn()
-    installNavigationGuards(fake.contents, base, log)
-    fake.openWindow('https://example.com/')
-    expect(log).toHaveBeenCalledOnce()
-    expect(log.mock.calls[0]?.[0]).toContain('https://example.com/')
+  describe('will-frame-navigate', () => {
+    it('blocks and logs an off-origin subframe navigation', () => {
+      const { emit, log } = setup()
+
+      const preventDefault = emit('will-frame-navigate', 'https://evil.example/', false)
+
+      expect(preventDefault).toHaveBeenCalledOnce()
+      expect(log).toHaveBeenCalledOnce()
+      expect(log.mock.calls[0]?.[0]).toContain('will-frame-navigate')
+    })
+
+    it('lets a same-origin subframe navigation through', () => {
+      const { emit, log } = setup()
+      expect(emit('will-frame-navigate', 'http://127.0.0.1:5173/embed', false)).not.toHaveBeenCalled()
+      expect(log).not.toHaveBeenCalled()
+    })
+
+    it.each(['about:blank', 'about:srcdoc'])('lets a subframe load inert %s', (url) => {
+      const { emit, log } = setup()
+      expect(emit('will-frame-navigate', url, false)).not.toHaveBeenCalled()
+      expect(log).not.toHaveBeenCalled()
+    })
+
+    it('ignores main-frame events, which will-navigate already guards', () => {
+      const { emit, log } = setup()
+      expect(emit('will-frame-navigate', 'https://evil.example/', true)).not.toHaveBeenCalled()
+      expect(log).not.toHaveBeenCalled()
+    })
+
+    it('logs a blocked main-frame navigation once, not once per event', () => {
+      const { emit, log } = setup()
+      // Electron emits both events for one main-frame navigation.
+      emit('will-navigate', 'https://evil.example/')
+      emit('will-frame-navigate', 'https://evil.example/', true)
+      expect(log).toHaveBeenCalledOnce()
+    })
+  })
+
+  it('does not treat about:blank as allowed for the main frame', () => {
+    const { emit } = setup()
+    expect(emit('will-navigate', 'about:blank')).toHaveBeenCalledOnce()
   })
 })
