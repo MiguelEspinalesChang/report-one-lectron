@@ -13,16 +13,16 @@
   "dependencies": {
     "@platform/shared-types": "workspace:*",
     "argon2": "^0.44.0",
-    "better-sqlite3": "^11.10.0",
-    "drizzle-orm": "^0.44.3",
-    "zod": "^3.24.0"
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@platform/tsconfig": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^22.10.0",
-    "drizzle-kit": "^0.31.1",
-    "typescript": "^5.7.0",
-    "vitest": "^2.1.0"
+    "@types/node": "^22.20.4",
+    "drizzle-kit": "^0.31.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
   }
 }

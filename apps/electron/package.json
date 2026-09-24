@@ -13,14 +13,14 @@
     "@platform/core": "workspace:*",
     "@platform/shared-types": "workspace:*",
     "argon2": "^0.44.0",
-    "better-sqlite3": "^11.10.0"
+    "better-sqlite3": "^13.0.3"
   },
   "devDependencies": {
     "@platform/tsconfig": "workspace:*",
-    "@types/node": "^22.10.0",
-    "electron": "^34.0.0",
-    "esbuild": "^0.25.0",
-    "typescript": "^5.7.0",
-    "wait-on": "^8.0.0"
+    "@types/node": "^22.20.4",
+    "electron": "^44.4.5",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3",
+    "wait-on": "^8.0.5"
   }
 }

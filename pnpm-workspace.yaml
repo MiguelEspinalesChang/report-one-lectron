@@ -7,3 +7,9 @@ allowBuilds:
   vue-demi: true
   better-sqlite3: true
   argon2: true
+
+# Security: @esbuild-kit/core-utils (deprecated, pulled by drizzle-kit 0.31) pins esbuild ~0.18,
+# affected by GHSA-67mh-4wv8-2f99. drizzle-kit itself already uses esbuild ^0.25.
+# Remove once drizzle-kit 1.0 is stable. See docs/features/done/dependency-security-patch.md.
+overrides:
+  "@esbuild-kit/core-utils>esbuild": "^0.25.12"

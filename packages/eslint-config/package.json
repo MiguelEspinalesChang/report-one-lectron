@@ -5,8 +5,8 @@
   "type": "module",
   "main": "./index.mjs",
   "dependencies": {
-    "eslint-plugin-vue": "^9.32.0",
-    "typescript-eslint": "^8.18.0"
+    "eslint-plugin-vue": "^9.33.0",
+    "typescript-eslint": "^8.70.1"
   },
   "peerDependencies": {
     "eslint": "^9.0.0"

@@ -42,7 +42,7 @@ folder**, regenerate them instead of copying them.
 | `node_modules/` (root and every workspace) | `pnpm install` | Links point to the pnpm store, which can differ per disk/volume. |
 | `apps/python-service/.venv/` | `pnpm setup:python` | Scripts in `.venv/bin` embed the absolute project path. |
 | `apps/python-service/*.egg-info/` | `pnpm setup:python` (`pip install -e ".[dev]"`) | Editable-install metadata; rewritten on every install. |
-| better-sqlite3 native build | `pnpm rebuild:node` / `pnpm rebuild:electron` | Node ABI for tests, Electron ABI for `pnpm dev` and packaging. |
+| Native modules (`better-sqlite3`, `argon2`) | `pnpm install` | N-API prebuilds: the same binary loads under Node (tests) and Electron. No rebuild step. |
 | `data/`, `*.db` | the app at runtime | Local databases; never committed. |
 
 Rebuild from scratch (new machine or moved folder):
@@ -51,7 +51,7 @@ Rebuild from scratch (new machine or moved folder):
 rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/python-service/.venv
 CI=true pnpm install   # CI=true skips the interactive "remove modules dir" prompt
 pnpm setup:python
-pnpm test              # verifies the Node ABI build + the real Python sidecar
+pnpm test              # verifies native modules + the real Python sidecar
 ```
 
 ## Scripts
@@ -62,6 +62,7 @@ pnpm test              # verifies the Node ABI build + the real Python sidecar
 | `pnpm build` | Typecheck and build every project |
 | `pnpm lint` | ESLint (TS/Vue) + ruff (Python) |
 | `pnpm test` | vitest (TS) + pytest (Python) |
+| `pnpm audit:deps` | Vulnerability audit: `pnpm audit` (fails on high+) + `pip-audit` (fails on any). Run before each release and after dependency bumps |
 | `pnpm clean` | Remove build artifacts |
 | `pnpm installer` | Build the installer (not configured yet) |
 
