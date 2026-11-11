@@ -1,48 +1,48 @@
 # Feature: frontend-alpha-acceptance
 
-**Objective:** Close the frontend alpha plan: finish the remaining gap (§6.4 user deactivation), reconcile the plan document with the code, and run the §8 acceptance checklist.
-**Plan (source of truth for scope):** `docs/features/in-progress/frontend-alpha-requirements.md`
-**Branch:** `feature/frontend-alpha-acceptance` (from `develop` @ 38d153c)
-**Problem / why:** Phases 0-8 are implemented, but R2.4 has no action (no backend use case), the plan document has stale checkboxes/references, and the §8 checklist has never been run end to end.
-**Constraints:** hexagonal rules (`docs/HEXAGONAL.md`), one-line Electron handlers, zod at the IPC boundary, i18n EN+ES, commits only with explicit user confirmation (project rule).
-**TDD:** strict (session config). Runner: `pnpm test` (vitest core/electron + pytest); focused: `pnpm --filter @platform/core exec vitest run`.
-**Delivery strategy:** ask-on-risk. Forecast ~300-400 authored lines; actual so far ~221 (T1) + docs.
+**Objetivo:** Cerrar el plan del alfa del frontend: terminar el gap restante (§6.4 desactivación de usuarios), reconciliar el documento del plan con el código y ejecutar el checklist de aceptación de §8.
+**Plan (fuente de verdad del alcance):** `docs/features/in-progress/frontend-alpha-requirements.md`
+**Rama:** `feature/frontend-alpha-acceptance` (desde `develop` @ 38d153c)
+**Problema / por qué:** Las fases 0-8 están implementadas, pero R2.4 no tiene acción (no existe el caso de uso en el backend), el documento del plan tiene checkboxes y referencias desactualizados, y el checklist de §8 nunca se ejecutó de punta a punta.
+**Restricciones:** reglas hexagonales (`docs/HEXAGONAL.md`), handlers de Electron de una línea, zod en la frontera IPC, i18n EN+ES, commits solo con confirmación explícita del usuario (regla del proyecto).
+**TDD:** estricto (configuración de la sesión). Runner: `pnpm test` (vitest core/electron + pytest); puntual: `pnpm --filter @platform/core exec vitest run`.
+**Estrategia de entrega:** ask-on-risk. Pronóstico ~300-400 líneas de autoría; real hasta ahora ~221 (T1) + docs.
 
-## Decisions
+## Decisiones
 
-- Deactivation is a reversible toggle (`setActive(userId, isActive)`), not a one-way action — an admin can reactivate a user.
-- A user cannot deactivate their own account (prevents locking out the only admin session). Enforced in core via the injected `AuthSession`; the UI disables the toggle on the own row.
+- La desactivación es un toggle reversible (`setActive(userId, isActive)`), no una acción de un solo sentido — un admin puede reactivar a un usuario.
+- Un usuario no puede desactivar su propia cuenta (evita dejar bloqueada la única sesión de admin). Se aplica en core mediante el `AuthSession` inyectado; la UI deshabilita el toggle en la fila propia.
 
-## Tasks
+## Tareas
 
-- [x] T1 — §6.4 `users:setActive`: core use case (+ self-deactivation guard, tests) → shared-types contract → IPC handler + preload → `useUsersStore` action + toggle in `UsersView` + i18n EN/ES. Route: delegated (writer trigger: 2+ non-trivial files across 3 packages). Evidence: RED 5 failing (`setActive is not a function`) → GREEN; core 97 ✓, electron 23 ✓, pytest 50 ✓, lint ✓, build ✓ (parent re-ran core: 97 ✓). ~221 authored lines, 18 files.
-- [x] T2 — Reconcile plan doc: check Phase 0/1 boxes, fix stale `rebuild:node` in Phase 6 closure, document that `useLiveStore` was not created (live state is component-local in `DeviceLiveView`), mark §6.4 done. Route: inline (single doc file). Evidence: all applied; F2 note verified against `DeviceLiveView.vue`; §8 "build y lint pasan" checked.
-- [x] T4 — R2.5 / §6.5 `users:resetPassword`: an admin sets a temporary password for an `operator` or `viewer` user; the target gets `mustChangePassword = true` and must change it on next login. Core use case rejects targets with the `admin` role (`CannotResetAdminPasswordError`) and enforces the password policy (min 8); UI adds a per-row "Reset password" action (hidden on admin rows) with a modal (`AppPasswordInput` + confirmation) → shared-types contract + zod → one-line IPC handler + preload → `useUsersStore` action → i18n EN/ES. TDD: service tests (operator ok, viewer ok, admin rejected, weak password, unknown user) + integration (login with temp password → `mustChangePassword: true`). Route: delegated (writer trigger: 2+ non-trivial files across 3 packages). Evidence: RED 5 failing (`resetPassword is not a function`) → GREEN; core 103 ✓, electron 23 ✓, pytest 50 ✓, lint ✓, build ✓ (parent re-ran core: 103 ✓). Reused `UserRepository.updatePasswordHash(id, hash, true)` — no new port method. ~316 authored lines.
-- [x] T5 — Secure password generator in the Users modals (create user + reset password): a "Generate" button fills password + confirmation with a random password, length selectable 8–20 (default 16), using `crypto.getRandomValues` with unbiased (rejection) sampling, guaranteeing at least one lowercase, uppercase, digit and symbol, excluding ambiguous characters (`0O1lI`), then shuffled (Fisher–Yates). Pure UI convenience util in `apps/frontend` (no business rule; backend policy stays min 8 and remains the authority). Generated value is revealed so the admin can hand it over. Adds vitest to `apps/frontend` for the util. Route: delegated (writer trigger: util + spec + component + view + i18n). Evidence: RED (module missing) → GREEN 11/11; core 103 ✓, electron 23 ✓, frontend 11 ✓, pytest 50 ✓, lint ✓, build ✓ (parent re-ran frontend: 11 ✓, reviewed util). Accepted scope addition: create-user modal gained a password confirmation field (needed so Generate fills both fields); `AppPasswordInput` got optional `revealed` prop; optional Copy button. ~500 authored lines (above the 400 heuristic: util+spec+2 modals+i18n; not split artificially).
-- [ ] T5b — RDD correction (lineage `review-95812b0812fc444c`, findings `R1-setActive-no-authz`, `R1-resetPassword-no-authz`, CRITICAL): core `UserManagementService` requires an authenticated session holding `users.manage` for `setActive` and `resetPassword` (`NotAuthenticatedError` / `PermissionDeniedError`). User approved 2026-09-24; changes the §5 "UI-only enforcement" decision for these operations. Budget ≤200 lines (planned 150). Route: delegated. Evidence: RED 5 failing (authz tests resolving) → GREEN; core 108 ✓, electron 23 ✓, frontend 11 ✓, pytest 50 ✓, lint ✓, build ✓ (parent re-ran core: 108 ✓, reviewed guard). 176 authored lines, 8 files. Uncommitted — awaiting user confirmation.
-- [ ] T6 — Backend permission enforcement for the remaining user-management operations (`createUser`, `assignRole`) and review of §5 for the rest of the IPC surface. Pre-existing gap (not introduced by this branch) found by the RDD risk lens; out of the frozen correction scope.
-- [ ] T3 — §8 acceptance: automated part (`pnpm lint`, `pnpm test`, `pnpm build`) done in T1; manual UI walk-through with the 3 roles (incl. the new deactivate toggle) by the user. Route: inline (per-action checks).
+- [x] T1 — §6.4 `users:setActive`: caso de uso en core (+ guard de autodesactivación, tests) → contrato en shared-types → handler IPC + preload → acción en `useUsersStore` + toggle en `UsersView` + i18n EN/ES. Ruta: delegada (trigger de writer: 2+ archivos no triviales en 3 paquetes). Evidencia: RED 5 fallando (`setActive is not a function`) → GREEN; core 97 ✓, electron 23 ✓, pytest 50 ✓, lint ✓, build ✓ (el padre volvió a correr core: 97 ✓). ~221 líneas de autoría, 18 archivos.
+- [x] T2 — Reconciliar el documento del plan: marcar los checkboxes de las Fases 0/1, corregir el `rebuild:node` obsoleto en el cierre de la Fase 6, documentar que `useLiveStore` no se creó (el estado en vivo es local al componente en `DeviceLiveView`), marcar §6.4 como hecho. Ruta: inline (un solo archivo de docs). Evidencia: todo aplicado; nota de F2 verificada contra `DeviceLiveView.vue`; §8 "build y lint pasan" marcado.
+- [x] T4 — R2.5 / §6.5 `users:resetPassword`: un admin define una contraseña temporal para un usuario `operator` o `viewer`; el destinatario queda con `mustChangePassword = true` y debe cambiarla en el próximo login. El caso de uso en core rechaza destinatarios con rol `admin` (`CannotResetAdminPasswordError`) y aplica la política de contraseñas (mínimo 8); la UI agrega una acción "Reset password" por fila (oculta en filas de admin) con un modal (`AppPasswordInput` + confirmación) → contrato en shared-types + zod → handler IPC de una línea + preload → acción en `useUsersStore` → i18n EN/ES. TDD: tests del servicio (operator ok, viewer ok, admin rechazado, contraseña débil, usuario inexistente) + integración (login con contraseña temporal → `mustChangePassword: true`). Ruta: delegada (trigger de writer: 2+ archivos no triviales en 3 paquetes). Evidencia: RED 5 fallando (`resetPassword is not a function`) → GREEN; core 103 ✓, electron 23 ✓, pytest 50 ✓, lint ✓, build ✓ (el padre volvió a correr core: 103 ✓). Se reutilizó `UserRepository.updatePasswordHash(id, hash, true)` — sin método nuevo en el puerto. ~316 líneas de autoría.
+- [x] T5 — Generador de contraseñas seguras en los modales de Usuarios (crear usuario + resetear contraseña): un botón "Generate" completa contraseña + confirmación con una contraseña aleatoria, de longitud seleccionable 8–20 (por defecto 16), usando `crypto.getRandomValues` con muestreo sin sesgo (por rechazo), garantizando al menos una minúscula, una mayúscula, un dígito y un símbolo, excluyendo caracteres ambiguos (`0O1lI`), y luego mezclada (Fisher–Yates). Utilidad de conveniencia puramente de UI en `apps/frontend` (sin regla de negocio; la política del backend sigue siendo mínimo 8 y es la autoridad). El valor generado se muestra para que el admin pueda entregarlo. Agrega vitest a `apps/frontend` para la utilidad. Ruta: delegada (trigger de writer: util + spec + componente + vista + i18n). Evidencia: RED (módulo inexistente) → GREEN 11/11; core 103 ✓, electron 23 ✓, frontend 11 ✓, pytest 50 ✓, lint ✓, build ✓ (el padre volvió a correr frontend: 11 ✓, revisó la utilidad). Ampliación de alcance aceptada: el modal de crear usuario ganó un campo de confirmación de contraseña (necesario para que Generate complete ambos campos); `AppPasswordInput` recibió la prop opcional `revealed`; botón Copy opcional. ~500 líneas de autoría (por encima de la heurística de 400: util+spec+2 modales+i18n; no se dividió artificialmente).
+- [ ] T5b — Corrección de RDD (linaje `review-95812b0812fc444c`, hallazgos `R1-setActive-no-authz`, `R1-resetPassword-no-authz`, CRÍTICOS): `UserManagementService` en core exige una sesión autenticada con `users.manage` para `setActive` y `resetPassword` (`NotAuthenticatedError` / `PermissionDeniedError`). El usuario aprobó el 2026-09-24; cambia la decisión de §5 "enforcement solo en la UI" para estas operaciones. Presupuesto ≤200 líneas (planificadas 150). Ruta: delegada. Evidencia: RED 5 fallando (tests de authz resolviendo) → GREEN; core 108 ✓, electron 23 ✓, frontend 11 ✓, pytest 50 ✓, lint ✓, build ✓ (el padre volvió a correr core: 108 ✓, revisó el guard). 176 líneas de autoría, 8 archivos. Sin commitear — a la espera de confirmación del usuario.
+- [ ] T6 — Enforcement de permisos en el backend para las operaciones restantes de gestión de usuarios (`createUser`, `assignRole`) y revisión de §5 para el resto de la superficie IPC. Gap preexistente (no introducido por esta rama) encontrado por la lente de riesgo de RDD; fuera del alcance congelado de la corrección.
+- [ ] T3 — Aceptación de §8: la parte automatizada (`pnpm lint`, `pnpm test`, `pnpm build`) se hizo en T1; recorrida manual de la UI con los 3 roles (incluido el nuevo toggle de desactivación) a cargo del usuario. Ruta: inline (checks por acción).
 
-## Acceptance criteria
+## Criterios de aceptación
 
-- [x] Admin can deactivate/reactivate another user; a deactivated user gets `InactiveUserError` on login; self-deactivation is rejected. (Proven by unit + integration tests; UI toggle pending manual check in T3.)
-- [x] `pnpm lint`, `pnpm test`, `pnpm build` green.
-- [ ] §8 checklist fully checked (manual items confirmed by the user).
+- [x] Un admin puede desactivar/reactivar a otro usuario; un usuario desactivado recibe `InactiveUserError` al hacer login; la autodesactivación se rechaza. (Probado con tests unitarios + de integración; el toggle de la UI queda pendiente de verificación manual en T3.)
+- [x] `pnpm lint`, `pnpm test`, `pnpm build` en verde.
+- [ ] Checklist de §8 completamente marcado (ítems manuales confirmados por el usuario).
 
-## Progress / evidence
+## Progreso / evidencia
 
-- T4 added by user request 2026-09-24 (admin resets operator/viewer passwords).
-- `auth-service.spec.ts` needed a no-op `setActive` on its own fake repository (widened port).
-- Commit split (user chose option A): T1+T4 share most files, so they went in one commit; T5 bits were stripped from `UsersView.vue`/i18n for commit 1 and restored after. Final tree verified identical to the pre-split state. Each commit was built/tested/linted in isolation (stash `--keep-index`).
-- ES strings for the new errors were changed from voseo to neutral Spanish ("No es posible …") to match `es.json`.
-- Restart gotcha: new IPC handlers/preload need a full `pnpm dev` restart (Vite HMR only reloads the renderer).
+- T4 agregada a pedido del usuario el 2026-09-24 (el admin resetea contraseñas de operator/viewer).
+- `auth-service.spec.ts` necesitó un `setActive` no-op en su propio repositorio falso (puerto ampliado).
+- División de commits (el usuario eligió la opción A): T1+T4 comparten la mayoría de los archivos, así que fueron en un solo commit; las partes de T5 se quitaron de `UsersView.vue`/i18n para el commit 1 y se restauraron después. Se verificó que el árbol final es idéntico al estado previo a la división. Cada commit se compiló/testeó/linteó de forma aislada (stash `--keep-index`).
+- Los textos en ES de los errores nuevos se cambiaron de voseo a español neutro ("No es posible …") para coincidir con `es.json`.
+- Gotcha de reinicio: los handlers IPC/preload nuevos requieren reiniciar `pnpm dev` por completo (el HMR de Vite solo recarga el renderer).
 
 ## Commits
 
 - `c44917a` feat(users): ✨ activar/desactivar y resetear contraseña de usuarios — T1 + T4. build 7/7, core 103, electron 23, pytest 50, lint ✓.
 - `84ce0b7` feat(frontend): ✨ generador de contraseñas seguras en los modales de usuarios — T5. build 7/7, core 103, electron 23, frontend 11, pytest 50, lint ✓.
-- docs commit — T2 + this document.
+- commit de docs — T2 + este documento.
 
-## Next step
+## Próximo paso
 
-T3: user runs the manual §8 walk-through with the 3 roles and reports results.
+T3: el usuario ejecuta la recorrida manual de §8 con los 3 roles e informa los resultados.
