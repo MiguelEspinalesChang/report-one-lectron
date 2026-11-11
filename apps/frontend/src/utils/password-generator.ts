@@ -19,7 +19,7 @@ const ALL_CHARS = REQUIRED_CHAR_SETS.join('')
 
 /** Minimal shape of the Web Crypto API surface this util depends on. */
 export interface RandomSource {
-  getRandomValues: <T extends ArrayBufferView>(array: T) => T
+  getRandomValues: <T extends ArrayBufferView<ArrayBuffer>>(array: T) => T
 }
 
 /**

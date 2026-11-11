@@ -102,7 +102,7 @@ export const CreateDeviceSchema = z.object({
   modelId: z.number().int().positive(),
   name: z.string().min(1).max(128),
   transport: TransportSchema,
-  connection: z.record(z.unknown()),
+  connection: z.record(z.string(), z.unknown()),
   slaveId: z.number().int().min(0).max(247).default(1),
   pollingIntervalS: z.number().int().positive().default(900),
   enabled: z.boolean().default(true),

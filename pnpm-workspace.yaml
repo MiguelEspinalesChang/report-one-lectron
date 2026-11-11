@@ -13,3 +13,7 @@ allowBuilds:
 # Remove once drizzle-kit 1.0 is stable. See docs/features/done/dependency-security-patch.md.
 overrides:
   "@esbuild-kit/core-utils>esbuild": "^0.25.12"
+  # Security: minimatch <11.0.1 (GHSA-g3hv-75wg-m249, ReDoS) is pinned to ^10 by
+  # @eslint/config-array and @typescript-eslint/typescript-estree. Dev-only (lint).
+  # Remove once eslint / typescript-eslint depend on minimatch >=11.0.1.
+  "minimatch@>=7.0.0 <11.0.1": "^11.0.1"
