@@ -3,6 +3,8 @@ import {
   AssignRoleSchema,
   ChangePasswordSchema,
   CreateUserSchema,
+  SetActiveSchema,
+  ResetPasswordSchema,
   IpcChannels,
   LoginSchema,
   CreateBrandSchema,
@@ -152,6 +154,14 @@ export function registerHandlers(core: Core): void {
   ipcMain.handle(IpcChannels.UsersAssignRole, (_event, raw: unknown) => {
     const dto = AssignRoleSchema.parse(raw)
     return core.userManagement.assignRole(dto.userId, dto.roleId)
+  })
+  ipcMain.handle(IpcChannels.UsersSetActive, (_event, raw: unknown) => {
+    const dto = SetActiveSchema.parse(raw)
+    return core.userManagement.setActive(dto.userId, dto.isActive)
+  })
+  ipcMain.handle(IpcChannels.UsersResetPassword, (_event, raw: unknown) => {
+    const dto = ResetPasswordSchema.parse(raw)
+    return core.userManagement.resetPassword(dto.userId, dto.newPassword)
   })
   ipcMain.handle(IpcChannels.UsersListRoles, async () => {
     const all = await core.userManagement.listRoles()

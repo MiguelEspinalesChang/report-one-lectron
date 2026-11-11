@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Data core sidecar: Modbus acquisition, telemetry ingest, CSV imports and report generation"
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=2.9",
+    "pydantic>=2.14",
     # Remaining runtime dependencies land with the real acquisition work:
     # "pymodbus>=3.7",
     # "pyserial>=3.5",
@@ -16,8 +16,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3",
-    "ruff==0.16.8",  # pinned: new ruff releases add rules and break lint
+    "pytest>=9.2",
+    "ruff==0.17.4",  # pinned: new ruff releases add rules and break lint
     "pip-audit>=2.10",
 ]
 

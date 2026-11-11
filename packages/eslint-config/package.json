@@ -5,10 +5,14 @@
   "type": "module",
   "main": "./index.mjs",
   "dependencies": {
-    "eslint-plugin-vue": "^9.33.0",
-    "typescript-eslint": "^8.70.1"
+    "eslint-plugin-vue": "^10.12.1",
+    "typescript-eslint": "^8.72.2",
+    "vue-eslint-parser": "^10.4.2"
   },
   "peerDependencies": {
-    "eslint": "^9.0.0"
+    "eslint": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
   }
 }

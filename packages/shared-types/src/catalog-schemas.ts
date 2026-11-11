@@ -98,17 +98,26 @@ export const DeleteMeterModelSchema = z.object({
   id: z.number().int().positive(),
 })
 
-export const CreateDeviceSchema = z.object({
+// Device fields without defaults. Create adds the defaults; update must not:
+// zod 4 applies `.default()` to absent keys even under `.partial()`, which
+// would turn a partial update into an overwrite of the stored values.
+const DeviceFieldsSchema = z.object({
   modelId: z.number().int().positive(),
   name: z.string().min(1).max(128),
   transport: TransportSchema,
-  connection: z.record(z.unknown()),
-  slaveId: z.number().int().min(0).max(247).default(1),
-  pollingIntervalS: z.number().int().positive().default(900),
-  enabled: z.boolean().default(true),
+  connection: z.record(z.string(), z.unknown()),
+  slaveId: z.number().int().min(0).max(247),
+  pollingIntervalS: z.number().int().positive(),
+  enabled: z.boolean(),
 })
 
-export const UpdateDeviceSchema = CreateDeviceSchema.partial().extend({
+export const CreateDeviceSchema = DeviceFieldsSchema.extend({
+  slaveId: DeviceFieldsSchema.shape.slaveId.default(1),
+  pollingIntervalS: DeviceFieldsSchema.shape.pollingIntervalS.default(900),
+  enabled: DeviceFieldsSchema.shape.enabled.default(true),
+})
+
+export const UpdateDeviceSchema = DeviceFieldsSchema.partial().extend({
   id: z.number().int().positive(),
 })
 

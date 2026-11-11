@@ -101,17 +101,24 @@
     "createTitle": "Nuevo usuario",
     "created": "Usuario creado.",
     "roleUpdated": "Rol actualizado.",
+    "statusUpdated": "Estado actualizado.",
+    "cannotDeactivateSelf": "No es posible desactivar tu propia cuenta.",
     "active": "Activo",
     "inactive": "Inactivo",
     "mustChange": "Debe cambiar contraseña",
     "passwordOk": "Contraseña actualizada",
+    "resetPassword": "Restablecer contraseña",
+    "resetPasswordTitle": "Restablecer contraseña",
+    "resetPasswordSuccess": "Contraseña restablecida. El usuario deberá cambiarla en su próximo ingreso.",
+    "passwordCopied": "Contraseña copiada al portapapeles.",
     "columns": {
       "username": "Usuario",
       "displayName": "Nombre visible",
       "role": "Rol",
       "active": "Estado",
       "mustChangePassword": "Contraseña",
-      "createdAt": "Creado"
+      "createdAt": "Creado",
+      "actions": "Acciones"
     },
     "form": {
       "username": "Usuario",
@@ -120,6 +127,10 @@
       "displayNamePlaceholder": "ej. Operador Uno",
       "password": "Contraseña",
       "passwordPlaceholder": "Al menos 8 caracteres",
+      "confirmPassword": "Confirmar contraseña",
+      "generatedLength": "Longitud",
+      "generatePassword": "Generar",
+      "copyPassword": "Copiar",
       "role": "Rol",
       "mustChangePassword": "Forzar cambio de contraseña en el primer ingreso"
     },
@@ -150,6 +161,7 @@
     "weakPassword": "La contraseña no cumple los requisitos mínimos.",
     "roleNotFound": "El rol seleccionado no existe.",
     "userNotFound": "Usuario no encontrado.",
+    "cannotDeactivateSelf": "No es posible desactivar tu propia cuenta.",
     "brandNotFound": "Marca no encontrada.",
     "meterModelNotFound": "Modelo no encontrado.",
     "invalidRegisterMap": "El mapa de registros es inválido.",
@@ -157,7 +169,10 @@
     "meterModelInUse": "Este modelo tiene dispositivos asociados y no puede eliminarse.",
     "deviceNotFound": "Dispositivo no encontrado.",
     "transportMismatch": "La configuración de conexión no coincide con el transporte seleccionado.",
-    "invalidConnection": "Configuración de conexión inválida."
+    "invalidConnection": "Configuración de conexión inválida.",
+    "cannotResetAdminPassword": "No es posible restablecer la contraseña de una cuenta de administrador.",
+    "notAuthenticated": "Es necesario iniciar sesión para realizar esta acción.",
+    "permissionDenied": "No es posible realizar esta acción: permisos insuficientes."
   },
   "catalog": {
     "title": "Catálogo de inventario",

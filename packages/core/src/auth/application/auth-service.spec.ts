@@ -64,6 +64,10 @@ class FakeUserRepository implements UserRepository {
   async updateRole(_userId: number, _roleId: number): Promise<void> {
     // not needed for auth-service tests
   }
+
+  async setActive(_userId: number, _isActive: boolean): Promise<void> {
+    // not needed for auth-service tests
+  }
 }
 
 class FakeRoleRepository implements RoleRepository {

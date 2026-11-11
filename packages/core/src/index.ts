@@ -105,7 +105,7 @@ export async function createCore(options: CreateCoreOptions): Promise<Core> {
     system: new SystemService(bridge),
     devices: new DeviceService(bridge, catalogDeviceRepository, meterModelRepository),
     auth: new AuthService(userRepository, roleRepository, hasher, session),
-    userManagement: new UserManagementService(userRepository, roleRepository, hasher),
+    userManagement: new UserManagementService(userRepository, roleRepository, hasher, session),
     catalog: {
       brands: new BrandService(brandRepository),
       models: new MeterModelService(meterModelRepository),

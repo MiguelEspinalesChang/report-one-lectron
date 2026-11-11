@@ -1,8 +1,18 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { UserManagementService, WeakPasswordError, RoleNotFoundError, UserNotFoundError } from './user-management-service'
+import {
+  UserManagementService,
+  WeakPasswordError,
+  RoleNotFoundError,
+  UserNotFoundError,
+  CannotDeactivateSelfError,
+  CannotResetAdminPasswordError,
+  NotAuthenticatedError,
+  PermissionDeniedError,
+} from './user-management-service'
 import type { UserRepository, RoleRepository, CreateUserInput } from '../ports/user-repository'
 import type { PasswordHasher } from '../ports/password-hasher'
 import type { User, Role } from '../domain/user'
+import { AuthSession, type SessionUser } from '../domain/auth-session'
 
 // ---------------------------------------------------------------------------
 // Fake adapters
@@ -41,14 +51,25 @@ class FakeUserRepository implements UserRepository {
     return user
   }
 
-  async updatePasswordHash(_userId: number, _hash: string, _mustChange: boolean): Promise<void> {
-    // not needed
+  async updatePasswordHash(userId: number, passwordHash: string, mustChangePassword: boolean): Promise<void> {
+    const user = this.store.find((u) => u.id === userId)
+    if (user !== undefined) {
+      user.passwordHash = passwordHash
+      user.mustChangePassword = mustChangePassword
+    }
   }
 
   async updateRole(userId: number, roleId: number): Promise<void> {
     const user = this.store.find((u) => u.id === userId)
     if (user !== undefined) {
       user.roleId = roleId
+    }
+  }
+
+  async setActive(userId: number, isActive: boolean): Promise<void> {
+    const user = this.store.find((u) => u.id === userId)
+    if (user !== undefined) {
+      user.isActive = isActive
     }
   }
 
@@ -93,6 +114,26 @@ class FakeHasher implements PasswordHasher {
 
 const adminRole: Role = { id: 1, name: 'admin', description: null, isSystem: true }
 
+const adminSessionUser: SessionUser = {
+  id: 100,
+  username: 'admin',
+  displayName: 'Admin',
+  roleId: adminRole.id,
+  roleName: adminRole.name,
+  mustChangePassword: false,
+  permissionCodes: ['users.manage'],
+}
+
+const viewerSessionUser: SessionUser = {
+  id: 101,
+  username: 'viewer',
+  displayName: 'Viewer',
+  roleId: 3,
+  roleName: 'viewer',
+  mustChangePassword: false,
+  permissionCodes: ['devices.view'],
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -101,13 +142,15 @@ describe('UserManagementService', () => {
   let usersRepo: FakeUserRepository
   let rolesRepo: FakeRoleRepository
   let hasher: FakeHasher
+  let session: AuthSession
   let service: UserManagementService
 
   beforeEach(() => {
     usersRepo = new FakeUserRepository()
     rolesRepo = new FakeRoleRepository()
     hasher = new FakeHasher()
-    service = new UserManagementService(usersRepo, rolesRepo, hasher)
+    session = new AuthSession()
+    service = new UserManagementService(usersRepo, rolesRepo, hasher, session)
   })
 
   describe('createUser', () => {
@@ -206,6 +249,218 @@ describe('UserManagementService', () => {
       rolesRepo.seed(adminRole)
 
       await expect(service.assignRole(999, 1)).rejects.toThrow(UserNotFoundError)
+    })
+  })
+
+  describe('setActive', () => {
+    beforeEach(() => {
+      session.set(adminSessionUser)
+    })
+
+    it('throws NotAuthenticatedError when there is no active session', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'noauth',
+        password: 'password123',
+        displayName: 'No Auth',
+        roleId: 1,
+      })
+      session.clear()
+
+      await expect(service.setActive(target.id, false)).rejects.toThrow(NotAuthenticatedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
+    it('throws PermissionDeniedError when the session lacks users.manage', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'noperm',
+        password: 'password123',
+        displayName: 'No Perm',
+        roleId: 1,
+      })
+      session.set(viewerSessionUser)
+
+      await expect(service.setActive(target.id, false)).rejects.toThrow(PermissionDeniedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
+    it('deactivates another user and returns the updated user', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'gina',
+        password: 'password123',
+        displayName: 'Gina',
+        roleId: 1,
+      })
+
+      const returned = await service.setActive(target.id, false)
+
+      expect(returned.isActive).toBe(false)
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(false)
+    })
+
+    it('reactivates a previously deactivated user', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'harold',
+        password: 'password123',
+        displayName: 'Harold',
+        roleId: 1,
+      })
+      await service.setActive(target.id, false)
+
+      const returned = await service.setActive(target.id, true)
+
+      expect(returned.isActive).toBe(true)
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
+    it('throws CannotDeactivateSelfError when deactivating the current session user', async () => {
+      rolesRepo.seed(adminRole)
+      const self = await service.createUser({
+        username: 'ivan',
+        password: 'password123',
+        displayName: 'Ivan',
+        roleId: 1,
+      })
+      session.set({
+        id: self.id,
+        username: self.username,
+        displayName: self.displayName,
+        roleId: self.roleId,
+        roleName: adminRole.name,
+        mustChangePassword: false,
+        permissionCodes: ['users.manage'],
+      })
+
+      await expect(service.setActive(self.id, false)).rejects.toThrow(CannotDeactivateSelfError)
+
+      const stored = await usersRepo.findById(self.id)
+      expect(stored?.isActive).toBe(true)
+    })
+
+    it('throws UserNotFoundError when the user does not exist', async () => {
+      await expect(service.setActive(999, false)).rejects.toThrow(UserNotFoundError)
+    })
+  })
+
+  describe('resetPassword', () => {
+    const operatorRole: Role = { id: 2, name: 'operator', description: null, isSystem: true }
+    const viewerRole: Role = { id: 3, name: 'viewer', description: null, isSystem: true }
+
+    beforeEach(() => {
+      session.set(adminSessionUser)
+    })
+
+    it('throws NotAuthenticatedError when there is no active session', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'noauth2',
+        password: 'password123',
+        displayName: 'No Auth',
+        roleId: operatorRole.id,
+      })
+      session.clear()
+
+      await expect(service.resetPassword(target.id, 'newpassword1')).rejects.toThrow(NotAuthenticatedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:password123')
+    })
+
+    it('throws PermissionDeniedError when the session lacks users.manage', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'noperm2',
+        password: 'password123',
+        displayName: 'No Perm',
+        roleId: operatorRole.id,
+      })
+      session.set(viewerSessionUser)
+
+      await expect(service.resetPassword(target.id, 'newpassword1')).rejects.toThrow(PermissionDeniedError)
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:password123')
+    })
+
+    it('resets an operator password and forces a change on next login', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'oscar',
+        password: 'password123',
+        displayName: 'Oscar',
+        roleId: operatorRole.id,
+      })
+
+      const returned = await service.resetPassword(target.id, 'newpassword1')
+
+      expect(returned.mustChangePassword).toBe(true)
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:newpassword1')
+      expect(stored?.mustChangePassword).toBe(true)
+    })
+
+    it('resets a viewer password and forces a change on next login', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(viewerRole)
+      const target = await service.createUser({
+        username: 'vicky',
+        password: 'password123',
+        displayName: 'Vicky',
+        roleId: viewerRole.id,
+      })
+
+      const returned = await service.resetPassword(target.id, 'newpassword1')
+
+      expect(returned.mustChangePassword).toBe(true)
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:newpassword1')
+    })
+
+    it('throws CannotResetAdminPasswordError when the target is an admin', async () => {
+      rolesRepo.seed(adminRole)
+      const target = await service.createUser({
+        username: 'walter',
+        password: 'password123',
+        displayName: 'Walter',
+        roleId: adminRole.id,
+      })
+
+      await expect(service.resetPassword(target.id, 'newpassword1')).rejects.toThrow(
+        CannotResetAdminPasswordError,
+      )
+
+      const stored = await usersRepo.findById(target.id)
+      expect(stored?.passwordHash).toBe('hashed:password123')
+      expect(stored?.mustChangePassword).toBe(false)
+    })
+
+    it('throws WeakPasswordError when the new password is too short', async () => {
+      rolesRepo.seed(adminRole)
+      rolesRepo.seed(operatorRole)
+      const target = await service.createUser({
+        username: 'xena',
+        password: 'password123',
+        displayName: 'Xena',
+        roleId: operatorRole.id,
+      })
+
+      await expect(service.resetPassword(target.id, 'short')).rejects.toThrow(WeakPasswordError)
+    })
+
+    it('throws UserNotFoundError when the user does not exist', async () => {
+      await expect(service.resetPassword(999, 'newpassword1')).rejects.toThrow(UserNotFoundError)
     })
   })
 
